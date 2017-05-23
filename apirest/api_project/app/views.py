@@ -2,7 +2,6 @@ from django.views.generic import DetailView, ListView, UpdateView, CreateView
 from .models import Group, Room, Resident, TaskType, Task, TaskDate, Comment
 from .forms import GroupForm, RoomForm, ResidentForm, TaskTypeForm, TaskForm, TaskDateForm, CommentForm
 
-
 class GroupListView(ListView):
     model = Group
 

@@ -1,5 +1,6 @@
 from django.conf.urls import url, include
 from rest_framework import routers
+from rest_framework.authtoken import views as rviews
 from . import api
 from . import views
 
@@ -17,6 +18,7 @@ router.register(r'user', api.UserViewSet)
 urlpatterns = (
     # urls for Django Rest Framework API
     url(r'^api/', include(router.urls)),
+    url(r'^api-token-auth/', rviews.obtain_auth_token)
 )
 
 urlpatterns += (
