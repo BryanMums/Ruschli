@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<p><a class="btn btn-default" href="{% url 'app_task_list' %}">Task Listing</a></p>
+<table class="table">
+<tr>
+<td>ID</td><td>Link</td>
+    <td>title</td>
+    <td>description</td>
+    <td>created_at</td>
+    <td>updated_at</td>
+    <td>need_someone</td>
+</tr>
+{% for object in object_list %}
+<tr>
+    <td>{{object.pk}}</td>
+    <td><a href="{{object.get_absolute_url}}">{{object}}</a></td>
+    <td>{{ object.title }}</td>
+    <td>{{ object.description }}</td>
+    <td>{{ object.created_at }}</td>
+    <td>{{ object.updated_at }}</td>
+    <td>{{ object.need_someone }}</td>
+</tr>
+{% endfor %}
+</table><a class="btn btn-primary" href="{% url 'app_task_create' %}">Create new Task</a>
+{% endblock %}

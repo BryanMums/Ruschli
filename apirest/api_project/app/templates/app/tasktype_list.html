@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<p><a class="btn btn-default" href="{% url 'app_tasktype_list' %}">TaskType Listing</a></p>
+<table class="table">
+<tr>
+<td>ID</td><td>Link</td>
+    <td>name</td>
+    <td>default_title</td>
+    <td>change_title</td>
+    <td>change_description</td>
+    <td>change_resident</td>
+    <td>change_room</td>
+    <td>change_receiver_user</td>
+    <td>change_receiver_group</td>
+    <td>change_copyreceiver_user</td>
+    <td>change_copyreceiver_group</td>
+    <td>default_need_someone</td>
+    <td>change_need_someone</td>
+</tr>
+{% for object in object_list %}
+<tr>
+    <td>{{object.pk}}</td>
+    <td><a href="{{object.get_absolute_url}}">{{object}}</a></td>
+    <td>{{ object.name }}</td>
+    <td>{{ object.default_title }}</td>
+    <td>{{ object.change_title }}</td>
+    <td>{{ object.change_description }}</td>
+    <td>{{ object.change_resident }}</td>
+    <td>{{ object.change_room }}</td>
+    <td>{{ object.change_receiver_user }}</td>
+    <td>{{ object.change_receiver_group }}</td>
+    <td>{{ object.change_copyreceiver_user }}</td>
+    <td>{{ object.change_copyreceiver_group }}</td>
+    <td>{{ object.default_need_someone }}</td>
+    <td>{{ object.change_need_someone }}</td>
+</tr>
+{% endfor %}
+</table><a class="btn btn-primary" href="{% url 'app_tasktype_create' %}">Create new TaskType</a>
+{% endblock %}

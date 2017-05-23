@@ -1,117 +1,211 @@
-from django.db import models
+from django.core.urlresolvers import reverse
+from django_extensions.db.fields import AutoSlugField
+from django.db.models import *
+from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import get_user_model
+from django.contrib.auth import models as auth_models
+from django.db import models as models
+from django_extensions.db import fields as extension_fields
 from django.contrib.auth.models import User
 
-# Entity User
-# Pour le moment, le modèle de base. A voir si nécessaire d'en faire un ou juste créer un profil.
-
-# Entity Group
 class Group(models.Model):
-    title = models.CharField(max_length=30)
-    description = models.TextField(null=True)
-    users = models.ManyToManyField(User)
 
-    def __str__(self):
-        return self.title
+    # Fields
+    title = CharField(max_length=30)
+    description = TextField(null=True)
+
+    # Relationship Fields
+    users = ManyToManyField(User)
+
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+
+    def get_absolute_url(self):
+        return reverse('app_group_detail', args=(self.pk,))
 
 
-# Entity Room
+    def get_update_url(self):
+        return reverse('app_group_update', args=(self.pk,))
+
+
 class Room(models.Model):
-    title = models.CharField(max_length=30)
-    number = models.IntegerField(null=True)
-    floor = models.IntegerField(null=True)
 
-    def __str__(self):
-        return self.title
+    # Fields
+    title = CharField(max_length=30)
+    number = IntegerField(null=True)
+    floor = IntegerField(null=True)
 
 
-# Entity Resident
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+
+    def get_absolute_url(self):
+        return reverse('app_room_detail', args=(self.pk,))
+
+
+    def get_update_url(self):
+        return reverse('app_room_update', args=(self.pk,))
+
+
 class Resident(models.Model):
-    firstname = models.CharField(max_length=40)
-    lastname = models.CharField(max_length=40)
-    image = models.ImageField(upload_to='residents', null=True) # A voir si on garde.
-    birthdate = models.DateField()
-    room = models.ForeignKey(Room, null=True)
-    comment = models.TextField(null=True)
-    allergies = models.TextField(null=True)
-    medications = models.TextField(null=True)
-    contact_name = models.CharField(max_length=80)
-    contact_phone = models.CharField(max_length=15)
-    active = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.firstname + " " + self.lastname
+    # Fields
+    firstname = CharField(max_length=40)
+    lastname = CharField(max_length=40)
+    birthdate = DateField()
+    comment = TextField(null=True, blank=True)
+    allergies = TextField(null=True, blank=True)
+    medications = TextField(null=True, blank=True)
+    contact_name = CharField(max_length=80, blank=True)
+    contact_phone = CharField(max_length=15, blank=True)
+    active = BooleanField(default=True)
+
+    # Relationship Fields
+    room = ForeignKey(Room, null=True, blank=True)
+
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+
+    def get_absolute_url(self):
+        return reverse('app_resident_detail', args=(self.pk,))
 
 
-# Entity TaskType
+    def get_update_url(self):
+        return reverse('app_resident_update', args=(self.pk,))
+
+
 class TaskType(models.Model):
-    name = models.CharField(max_length=50)
-    group = models.ManyToManyField(Group)
-    default_title = models.CharField(max_length=60, null=True)
-    change_title = models.BooleanField(default=True)
-    default_description =  models.TextField(null=True)
-    change_description = models.BooleanField(default=True)
-    default_resident = models.ManyToManyField(Resident, blank=True)
-    change_resident = models.BooleanField(default=True)
-    default_room = models.ManyToManyField(Room, blank=True)
-    change_room = models.BooleanField(default=True)
-    default_receiver_user = models.ManyToManyField(User, blank=True, related_name="tasktype_receiver_users")
-    change_receiver_user = models.BooleanField(default=True)
-    default_receiver_group = models.ManyToManyField(Group, blank=True, related_name="tasktype_receiver_groups")
-    change_receiver_group = models.BooleanField(default=True)
-    default_copyreceiver_user = models.ManyToManyField(User, blank=True, related_name="tasktype_copyreceiver_users")
-    change_copyreceiver_user = models.BooleanField(default=True)
-    default_copyreceiver_group = models.ManyToManyField(Group, blank=True, related_name="tasktype_copyreceiver_groups")
-    change_copyreceiver_group = models.BooleanField(default=True)
-    default_need_someone = models.BooleanField(default=False)
-    change_need_someone = models.BooleanField(default=True)
 
-    def __str__(self):
-        return self.name
+    # Fields
+    name = CharField(max_length=50)
+    default_title = CharField(max_length=60, null=True)
+    change_title = BooleanField(default=True)
+    change_description = BooleanField(default=True)
+    change_resident = BooleanField(default=True)
+    change_room = BooleanField(default=True)
+    change_receiver_user = BooleanField(default=True)
+    change_receiver_group = BooleanField(default=True)
+    change_copyreceiver_user = BooleanField(default=True)
+    change_copyreceiver_group = BooleanField(default=True)
+    default_need_someone = BooleanField(default=False)
+    change_need_someone = BooleanField(default=True)
+
+    # Relationship Fields
+    group = ManyToManyField(Group)
+    default_resident = ManyToManyField(Resident, blank=True)
+    default_room = ManyToManyField(Room, blank=True)
+    default_receiver_user = ManyToManyField(User, blank=True, related_name="tasktype_receiver_users")
+    default_receiver_group = ManyToManyField(Group, blank=True, related_name="tasktype_receiver_groups")
+    default_copyreceiver_user = ManyToManyField(User, blank=True, related_name="tasktype_copyreceiver_users")
+    default_copyreceiver_group = ManyToManyField(Group, blank=True, related_name="tasktype_copyreceiver_groups")
+
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+
+    def get_absolute_url(self):
+        return reverse('app_tasktype_detail', args=(self.pk,))
 
 
-# Entity Task
+    def get_update_url(self):
+        return reverse('app_tasktype_update', args=(self.pk,))
+
+
 class Task(models.Model):
-    id_type_task = models.ForeignKey(TaskType)
-    title = models.CharField(max_length=60)
-    description = models.TextField(null=True)
-    resident = models.ManyToManyField(Resident, blank=True)
-    room = models.ManyToManyField(Room, blank=True)
-    receiver_user = models.ManyToManyField(User, blank=True, related_name="task_receiver_users")
-    receiver_group = models.ManyToManyField(Group, blank=True, related_name="task_receiver_groups")
-    copyreceiver_user = models.ManyToManyField(User, blank=True, related_name="task_copyreceiver_users")
-    copyreceiver_group = models.ManyToManyField(Group, blank=True, related_name="task_copyreceiver_groups")
-    author = models.ForeignKey(User, related_name="task_authors")
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    need_someone = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.title
+    # Fields
+    title = CharField(max_length=60)
+    description = TextField(null=True)
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now=True)
+    need_someone = BooleanField(default=False)
+
+    # Relationship Fields
+    id_type_task = ForeignKey(TaskType, null=True, blank=True)
+    resident = ManyToManyField(Resident, blank=True)
+    room = ManyToManyField(Room, blank=True)
+    receiver_user = ManyToManyField(User, blank=True, related_name="task_receiver_users")
+    receiver_group = ManyToManyField(Group, blank=True, related_name="task_receiver_groups")
+    copyreceiver_user = ManyToManyField(User, blank=True, related_name="task_copyreceiver_users")
+    copyreceiver_group = ManyToManyField(Group, blank=True, related_name="task_copyreceiver_groups")
+    author = ForeignKey(User, related_name="task_authors")
+
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+
+    def get_absolute_url(self):
+        return reverse('app_task_detail', args=(self.pk,))
 
 
-# Entity TaskDate
+    def get_update_url(self):
+        return reverse('app_task_update', args=(self.pk,))
+
+
 class TaskDate(models.Model):
-    parent = models.ForeignKey('self', null=True)
-    eventType = models.IntegerField(default=0)
-    start_date = models.DateField()
-    end_date = models.DateField(null=True)
-    time = models.TimeField(null=True)
-    task = models.ForeignKey(Task)
-    active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
-    def __str__(self):
-        return "De : " + self.start_date + " à " + self.end_date + " : " + self.task.title
+    # Fields
+    eventType = IntegerField(default=0)
+    start_date = DateField()
+    end_date = DateField(null=True, blank=True)
+    time = TimeField(null=True, blank=True)
+    active = BooleanField(default=True)
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now=True)
+
+    # Relationship Fields
+    parent = ForeignKey('self', null=True, blank=True)
+    task = ForeignKey(Task)
+
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+
+    def get_absolute_url(self):
+        return reverse('app_taskdate_detail', args=(self.pk,))
 
 
-# Entity Comment
+    def get_update_url(self):
+        return reverse('app_taskdate_update', args=(self.pk,))
+
+
 class Comment(models.Model):
-    author = models.ForeignKey(User)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    text = models.TextField()
-    taskdate = models.ForeignKey(TaskDate)
 
-    def __str__(self):
-        return self.text
+    # Fields
+    created_at = DateTimeField(auto_now_add=True)
+    updated_at = DateTimeField(auto_now=True)
+    text = TextField()
+
+    # Relationship Fields
+    author = ForeignKey(User, related_name='comments')
+    taskdate = ForeignKey(TaskDate)
+
+    class Meta:
+        ordering = ('-pk',)
+
+    def __unicode__(self):
+        return u'%s' % self.pk
+
+    def get_absolute_url(self):
+        return reverse('app_comment_detail', args=(self.pk,))
+
+
+    def get_update_url(self):
+        return reverse('app_comment_update', args=(self.pk,))

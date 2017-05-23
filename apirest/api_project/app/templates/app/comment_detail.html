@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<p><a class="btn btn-default" href="{% url 'app_comment_list' %}">Comment Listing</a></p>
+<table class="table">
+<tr><td>created_at</td><td>{{ object.created_at }}</td></tr>
+<tr><td>updated_at</td><td>{{ object.updated_at }}</td></tr>
+<tr><td>text</td><td>{{ object.text }}</td></tr>
+</table>
+<a class="btn btn-primary" href="{{object.get_update_url}}">Edit Comment</a>
+
+{% endblock %}
