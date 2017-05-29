@@ -13,7 +13,6 @@ class GroupAdminForm(forms.ModelForm):
 class GroupAdmin(admin.ModelAdmin):
     form = GroupAdminForm
     list_display = ['title', 'description']
-    readonly_fields = ['title', 'description']
 
 admin.site.register(Group, GroupAdmin)
 

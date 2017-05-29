@@ -3,18 +3,10 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-class UserSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = User
-        fields = (
-            'id',
-            'username',
-            'comments'
-        )
 
 
-class GroupSerializer(serializers.ModelSerializer):
+
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Group
@@ -24,8 +16,20 @@ class GroupSerializer(serializers.ModelSerializer):
             'description',
         )
 
+class UserSerializer(serializers.HyperlinkedModelSerializer):
+    sectors = GroupSerializer(many=True, read_only=True)
 
-class RoomSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+
+        fields = (
+            'id',
+            'username',
+            'comments',
+            'sectors'
+        )
+
+class RoomSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Room
@@ -37,7 +41,7 @@ class RoomSerializer(serializers.ModelSerializer):
         )
 
 
-class ResidentSerializer(serializers.ModelSerializer):
+class ResidentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Resident
@@ -55,7 +59,7 @@ class ResidentSerializer(serializers.ModelSerializer):
         )
 
 
-class TaskTypeSerializer(serializers.ModelSerializer):
+class TaskTypeSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.TaskType
@@ -76,7 +80,7 @@ class TaskTypeSerializer(serializers.ModelSerializer):
         )
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class TaskSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Task
@@ -90,12 +94,15 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
 
-class TaskDateSerializer(serializers.ModelSerializer):
+class TaskDateSerializer(serializers.HyperlinkedModelSerializer):
+    task = TaskSerializer(many=False)
 
     class Meta:
         model = models.TaskDate
         fields = (
             'pk',
+            'parent',
+            'task',
             'eventType',
             'start_date',
             'end_date',
@@ -106,7 +113,7 @@ class TaskDateSerializer(serializers.ModelSerializer):
         )
 
 
-class CommentSerializer(serializers.ModelSerializer):
+class CommentSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
         model = models.Comment
@@ -115,4 +122,5 @@ class CommentSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at',
             'text',
+            'author'
         )

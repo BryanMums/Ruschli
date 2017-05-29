@@ -26,7 +26,7 @@ class Group(models.Model):
     description = TextField(null=True)
 
     # Relationship Fields
-    users = ManyToManyField(User)
+    users = ManyToManyField(User, related_name='sectors')
 
     class Meta:
         ordering = ('-pk',)
