@@ -33,9 +33,19 @@ class TaskForm(forms.ModelForm):
 
 
 class TaskDateForm(forms.ModelForm):
+    DAYS_OF_WEEK = (
+        (0, 'Lundi'),
+        (1, 'Mardi'),
+        (2, 'Mercredi'),
+        (3, 'Jeudi'),
+        (4, 'Vendredi'),
+        (5, 'Samedi'),
+        (6, 'Dimanche'),
+    )
+    #daysOfWeek = forms.MultipleChoiceField(choices=DAYS_OF_WEEK, widget=forms.SelectMultiple)
     class Meta:
         model = TaskDate
-        fields = ['eventType', 'start_date', 'end_date', 'time', 'active', 'parent', 'task']
+        fields = ['eventType', 'start_date', 'end_date', 'time', 'active', 'parent', 'task', 'daysOfWeek']
 
 
 class CommentForm(forms.ModelForm):

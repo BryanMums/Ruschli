@@ -1,0 +1,51 @@
+[
+  {
+    "model": "app.day",
+    "pk": 0,
+    "fields": {
+      "name": "Lundi"
+    }
+  },
+  {
+    "model": "app.day",
+    "pk": 1,
+    "fields": {
+      "name": "Mardi"
+    }
+  },
+  {
+    "model": "app.day",
+    "pk": 2,
+    "fields": {
+      "name": "Mercredi"
+    }
+  },
+  {
+    "model": "app.day",
+    "pk": 3,
+    "fields": {
+      "name": "Jeudi"
+    }
+  },
+  {
+    "model": "app.day",
+    "pk": 4,
+    "fields": {
+      "name": "Vendredi"
+    }
+  },
+  {
+    "model": "app.day",
+    "pk": 5,
+    "fields": {
+      "name": "Samedi"
+    }
+  },
+  {
+    "model": "app.day",
+    "pk": 6,
+    "fields": {
+      "name": "Dimanche"
+    }
+  }
+]

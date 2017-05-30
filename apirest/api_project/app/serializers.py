@@ -93,9 +93,21 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'need_someone',
         )
 
+class CommentSerializer(serializers.HyperlinkedModelSerializer):
+
+    class Meta:
+        model = models.Comment
+        fields = (
+            'pk',
+            'created_at',
+            'updated_at',
+            'text',
+            'author'
+        )
 
 class TaskDateSerializer(serializers.HyperlinkedModelSerializer):
     task = TaskSerializer(many=False)
+    comments = CommentSerializer(many=True)
 
     class Meta:
         model = models.TaskDate
@@ -110,17 +122,5 @@ class TaskDateSerializer(serializers.HyperlinkedModelSerializer):
             'active',
             'created_at',
             'updated_at',
-        )
-
-
-class CommentSerializer(serializers.HyperlinkedModelSerializer):
-
-    class Meta:
-        model = models.Comment
-        fields = (
-            'pk',
-            'created_at',
-            'updated_at',
-            'text',
-            'author'
+            'comments'
         )

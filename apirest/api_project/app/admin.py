@@ -3,6 +3,7 @@ from django import forms
 from .models import Group, Room, Resident, TaskType, Task, TaskDate, Comment
 from django.contrib.auth.models import User
 
+
 class GroupAdminForm(forms.ModelForm):
 
     class Meta:
@@ -72,13 +73,22 @@ class TaskAdminForm(forms.ModelForm):
 class TaskAdmin(admin.ModelAdmin):
     form = TaskAdminForm
     list_display = ['title', 'description', 'created_at', 'updated_at', 'need_someone']
-    readonly_fields = ['title', 'description', 'created_at', 'updated_at', 'need_someone']
+    readonly_fields = ['created_at', 'updated_at']
 
 admin.site.register(Task, TaskAdmin)
 
 
 class TaskDateAdminForm(forms.ModelForm):
-
+    DAYS_OF_WEEK = (
+        (0, 'Lundi'),
+        (1, 'Mardi'),
+        (2, 'Mercredi'),
+        (3, 'Jeudi'),
+        (4, 'Vendredi'),
+        (5, 'Samedi'),
+        (6, 'Dimanche'),
+    )
+    #daysOfWeek = forms.MultipleChoiceField(choices=DAYS_OF_WEEK, widget=forms.SelectMultiple, required=False)
     class Meta:
         model = TaskDate
         fields = '__all__'
@@ -87,7 +97,7 @@ class TaskDateAdminForm(forms.ModelForm):
 class TaskDateAdmin(admin.ModelAdmin):
     form = TaskDateAdminForm
     list_display = ['eventType', 'start_date', 'end_date', 'time', 'active', 'created_at', 'updated_at']
-    readonly_fields = ['eventType', 'start_date', 'end_date', 'time', 'active', 'created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at']
 
 admin.site.register(TaskDate, TaskDateAdmin)
 

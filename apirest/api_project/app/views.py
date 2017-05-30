@@ -1,6 +1,12 @@
 from django.views.generic import DetailView, ListView, UpdateView, CreateView
 from .models import Group, Room, Resident, TaskType, Task, TaskDate, Comment
 from .forms import GroupForm, RoomForm, ResidentForm, TaskTypeForm, TaskForm, TaskDateForm, CommentForm
+from django.http import HttpResponse
+
+def test(request):
+    data = request.user.get_tasks_for_a_day()
+    return HttpResponse(data)
+
 
 class GroupListView(ListView):
     model = Group

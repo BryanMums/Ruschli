@@ -76,3 +76,7 @@ urlpatterns += (
     url(r'^app/comment/detail/(?P<pk>\S+)/$', views.CommentDetailView.as_view(), name='app_comment_detail'),
     url(r'^app/comment/update/(?P<pk>\S+)/$', views.CommentUpdateView.as_view(), name='app_comment_update'),
 )
+
+urlpatterns += (
+    url(r'^app/test/', views.test),
+)
