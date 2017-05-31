@@ -85,3 +85,7 @@ urlpatterns += (
 urlpatterns += (
     url(r'^app/residents/active', views.get_residents_active),
 )
+
+urlpatterns += (
+    url(r'^app/test/create', views.test_create),
+)

@@ -17,6 +17,8 @@ from django.db.models import Q
 from django.contrib.postgres.fields import ArrayField
 from django.core.validators import MaxValueValidator, MinValueValidator
 import datetime as datetime2
+from django.db import transaction
+from django.db import IntegrityError
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):
@@ -157,7 +159,7 @@ class Task(models.Model):
 
     # Relationship Fields
     id_type_task = ForeignKey(TaskType, null=True, blank=True)
-    resident = ManyToManyField(Resident, blank=True)
+    resident = ManyToManyField(Resident, blank=True, null=True)
     room = ManyToManyField(Room, blank=True)
     receiver_user = ManyToManyField(User, blank=True, related_name="task_receiver_users")
     receiver_group = ManyToManyField(Group, blank=True, related_name="task_receiver_groups")
@@ -271,6 +273,113 @@ class Comment(models.Model):
 
     def get_update_url(self):
         return reverse('app_comment_update', args=(self.pk,))
+
+
+class TaskManager(models.Manager):
+
+    def create_task(post, user):
+        result = None
+        # La première étape va être de créer la Task
+        try :
+            with transaction.atomic():
+                task = Task.objects.create(title = post.get('title'),
+                                            description = post.get('description'),
+                                            need_someone = post.get('need_someone'),
+                                            id_type_task = post.get('id_type_task'),
+                                            author = user)
+                if post.get('resident') is not None:
+                    task.resident.add(post.get('resident'))
+                if post.get('room') is not None:
+                    task.room.add(post.get('room'))
+                if post.get('receiver_user') is not None:
+                    task.receiver_user.add(post.get('receiver_user'))
+                if post.get('receiver_group') is not None:
+                    task.receiver_group.add(post.get('receiver_group'))
+                if post.get('copyreceiver_user') is not None:
+                    task.copyreceiver_user.add(post.get('copyreceiver_user'))
+                if post.get('copyreceiver_group') is not None:
+                    task.copyreceiver_group.add(post.get('copyreceiver_group'))
+
+                start_date = post.get('start_date')
+                end_date = post.get('end_date')
+                eventType = post.get('eventType')
+                # Si la date de fin est plus petite que la date de début, cela ne joue pas !
+                if start_date is None:
+                    raise
+                if end_date is not None:
+                    if end_date < start_date :
+                        raise
+
+
+                # Les valeurs de base pour chaque cas
+                data_dict = {}
+                data_dict['start_date'] = start_date
+                data_dict['end_date'] = end_date
+                data_dict['eventType'] = eventType
+                data_dict['time'] = post.get('time')
+                data_dict['task'] = task
+
+                # Dans le cas d'un ajout d'une tâche non périodique
+                if eventType == 0 :
+                    # On n'a pas besoin de mettre d'autres valeurs
+                    pass
+                # Dans le cas d'un ajout d'une tâche périodique
+                elif eventType == 1 :
+                    periodicType = post.get('periodicType')
+                    data_dict['periodicType'] = periodicType
+                    # Dans le cas : Quotidien
+                    if periodicType == 0:
+                        # Rien de spécifique
+                        pass
+                    # Dans le cas : Hebdomadaire
+                    elif periodicType == 1:
+                        if post.get('daysOfWeek') is None or post.get('intervalWeek') is None:
+                            raise
+                        data_dict['daysOfWeek'] = post.get('daysOfWeek')
+                        data_dict['intervalWeek'] = post.get('intervalWeek')
+                    # Dans le cas : Mensuel
+                    elif periodicType == 2:
+                        monthlyType = post.get('monthlyType')
+                        data_dict['monthlyType'] = monthlyType
+                        # Répétition selon un jour
+                        if monthlyType == 0:
+                            if post.get('dayNumber') is None or post.get('intervalMonth') is None:
+                                raise
+                            data_dict['dayNumber'] = post.get('dayNumber')
+                            data_dict['intervalMonth'] = post.get('intervallMonth')
+                        # Répépition selon le combien-t-ième jour
+                        elif monthlyType == 1:
+                            if post.get('weekNumber') is None or post.get('daysOfWeek') is None or post.get('intervalMonth') is None:
+                                raise
+                            data_dict['weekNumber'] = post.get('weekNumber')
+                            data_dict['daysOfWeek'] = post.get('daysOfWeek')
+                            data_dict['intervalMonth'] = post.get('intervalMonth')
+                        else:
+                            raise
+
+                    # Dans le cas : Annuel
+                    elif periodicType == 3:
+                        # Rien de spécifique
+                        pass
+                    # Cas pas possible
+                    else:
+                        raise
+
+                # Pour une mauvaise valeur dans eventType
+                else :
+                    raise
+
+                # On fait l'ajout selon les valeurs gardées
+                result = TaskDate.objects.create(**data_dict)
+
+        except Exception as e:
+            #return "prout"
+            #print('%s (%s)' % (e.message, type(e)))
+            transaction.rollback()
+            return None
+
+        return result
+
 
 
 def get_groups(self):
