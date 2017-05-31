@@ -28,7 +28,6 @@ class RoomAdminForm(forms.ModelForm):
 class RoomAdmin(admin.ModelAdmin):
     form = RoomAdminForm
     list_display = ['title', 'number', 'floor']
-    readonly_fields = ['title', 'number', 'floor']
 
 admin.site.register(Room, RoomAdmin)
 
@@ -43,8 +42,6 @@ class ResidentAdminForm(forms.ModelForm):
 class ResidentAdmin(admin.ModelAdmin):
     form = ResidentAdminForm
     list_display = ['firstname', 'lastname', 'birthdate', 'comment', 'allergies', 'medications', 'contact_name', 'contact_phone', 'active']
-    readonly_fields = ['firstname', 'lastname', 'birthdate', 'comment', 'allergies', 'medications', 'contact_name', 'contact_phone', 'active']
-
 admin.site.register(Resident, ResidentAdmin)
 
 

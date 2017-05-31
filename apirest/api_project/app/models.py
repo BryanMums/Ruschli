@@ -278,18 +278,27 @@ def get_groups(self):
 
 User.add_to_class('get_groups', get_groups)
 
-def get_tasks_for_a_day(self, date = datetime.now(), group=1):
+def get_tasks_for_a_day(self, date, group, resident):
     # Récupérer toutes les TaskDate où la date se situe après le début et avant la fin
-    groupObj = Group.objects.get(pk=group)
-    TaskDates =  TaskDate.objects.filter(
-        Q(start_date__lte = date)
-        &
-        (Q(end_date__gte = date) | Q(end_date__isnull = True))
-        &
-        (
-        Q(task__receiver_user = self.id) | Q(task__copyreceiver_user = self.id) |
-        Q(task__receiver_group = groupObj.id) | Q(task__copyreceiver_group = groupObj.id)
-        ))
+    # TODO : A optimiser
+    if resident is None :
+        TaskDates =  TaskDate.objects.filter(
+            Q(start_date__lte = date)
+            &
+            (Q(end_date__gte = date) | Q(end_date__isnull = True))
+            &
+            (
+            Q(task__receiver_user = self.id) | Q(task__copyreceiver_user = self.id) |
+            Q(task__receiver_group = group.id) | Q(task__copyreceiver_group = group.id)
+            ))
+    else :
+        TaskDates =  TaskDate.objects.filter(
+            Q(start_date__lte = date)
+            &
+            (Q(end_date__gte = date) | Q(end_date__isnull = True))
+            &
+            Q(task__resident = resident)
+            )
 
     # On va calculer pour ne garder que celle qui tombent le jour J
     accurateTaskDates = []
@@ -350,7 +359,7 @@ def get_tasks_for_a_day(self, date = datetime.now(), group=1):
                                 month = new_date.month - 1 + taskdate.intervalMonth
                                 year = int(new_date.year + month / 12 )
                                 month = month % 12 + 1
-                                new_date = datetime2.date(year,month,new_date.day)
+                                new_date = datetime2.date(year,month,1)
 
                 # Deuxième cas, exemple : le deuxième mardi tous les 2 mois
                 elif taskdate.monthlyType == 1 :
@@ -365,7 +374,8 @@ def get_tasks_for_a_day(self, date = datetime.now(), group=1):
                                     month = new_date.month - 1 + taskdate.intervalMonth
                                     year = int(new_date.year + month / 12 )
                                     month = month % 12 + 1
-                                    new_date = datetime2.date(year,month,new_date.day)
+                                    # ATTENTION A CHANGER ICI, PETIT PROBLEME
+                                    new_date = datetime2.date(year,month,1)
 
             # Annuel
             elif periodicType == 3 :

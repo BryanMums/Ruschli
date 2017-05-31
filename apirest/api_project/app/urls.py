@@ -78,5 +78,10 @@ urlpatterns += (
 )
 
 urlpatterns += (
-    url(r'^app/test/', views.test),
+    url(r'^app/tasks/(?P<date_url>\d{4}-\d{2}-\d{2})/(?P<group_id>\S+)/$', views.get_tasks_for_a_day),
+    url(r'^app/tasks/(?P<date_url>\d{4}-\d{2}-\d{2})/(?P<group_id>\S+)/(?P<resident_id>\S+)/$', views.get_tasks_for_a_day),
+)
+
+urlpatterns += (
+    url(r'^app/residents/active', views.get_residents_active),
 )

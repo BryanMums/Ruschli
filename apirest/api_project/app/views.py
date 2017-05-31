@@ -1,12 +1,33 @@
 from django.views.generic import DetailView, ListView, UpdateView, CreateView
 from .models import Group, Room, Resident, TaskType, Task, TaskDate, Comment
 from .forms import GroupForm, RoomForm, ResidentForm, TaskTypeForm, TaskForm, TaskDateForm, CommentForm
+from .serializers import TaskDateSerializer, ResidentSerializer
 from django.http import HttpResponse
+from datetime import datetime
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 def test(request):
-    data = request.user.get_tasks_for_a_day()
+    data = request.user.get_tasks_for_a_day(datetime.now(), 1, None)
     return HttpResponse(data)
 
+@api_view(['GET'])
+def get_tasks_for_a_day(request, date_url, group_id, resident_id=None):
+    date = datetime.strptime(date_url, '%Y-%m-%d')
+    group = Group.objects.get(pk=group_id)
+    if resident_id is not None :
+        resident = Resident.objects.get(resident_id)
+        data = request.user.get_tasks_for_a_day(date, group, resident)
+    else:
+        data = request.user.get_tasks_for_a_day(date, group, None)
+    serializer = TaskDateSerializer(data, many=True, context={'request': request})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_residents_active(request):
+    data = Resident.objects.filter(active=True)
+    serializer = ResidentSerializer(data, many=True, context={'request': request})
+    return Response(serializer.data)
 
 class GroupListView(ListView):
     model = Group
