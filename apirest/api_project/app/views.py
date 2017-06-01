@@ -27,6 +27,10 @@ def test_create(request):
 
 
 @api_view(['GET'])
+def test_update(request):
+    pass
+
+@api_view(['GET'])
 def get_tasks_for_a_day(request, date_url, group_id, resident_id=None):
     date = datetime.strptime(date_url, '%Y-%m-%d')
     group = Group.objects.get(pk=group_id)
