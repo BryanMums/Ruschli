@@ -1,12 +1,17 @@
 from django.views.generic import DetailView, ListView, UpdateView, CreateView
 from .models import Group, Room, Resident, TaskType, Task, TaskDate, Comment, TaskManager
 from .forms import GroupForm, RoomForm, ResidentForm, TaskTypeForm, TaskForm, TaskDateForm, CommentForm
-from .serializers import TaskDateSerializer, ResidentSerializer
+from .serializers import TaskDateSerializer, ResidentSerializer, UserSerializer
 from django.http import HttpResponse
 from datetime import datetime
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+
+@api_view(['GET'])
+def get_connected_user(request):
+    serializer = UserSerializer(request.user, many=False, context={'request': request})
+    return Response(serializer.data)
 
 @api_view(['GET'])
 def test_create(request):
@@ -39,6 +44,14 @@ def get_tasks_for_a_day(request, date_url, group_id, resident_id=None):
         data = request.user.get_tasks_for_a_day(date, group, resident)
     else:
         data = request.user.get_tasks_for_a_day(date, group, None)
+    serializer = TaskDateSerializer(data, many=True, context={'request': request})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def get_tasks_for_a_day_resident(request, date_url, resident_id):
+    date = datetime.strptime(date_url, '%Y-%m-%d')
+    resident = Resident.objects.get(pk=resident_id)
+    data = request.user.get_tasks_for_a_day(date, None, resident)
     serializer = TaskDateSerializer(data, many=True, context={'request': request})
     return Response(serializer.data)
 

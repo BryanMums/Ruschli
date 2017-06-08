@@ -1,0 +1,22 @@
+﻿<h3>Tâches</h3>
+<hr/>
+<div class="row justify-content-center">
+  <div class="col-12 col-sm-12 col-lg-4">
+    <my-date-picker [options]="myDatePickerOptions" [selDate]="selDate" (dateChanged)="onDateChanged($event)"></my-date-picker>
+  </div>
+</div>
+<div *ngIf="tasks" class="col-12 col-lg-6 offset-lg-3" >
+
+<div *ngFor="let taskDate of tasks">
+  <task-card [taskDate]="taskDate"></task-card>
+</div>
+
+<div [style.display]="tasks.length == 0 ? 'block' : 'none'">
+  <p>Aucune tâche pour cette date.</p>
+</div>
+<div class="row justify-content-center">
+  <div class="col-12 col-sm-12 col-md-8 col-lg-6">
+    <p><a [routerLink]="['/add-task']" class="btn btn-success btn-block">Créer une tâche</a></p>
+  </div>
+</div>
+</div>

@@ -1,7 +1,3 @@
-﻿/**
- * System configuration for Angular 2 samples
- * Adjust as necessary for your application needs.
- */
 (function (global) {
     System.config({
         paths: {
@@ -23,9 +19,11 @@
             '@angular/http/testing': 'npm:@angular/http/bundles/http-testing.umd.js',
             '@angular/router': 'npm:@angular/router/bundles/router.umd.js',
             '@angular/forms': 'npm:@angular/forms/bundles/forms.umd.js',
+            'angular-in-memory-web-api': 'npm:angular-in-memory-web-api/bundles/in-memory-web-api.umd.js',
 
             // other libraries
-            'rxjs': 'npm:rxjs'
+            'rxjs': 'npm:rxjs',
+            'mydatepicker': 'npm:mydatepicker/bundles/mydatepicker.umd.min.js'
         },
         // packages tells the System loader how to load when no filename and/or no extension
         packages: {
@@ -34,6 +32,10 @@
                 defaultExtension: 'js'
             },
             rxjs: {
+                defaultExtension: 'js'
+            },
+            flatpickr: {
+                main: './ng2-flatpickr.js',
                 defaultExtension: 'js'
             }
         }

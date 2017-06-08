@@ -5,4 +5,5 @@ function __export(m) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./authentication.service"));
 __export(require("./user.service"));
+__export(require("./resident.service"));
 //# sourceMappingURL=index.js.map

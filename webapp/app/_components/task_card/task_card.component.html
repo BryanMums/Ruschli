@@ -1,0 +1,22 @@
+<div class="d-flex flex-column" style="overflow-x:hidden;border-radius:3px;margin-bottom:10px;">
+    <div style="border-bottom:1px solid whitesmoke;background:#2c3e50;color:whitesmoke;padding-left:5px;">
+      <div class="d-flex justify-content-end">
+        <small class="mr-auto" [style.display]="taskDate.eventType == 0 ? 'block' : 'none'">Non périodique</small>
+        <small class="mr-auto" [style.display]="taskDate.eventType == 1 ? 'block' : 'none'">Périodique</small>
+        <small class="pr-2" *ngIf="taskDate.time">{{taskDate.time}}</small>
+      </div>
+    </div>
+    <div style="background:white;padding:5px;">
+      <h5 style="margin-bottom:0px;">{{taskDate.task.title}}</h5>
+    </div>
+    <div class="col-12"  style="overflow-x:scroll;background:white;">
+      <div *ngIf="taskDate.task.resident" class="small row flex-row flex-nowrap"  style="padding:5px">
+          <span class="badge badge-primary" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</span>
+      </div>
+    </div>
+    <div class="col-12"  style="overflow-x:scroll;background:white;">
+      <div *ngIf="taskDate.task.room" class="small row flex-row flex-nowrap" style="padding:5px">
+          <span class="badge badge-default" *ngFor="let room of taskDate.task.room">{{room.title}}</span>
+      </div>
+    </div>
+</div>

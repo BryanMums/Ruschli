@@ -10,18 +10,47 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
-var index_1 = require("../_services/index");
+var index_1 = require("../../_services/index");
 var HomeComponent = (function () {
     function HomeComponent(userService) {
         this.userService = userService;
         this.users = [];
+        this.tasks = [];
+        this.selDate = { year: 2017, month: 6, day: 6 };
+        this.myDatePickerOptions = {
+            dateFormat: 'yyyy-mm-dd',
+            dayLabels: { su: 'Dim', mo: 'Lun', tu: 'Mar', we: 'Mer', th: 'Jeu', fr: 'Ven', sa: 'Sam' },
+            todayBtnTxt: 'Aujourd\'ĥui',
+            editableDateField: false,
+            showClearDateBtn: false,
+            showIncreaseDateBtn: true,
+            showDecreaseDateBtn: true,
+            openSelectorOnInputClick: true
+        };
     }
     HomeComponent.prototype.ngOnInit = function () {
         var _this = this;
-        // get users from secure api end point
         this.userService.getUsers()
             .subscribe(function (users) {
             _this.users = users;
+        });
+        var date = new Date();
+        this.selDate = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
+        var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+        // On récupère le résident selon l'id
+        this.userService.getTasks(dateStr)
+            .subscribe(function (tasks) {
+            _this.tasks = tasks;
+        });
+    };
+    HomeComponent.prototype.onDateChanged = function (event) {
+        var _this = this;
+        // event properties are: event.date, event.jsdate, event.formatted and event.epoc
+        var date = event;
+        console.log(date.formatted);
+        this.userService.getTasks(date.formatted)
+            .subscribe(function (tasks) {
+            _this.tasks = tasks;
         });
     };
     return HomeComponent;

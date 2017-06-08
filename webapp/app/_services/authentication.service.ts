@@ -2,15 +2,24 @@
 import { Http, Response } from '@angular/http';
 import { Observable } from 'rxjs';
 import { Headers, RequestOptions } from '@angular/http';
+import { Group, User } from '../_models/index';
+import { UserService } from './index';
+//import { JwtHelper} from 'angular2-jwt';
 import 'rxjs/add/operator/map'
 
 @Injectable()
 export class AuthenticationService {
+    public user: User;
     public token: string;
+    public selectedGroup: Group;
 
     constructor(private http: Http) {
         // set token if saved in local storage
-        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if(localStorage['currentUser']){
+            var currentUser = JSON.parse(localStorage['currentUser']);
+        }else{
+            var currentUser = null;
+        }
         this.token = currentUser && currentUser.token;
     }
 
@@ -27,8 +36,12 @@ export class AuthenticationService {
                     this.token = token;
 
                     // store username and jwt token in local storage to keep user logged in between page refreshes
-                    localStorage.setItem('currentUser', JSON.stringify({ username: username, token: token }));
+                    localStorage['currentUser'] = JSON.stringify({ username: username, token: token });
+                    //let jwtHelper = new JwtHelper();
 
+                    // On va récupérer les groupes
+
+                    //console.log(this.user);
                     // return true to indicate successful login
                     return true;
                 } else {
@@ -38,9 +51,17 @@ export class AuthenticationService {
             });
     }
 
+    getUser(): Observable<User>{
+      let headers = new Headers({ 'Authorization': 'JWT ' + this.token });
+      let options = new RequestOptions({ headers: headers });
+      return this.http.get('http://localhost:8000/api/get_connected_user/', options)
+      .map((response: Response) => response.json());
+    }
+
     logout(): void {
         // clear token remove user from local storage to log user out
         this.token = null;
-        localStorage.removeItem('currentUser');
+        delete localStorage['currentUser'];
+        //localStorage.clear();
     }
 }

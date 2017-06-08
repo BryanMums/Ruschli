@@ -1,0 +1,25 @@
+<div class="col-12 col-md-6 offset-md-3">
+    <h2>Résidents</h2>
+    <hr/>
+    <select id="sort" class="custom-select" style="width:100%">
+      <option value="lastname" (click)="onSort('lastname', 1)">Nom (croissant)</option>
+      <option value="-lastname" (click)="onSort('lastname', -1)">Nom (décroissant)</option>
+      <option value="firstname" (click)="onSort('firstname', 1)">Prénom (croissant)</option>
+      <option value="-firstname" (click)="onSort('firstname', -1)">Prénom (décroissant)</option>
+    </select>
+    <h5 class="mt-2">Liste</h5>
+    <div>
+        <div class="list-group">
+          <a *ngFor="let resident of residents" (click)="onSelect(resident)" class="list-group-item list-group-item-action">
+            <div class="d-flex flex-column">
+              <span>
+                {{resident.firstname}} {{resident.lastname}}
+              </span>
+              <small class="text-muted" *ngIf="resident.room">
+                {{resident.room.title}}
+              </small>
+            </div>
+          </a>
+        </div>
+    </div>
+</div>

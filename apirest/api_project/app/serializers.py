@@ -42,6 +42,7 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ResidentSerializer(serializers.HyperlinkedModelSerializer):
+    room = RoomSerializer(many=False)
 
     class Meta:
         model = models.Resident
@@ -56,6 +57,7 @@ class ResidentSerializer(serializers.HyperlinkedModelSerializer):
             'contact_name',
             'contact_phone',
             'active',
+            'room'
         )
 
 
@@ -81,6 +83,12 @@ class TaskTypeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskSerializer(serializers.HyperlinkedModelSerializer):
+    room = RoomSerializer(many=True)
+    resident = ResidentSerializer(many=True)
+    receiver_user = UserSerializer(many=True)
+    receiver_group = GroupSerializer(many=True)
+    copyreceiver_user = UserSerializer(many=True)
+    copyreceiver_group = GroupSerializer(many=True)
 
     class Meta:
         model = models.Task
@@ -91,6 +99,12 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'created_at',
             'updated_at',
             'need_someone',
+            'room',
+            'resident',
+            'receiver_user',
+            'receiver_group',
+            'copyreceiver_user',
+            'copyreceiver_group'
         )
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):

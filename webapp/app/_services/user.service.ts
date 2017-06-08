@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map'
 
 import { AuthenticationService } from './index';
-import { User } from '../_models/index';
+import { User, Group, TaskDate } from '../_models/index';
 
 @Injectable()
 export class UserService {
@@ -22,5 +22,26 @@ export class UserService {
         // get users from api
         return this.http.get('http://localhost:8000/api/user/', options)
             .map((response: Response) => response.json());
+    }
+
+    getConnectedUser(): Observable<User> {
+      let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+      let options = new RequestOptions({ headers: headers });
+
+      // get users from api
+      return this.http.get('http://localhost:8000/api/get_connected_user/', options)
+          .map((response: Response) => response.json());
+    }
+
+    getTasks(date:any): Observable<TaskDate[]>{
+
+      let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+      let options = new RequestOptions({ headers: headers });
+
+      // get tasks for the resident at a specified date
+
+      return this.http.get('http://localhost:8000/api/tasks/'+ date +'/1/', options)
+          .map((response: Response) => response.json());
+
     }
 }

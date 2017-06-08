@@ -1,0 +1,78 @@
+<div *ngIf=resident >
+  <h2>{{resident.firstname}} {{resident.lastname}}</h2>
+  <hr/>
+  <div class="row">
+    <div class="col-md-6 col-12">
+      <div class="d-flex flex-column">
+        <small><strong>Date d'anniversaire</strong></small>
+        <p>{{resident.birthdate}}</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-12" *ngIf=resident.room>
+      <div class="d-flex flex-column">
+        <small><strong>Chambre</strong></small>
+        <p>{{resident.room.title}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-12">
+      <div class="d-flex flex-column">
+        <small><strong>Personne de contact</strong></small>
+        <p>{{resident.contact_name}}</p>
+      </div>
+    </div>
+    <div class="col-md-6 col-12">
+      <div class="d-flex flex-column">
+        <small><strong>Téléphone de contact</strong></small>
+        <p>{{resident.contact_phone}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex flex-column">
+        <small class="mt-2"><strong>Commentaire</strong></small>
+        <p>{{resident.comment}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex flex-column">
+        <small class="mt-2"><strong>Allergies</strong></small>
+        <p>{{resident.allergies}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex flex-column">
+        <small class="mt-2"><strong>Médicaments</strong></small>
+        <p>{{resident.medications}}</p>
+      </div>
+    </div>
+  </div>
+
+  <h3>Tâches</h3>
+  <hr/>
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-12 col-lg-4">
+      <my-date-picker [options]="myDatePickerOptions" [selDate]="selDate" (dateChanged)="onDateChanged($event)"></my-date-picker>
+    </div>
+  </div>
+  <div *ngIf="tasks" class="col-12 col-lg-6 offset-lg-3" >
+
+  <div *ngFor="let taskDate of tasks">
+    <task-card [taskDate]="taskDate"></task-card>
+  </div>
+
+  <div [style.display]="tasks.length == 0 ? 'block' : 'none'">
+    <p>Aucune tâche pour cette date.</p>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-12 col-sm-12 col-md-8 col-lg-6">
+      <p><a [routerLink]="['/residents']" class="btn btn-primary btn-block">Liste des résidents</a></p>
+    </div>
+  </div>
+</div>

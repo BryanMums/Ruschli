@@ -1,7 +1,30 @@
-﻿<!-- main app container -->
+<!-- main app container -->
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-primary">
+  <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <a class="navbar-brand" href="#">Ruschli</a>
+  <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <ul class="navbar-nav">
+      <li class="nav-item active">
+        <a class="nav-link" [routerLink]="['/']">Tâches</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" [routerLink]="['/residents']">Résidents</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" href="#"><i class="fa fa-plus-circle" style="color: #2ecc71" aria-hidden="true"></i> Nouvelle tâche</a>
+      </li>
+      <li class="nav-item active">
+        <a class="nav-link" [routerLink]="['/login']"><i class="fa fa-power-off" style="color: #e74c3c" aria-hidden="true"></i> Déconnexion</a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
 <div class="jumbotron">
-    <div class="container">
-        <div class="col-sm-8 col-sm-offset-2">
+    <div class="container-fluid">
+        <div class="col-12 col-md-8 offset-md-2">
             <router-outlet></router-outlet>
         </div>
     </div>
@@ -10,9 +33,6 @@
 <!-- credits -->
 <div class="text-center">
     <p>
-        <a href="http://jasonwatmore.com/post/2016/08/16/angular-2-jwt-authentication-example-tutorial" target="_top">Angular 2 JWT Authentication Example & Tutorial</a>
-    </p>
-    <p>
-        <a href="http://jasonwatmore.com" target="_top">JasonWatmore.com</a>
+        <small class="text-muted">Un problème ? Contactez la responsable : <br/><a href="http://jasonwatmore.com/post/2016/08/16/angular-2-jwt-authentication-example-tutorial" target="_top">Carole Muhmenthaler</a></small>
     </p>
 </div>

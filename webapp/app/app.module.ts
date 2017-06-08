@@ -3,40 +3,41 @@ import { BrowserModule } from '@angular/platform-browser';
 import { FormsModule }    from '@angular/forms';
 import { HttpModule } from '@angular/http';
 
-// used to create fake backend
-//import { fakeBackendProvider } from './_helpers/index';
-//import { MockBackend, MockConnection } from '@angular/http/testing';
-//import { BaseRequestOptions } from '@angular/http';
-
 import { AppComponent }  from './app.component';
 import { routing }        from './app.routing';
 
 import { AuthGuard } from './_guards/index';
-import { AuthenticationService, UserService } from './_services/index';
-import { LoginComponent } from './login/index';
-import { HomeComponent } from './home/index';
+import { AuthenticationService, UserService, ResidentService } from './_services/index';
+import { LoginComponent } from './_components/login/index';
+import { HomeComponent } from './_components/home/index';
+import { ResidentsComponent } from './_components/residents/index';
+import { ResidentComponent } from './_components/resident/index';
+import { TaskCardComponent } from './_components/task_card/index';
+import { MyDatePickerModule } from 'mydatepicker';
+
+//import { Ng2FlatpickrComponent } from 'flatpickr';
 
 @NgModule({
     imports: [
         BrowserModule,
         FormsModule,
         HttpModule,
-        routing
+        routing,
+        MyDatePickerModule
     ],
     declarations: [
         AppComponent,
         LoginComponent,
-        HomeComponent
+        HomeComponent,
+        ResidentsComponent,
+        ResidentComponent,
+        TaskCardComponent
     ],
     providers: [
         AuthGuard,
         AuthenticationService,
         UserService,
-
-        // providers used to create fake backend
-        //fakeBackendProvider,
-        //MockBackend,
-        //BaseRequestOptions
+        ResidentService
     ],
     bootstrap: [AppComponent]
 })

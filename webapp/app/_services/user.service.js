@@ -26,6 +26,20 @@ var UserService = (function () {
         return this.http.get('http://localhost:8000/api/user/', options)
             .map(function (response) { return response.json(); });
     };
+    UserService.prototype.getConnectedUser = function () {
+        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+        var options = new http_1.RequestOptions({ headers: headers });
+        // get users from api
+        return this.http.get('http://localhost:8000/api/get_connected_user/', options)
+            .map(function (response) { return response.json(); });
+    };
+    UserService.prototype.getTasks = function (date) {
+        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+        var options = new http_1.RequestOptions({ headers: headers });
+        // get tasks for the resident at a specified date
+        return this.http.get('http://localhost:8000/api/tasks/' + date + '/1/', options)
+            .map(function (response) { return response.json(); });
+    };
     return UserService;
 }());
 UserService = __decorate([

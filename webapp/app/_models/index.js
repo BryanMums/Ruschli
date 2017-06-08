@@ -4,4 +4,7 @@ function __export(m) {
 }
 Object.defineProperty(exports, "__esModule", { value: true });
 __export(require("./user"));
+__export(require("./resident"));
+__export(require("./group"));
+__export(require("./taskDate"));
 //# sourceMappingURL=index.js.map

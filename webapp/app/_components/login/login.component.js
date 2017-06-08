@@ -11,7 +11,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var router_1 = require("@angular/router");
-var index_1 = require("../_services/index");
+var index_1 = require("../../_services/index");
 var LoginComponent = (function () {
     function LoginComponent(router, authenticationService) {
         this.router = router;
@@ -30,7 +30,23 @@ var LoginComponent = (function () {
         this.authenticationService.login(this.model.username, this.model.password)
             .subscribe(function (result) {
             if (result === true) {
-                _this.router.navigate(['/']);
+                _this.authenticationService.getUser()
+                    .subscribe(function (result) {
+                    if (result.sectors.length == 0) {
+                        console.log("Pas de secteur");
+                        localStorage['sector'] = null;
+                        _this.router.navigate(['/']);
+                    }
+                    else if (result.sectors.length == 1) {
+                        console.log("Un secteur");
+                        localStorage['sector'] = result.sectors[0];
+                        _this.router.navigate(['/']);
+                    }
+                    else {
+                        console.log("Plusieurs secteurs");
+                        _this.router.navigate(['/residents']);
+                    }
+                });
             }
             else {
                 _this.error = 'Username or password is incorrect';

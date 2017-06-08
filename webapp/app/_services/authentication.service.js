@@ -12,12 +12,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
 var http_2 = require("@angular/http");
+//import { JwtHelper} from 'angular2-jwt';
 require("rxjs/add/operator/map");
 var AuthenticationService = (function () {
     function AuthenticationService(http) {
         this.http = http;
         // set token if saved in local storage
-        var currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        if (localStorage['currentUser']) {
+            var currentUser = JSON.parse(localStorage['currentUser']);
+        }
+        else {
+            var currentUser = null;
+        }
         this.token = currentUser && currentUser.token;
     }
     AuthenticationService.prototype.login = function (username, password) {
@@ -33,7 +39,10 @@ var AuthenticationService = (function () {
                 // set token property
                 _this.token = token;
                 // store username and jwt token in local storage to keep user logged in between page refreshes
-                localStorage.setItem('currentUser', JSON.stringify({ username: username, token: token }));
+                localStorage['currentUser'] = JSON.stringify({ username: username, token: token });
+                //let jwtHelper = new JwtHelper();
+                // On va récupérer les groupes
+                //console.log(this.user);
                 // return true to indicate successful login
                 return true;
             }
@@ -43,10 +52,17 @@ var AuthenticationService = (function () {
             }
         });
     };
+    AuthenticationService.prototype.getUser = function () {
+        var headers = new http_2.Headers({ 'Authorization': 'JWT ' + this.token });
+        var options = new http_2.RequestOptions({ headers: headers });
+        return this.http.get('http://localhost:8000/api/get_connected_user/', options)
+            .map(function (response) { return response.json(); });
+    };
     AuthenticationService.prototype.logout = function () {
         // clear token remove user from local storage to log user out
         this.token = null;
-        localStorage.removeItem('currentUser');
+        delete localStorage['currentUser'];
+        //localStorage.clear();
     };
     return AuthenticationService;
 }());

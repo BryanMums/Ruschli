@@ -78,12 +78,16 @@ urlpatterns += (
 )
 
 urlpatterns += (
-    url(r'^app/tasks/(?P<date_url>\d{4}-\d{2}-\d{2})/(?P<group_id>\S+)/$', views.get_tasks_for_a_day),
-    url(r'^app/tasks/(?P<date_url>\d{4}-\d{2}-\d{2})/(?P<group_id>\S+)/(?P<resident_id>\S+)/$', views.get_tasks_for_a_day),
+    url(r'^api/get_connected_user/$', views.get_connected_user),
 )
 
 urlpatterns += (
-    url(r'^app/residents/active', views.get_residents_active),
+    url(r'^api/tasks/(?P<date_url>\d{4}-\d{2}-\d{2})/(?P<group_id>\S+)/$', views.get_tasks_for_a_day),
+    url(r'^api/tasks_resident/(?P<date_url>\d{4}-\d{2}-\d{2})/(?P<resident_id>\S+)/$', views.get_tasks_for_a_day_resident),
+)
+
+urlpatterns += (
+    url(r'^api/residents/active', views.get_residents_active),
 )
 
 urlpatterns += (
