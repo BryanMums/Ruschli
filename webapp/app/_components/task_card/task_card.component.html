@@ -1,4 +1,4 @@
-<div class="d-flex flex-column" style="overflow-x:hidden;border-radius:3px;margin-bottom:10px;">
+<div class="d-flex flex-column task_card" (click)="detail()">
     <div style="border-bottom:1px solid whitesmoke;background:#2c3e50;color:whitesmoke;padding-left:5px;">
       <div class="d-flex justify-content-end">
         <small class="mr-auto" [style.display]="taskDate.eventType == 0 ? 'block' : 'none'">Non périodique</small>
@@ -11,12 +11,12 @@
     </div>
     <div class="col-12"  style="overflow-x:scroll;background:white;">
       <div *ngIf="taskDate.task.resident" class="small row flex-row flex-nowrap"  style="padding:5px">
-          <span class="badge badge-primary" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</span>
+          <span class="badge badge-primary mr-1" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</span>
       </div>
     </div>
     <div class="col-12"  style="overflow-x:scroll;background:white;">
       <div *ngIf="taskDate.task.room" class="small row flex-row flex-nowrap" style="padding:5px">
-          <span class="badge badge-default" *ngFor="let room of taskDate.task.room">{{room.title}}</span>
+          <span class="badge badge-default mr-1" *ngFor="let room of taskDate.task.room">{{room.title}}</span>
       </div>
     </div>
 </div>

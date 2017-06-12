@@ -12,6 +12,13 @@ import {IMyDpOptions, IMyDateModel, IMyDate} from 'mydatepicker';
 })
 
 export class TaskCardComponent {
-@Input() taskDate: TaskDate
+    @Input() taskDate: TaskDate
+
+    constructor(private router: Router){}
+
+    detail(){
+      console.log("lol")
+      this.router.navigate(['./task',this.taskDate.pk])
+    }
 
 }

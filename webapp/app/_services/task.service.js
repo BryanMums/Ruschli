@@ -13,41 +13,24 @@ var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
 require("rxjs/add/operator/map");
 var index_1 = require("./index");
-var UserService = (function () {
-    function UserService(http, authenticationService) {
+var TaskService = (function () {
+    function TaskService(http, authenticationService) {
         this.http = http;
         this.authenticationService = authenticationService;
     }
-    UserService.prototype.getUsers = function () {
-        // add authorization header with jwt token
+    TaskService.prototype.getTaskDate = function (taskDate_id) {
         var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
         var options = new http_1.RequestOptions({ headers: headers });
         // get users from api
-        return this.http.get('http://localhost:8000/api/user/', options)
+        return this.http.get('http://localhost:8000/api/taskdate/' + taskDate_id + '/', options)
             .map(function (response) { return response.json(); });
     };
-    UserService.prototype.getConnectedUser = function () {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        // get users from api
-        return this.http.get('http://localhost:8000/api/get_connected_user/', options)
-            .map(function (response) { return response.json(); });
-    };
-    UserService.prototype.getTasks = function (date) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        var sector = localStorage["sector"];
-        console.log(localStorage["sector"]);
-        // get tasks for the resident at a specified date
-        return this.http.get('http://localhost:8000/api/tasks/' + date + '/' + sector + '/', options)
-            .map(function (response) { return response.json(); });
-    };
-    return UserService;
+    return TaskService;
 }());
-UserService = __decorate([
+TaskService = __decorate([
     core_1.Injectable(),
     __metadata("design:paramtypes", [http_1.Http,
         index_1.AuthenticationService])
-], UserService);
-exports.UserService = UserService;
-//# sourceMappingURL=user.service.js.map
+], TaskService);
+exports.TaskService = TaskService;
+//# sourceMappingURL=task.service.js.map

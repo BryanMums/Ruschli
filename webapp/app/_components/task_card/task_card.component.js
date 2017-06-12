@@ -10,11 +10,17 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
+var router_1 = require("@angular/router");
 require("rxjs/add/operator/switchMap");
 var index_1 = require("../../_models/index");
 var TaskCardComponent = (function () {
-    function TaskCardComponent() {
+    function TaskCardComponent(router) {
+        this.router = router;
     }
+    TaskCardComponent.prototype.detail = function () {
+        console.log("lol");
+        this.router.navigate(['./task', this.taskDate.pk]);
+    };
     return TaskCardComponent;
 }());
 __decorate([
@@ -26,7 +32,8 @@ TaskCardComponent = __decorate([
         selector: 'task-card',
         moduleId: module.id,
         templateUrl: 'task_card.component.html'
-    })
+    }),
+    __metadata("design:paramtypes", [router_1.Router])
 ], TaskCardComponent);
 exports.TaskCardComponent = TaskCardComponent;
 //# sourceMappingURL=task_card.component.js.map

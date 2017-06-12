@@ -109,6 +109,6 @@ class CommentAdminForm(forms.ModelForm):
 class CommentAdmin(admin.ModelAdmin):
     form = CommentAdminForm
     list_display = ['created_at', 'updated_at', 'text']
-    readonly_fields = ['created_at', 'updated_at', 'text']
+    readonly_fields = ['created_at', 'updated_at']
 
 admin.site.register(Comment, CommentAdmin)

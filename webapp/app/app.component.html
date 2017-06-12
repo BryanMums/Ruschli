@@ -1,5 +1,5 @@
 <!-- main app container -->
-<nav class="navbar navbar-toggleable-md navbar-inverse bg-primary">
+<nav class="navbar navbar-toggleable-md navbar-inverse bg-inverse">
   <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -22,17 +22,37 @@
   </div>
 </nav>
 
-<div class="jumbotron">
+<div class="pt-2">
     <div class="container-fluid">
         <div class="col-12 col-md-8 offset-md-2">
             <router-outlet></router-outlet>
         </div>
     </div>
 </div>
+<footer class="page-footer blue center-on-small-only">
 
-<!-- credits -->
-<div class="text-center">
-    <p>
-        <small class="text-muted">Un problème ? Contactez la responsable : <br/><a href="http://jasonwatmore.com/post/2016/08/16/angular-2-jwt-authentication-example-tutorial" target="_top">Carole Muhmenthaler</a></small>
-    </p>
-</div>
+    <!--Footer Links-->
+    <div class="container">
+        <div class="row justify-content-center">
+
+            <!--First column-->
+            <div class="col-md-6">
+                <h5 class="title">Un problème ?</h5>
+                <p>Contactez la responsable : <a href="http://jasonwatmore.com/post/2016/08/16/angular-2-jwt-authentication-example-tutorial" target="_top">Carole Muhmenthaler</a>.</p>
+            </div>
+            <!--/.First column-->
+        </div>
+    </div>
+    <!--/.Footer Links-->
+
+    <!--Copyright-->
+    <div class="footer-copyright">
+        <div class="container-fluid">
+            © 2017 Copyright: <a href="http://www.ruschli.ch">Résidence du Ruschli SA</a>
+
+        </div>
+    </div>
+    <!--/.Copyright-->
+
+</footer>
+<!--/.Footer-->

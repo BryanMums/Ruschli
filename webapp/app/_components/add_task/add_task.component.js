@@ -11,9 +11,9 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var index_1 = require("../../_services/index");
-var HomeComponent = (function () {
-    function HomeComponent(userService) {
-        this.userService = userService;
+var AddTaskComponent = (function () {
+    function AddTaskComponent(taskService) {
+        this.taskService = taskService;
         this.tasks = [];
         this.selDate = { year: 2017, month: 6, day: 6 };
         this.myDatePickerOptions = {
@@ -27,35 +27,20 @@ var HomeComponent = (function () {
             openSelectorOnInputClick: true
         };
     }
-    HomeComponent.prototype.ngOnInit = function () {
-        var _this = this;
+    AddTaskComponent.prototype.ngOnInit = function () {
         var date = new Date();
         this.selDate = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
         var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
         // On récupère le résident selon l'id
-        this.userService.getTasks(dateStr)
-            .subscribe(function (tasks) {
-            _this.tasks = tasks;
-        });
     };
-    HomeComponent.prototype.onDateChanged = function (event) {
-        var _this = this;
-        // event properties are: event.date, event.jsdate, event.formatted and event.epoc
-        var date = event;
-        console.log(date.formatted);
-        this.userService.getTasks(date.formatted)
-            .subscribe(function (tasks) {
-            _this.tasks = tasks;
-        });
-    };
-    return HomeComponent;
+    return AddTaskComponent;
 }());
-HomeComponent = __decorate([
+AddTaskComponent = __decorate([
     core_1.Component({
         moduleId: module.id,
-        templateUrl: 'home.component.html'
+        templateUrl: 'add_task.component.html'
     }),
-    __metadata("design:paramtypes", [index_1.UserService])
-], HomeComponent);
-exports.HomeComponent = HomeComponent;
-//# sourceMappingURL=home.component.js.map
+    __metadata("design:paramtypes", [index_1.TaskService])
+], AddTaskComponent);
+exports.AddTaskComponent = AddTaskComponent;
+//# sourceMappingURL=add_task.component.js.map

@@ -89,6 +89,7 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
     receiver_group = GroupSerializer(many=True)
     copyreceiver_user = UserSerializer(many=True)
     copyreceiver_group = GroupSerializer(many=True)
+    author = UserSerializer(many=False)
 
     class Meta:
         model = models.Task
@@ -104,10 +105,12 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'receiver_user',
             'receiver_group',
             'copyreceiver_user',
-            'copyreceiver_group'
+            'copyreceiver_group',
+            'author'
         )
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
+    author = UserSerializer(many=False)
 
     class Meta:
         model = models.Comment
@@ -119,7 +122,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
             'author'
         )
 
-class TaskDateSerializer(serializers.HyperlinkedModelSerializer):
+class TaskDateSerializer(serializers.ModelSerializer):
     task = TaskSerializer(many=False)
     comments = CommentSerializer(many=True)
 
@@ -130,11 +133,18 @@ class TaskDateSerializer(serializers.HyperlinkedModelSerializer):
             'parent',
             'task',
             'eventType',
+            'periodicType',
             'start_date',
             'end_date',
             'time',
             'active',
             'created_at',
             'updated_at',
-            'comments'
+            'comments',
+            'monthlyType',
+            'intervalWeek',
+            'dayNumber',
+            'intervalMonth',
+            'weekNumber',
+            'daysOfWeek'
         )

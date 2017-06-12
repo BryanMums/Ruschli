@@ -34,17 +34,17 @@ var LoginComponent = (function () {
                     .subscribe(function (result) {
                     if (result.sectors.length == 0) {
                         console.log("Pas de secteur");
-                        localStorage['sector'] = null;
+                        localStorage['sector'] = 0;
                         _this.router.navigate(['/']);
                     }
                     else if (result.sectors.length == 1) {
                         console.log("Un secteur");
-                        localStorage['sector'] = result.sectors[0];
+                        localStorage['sector'] = result.sectors[0].pk;
                         _this.router.navigate(['/']);
                     }
                     else {
                         console.log("Plusieurs secteurs");
-                        _this.router.navigate(['/residents']);
+                        _this.router.navigate(['/choose-sector']);
                     }
                 });
             }

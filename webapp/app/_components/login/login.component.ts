@@ -31,15 +31,15 @@ export class LoginComponent implements OnInit {
                     .subscribe(result => {
                         if(result.sectors.length == 0){
                             console.log("Pas de secteur");
-                            localStorage['sector'] = null;
+                            localStorage['sector'] = 0;
                             this.router.navigate(['/']);
                         }else if(result.sectors.length == 1){
                             console.log("Un secteur");
-                            localStorage['sector'] = result.sectors[0];
+                            localStorage['sector'] = result.sectors[0].pk;
                             this.router.navigate(['/']);
                         }else{
                           console.log("Plusieurs secteurs");
-                          this.router.navigate(['/residents'])
+                          this.router.navigate(['/choose-sector'])
                         }
                     });
 

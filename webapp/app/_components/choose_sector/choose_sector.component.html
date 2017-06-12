@@ -1,0 +1,13 @@
+<div *ngIf="user">
+  <h2>Choix du secteur</h2>
+  <hr/>
+  <div class="col-12 col-md-6">
+    <p>Dans quel secteur travaillez-vous aujourdĥui ?</p>
+    <div class="form-group">
+      <select class="form-control">
+          <option selected="true" disabled="disabled">Veuillez choisir un secteur</option>
+          <option *ngFor="let sector of user.sectors" (click)="change(sector.pk)">{{sector.title}}</option>
+      </select>
+    </div>
+  </div>
+</div>

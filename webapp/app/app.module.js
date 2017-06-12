@@ -19,6 +19,9 @@ var index_4 = require("./_components/home/index");
 var index_5 = require("./_components/residents/index");
 var index_6 = require("./_components/resident/index");
 var index_7 = require("./_components/task_card/index");
+var index_8 = require("./_components/task_detail/index");
+var index_9 = require("./_components/choose_sector/index");
+var index_10 = require("./_components/add_task/index");
 var mydatepicker_1 = require("mydatepicker");
 //import { Ng2FlatpickrComponent } from 'flatpickr';
 var AppModule = (function () {
@@ -41,13 +44,17 @@ AppModule = __decorate([
             index_4.HomeComponent,
             index_5.ResidentsComponent,
             index_6.ResidentComponent,
-            index_7.TaskCardComponent
+            index_7.TaskCardComponent,
+            index_8.TaskDetailComponent,
+            index_9.ChooseSectorComponent,
+            index_10.AddTaskComponent
         ],
         providers: [
             index_1.AuthGuard,
             index_2.AuthenticationService,
             index_2.UserService,
-            index_2.ResidentService
+            index_2.ResidentService,
+            index_2.TaskService
         ],
         bootstrap: [app_component_1.AppComponent]
     })

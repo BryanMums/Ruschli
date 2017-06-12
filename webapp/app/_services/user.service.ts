@@ -37,10 +37,12 @@ export class UserService {
 
       let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
       let options = new RequestOptions({ headers: headers });
+      let sector = localStorage["sector"];
+      console.log(localStorage["sector"]);
 
       // get tasks for the resident at a specified date
 
-      return this.http.get('http://localhost:8000/api/tasks/'+ date +'/1/', options)
+      return this.http.get('http://localhost:8000/api/tasks/'+ date +'/'+sector+'/', options)
           .map((response: Response) => response.json());
 
     }
