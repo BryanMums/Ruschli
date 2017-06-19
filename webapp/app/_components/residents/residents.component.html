@@ -1,11 +1,8 @@
 <div class="col-12 col-md-6 offset-md-3">
     <h2>Résidents</h2>
     <hr/>
-    <select id="sort" class="custom-select" style="width:100%">
-      <option value="lastname" (click)="onSort('lastname', 1)">Nom (croissant)</option>
-      <option value="-lastname" (click)="onSort('lastname', -1)">Nom (décroissant)</option>
-      <option value="firstname" (click)="onSort('firstname', 1)">Prénom (croissant)</option>
-      <option value="-firstname" (click)="onSort('firstname', -1)">Prénom (décroissant)</option>
+    <select *ngIf="tabSort != []" id="sort" class="custom-select" style="width:100%" [ngModel]="selectedSort" (ngModelChange)="onSort($event)">
+      <option *ngFor="let sort of tabSort; let i = index" [ngValue]=i>{{sort[0]}}</option>
     </select>
     <h5 class="mt-2">Liste</h5>
     <div>

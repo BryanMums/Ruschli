@@ -23,7 +23,8 @@ var index_8 = require("./_components/task_detail/index");
 var index_9 = require("./_components/choose_sector/index");
 var index_10 = require("./_components/add_task/index");
 var mydatepicker_1 = require("mydatepicker");
-//import { Ng2FlatpickrComponent } from 'flatpickr';
+var angular_2_dropdown_multiselect_1 = require("angular-2-dropdown-multiselect");
+var index_11 = require("./_utils/index");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -34,9 +35,11 @@ AppModule = __decorate([
         imports: [
             platform_browser_1.BrowserModule,
             forms_1.FormsModule,
+            forms_1.ReactiveFormsModule,
             http_1.HttpModule,
             app_routing_1.routing,
-            mydatepicker_1.MyDatePickerModule
+            mydatepicker_1.MyDatePickerModule,
+            angular_2_dropdown_multiselect_1.MultiselectDropdownModule
         ],
         declarations: [
             app_component_1.AppComponent,
@@ -47,14 +50,17 @@ AppModule = __decorate([
             index_7.TaskCardComponent,
             index_8.TaskDetailComponent,
             index_9.ChooseSectorComponent,
-            index_10.AddTaskComponent
+            index_10.AddTaskComponent,
+            index_11.KeysPipe,
+            index_11.ValuesPipe
         ],
         providers: [
             index_1.AuthGuard,
             index_2.AuthenticationService,
             index_2.UserService,
             index_2.ResidentService,
-            index_2.TaskService
+            index_2.TaskService,
+            index_2.FormService
         ],
         bootstrap: [app_component_1.AppComponent]
     })

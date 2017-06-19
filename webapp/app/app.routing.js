@@ -16,7 +16,7 @@ var appRoutes = [
     { path: 'resident/:id', component: index_4.ResidentComponent, canActivate: [index_8.AuthGuard] },
     { path: 'task/:id', component: index_5.TaskDetailComponent, canActivate: [index_8.AuthGuard] },
     { path: 'choose-sector', component: index_6.ChooseSectorComponent, canActivate: [index_8.AuthGuard] },
-    { path: 'task/add', component: index_7.AddTaskComponent, canActivate: [index_8.AuthGuard] },
+    { path: 'task-add', component: index_7.AddTaskComponent, canActivate: [index_8.AuthGuard] },
     // otherwise redirect to home
     { path: '**', redirectTo: '' }
 ];

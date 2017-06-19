@@ -22,8 +22,12 @@
             'angular-in-memory-web-api': 'npm:angular-in-memory-web-api/bundles/in-memory-web-api.umd.js',
 
             // other libraries
+            'plugin-traceur': 'npm:systemjs-plugin-traceur/plugin-traceur.js',
+            'traceur': 'npm:traceur/bin/traceur.js',
+            'traceur-runtime': 'npm:traceur/bin/traceur-runtime.js',
             'rxjs': 'npm:rxjs',
-            'mydatepicker': 'npm:mydatepicker/bundles/mydatepicker.umd.min.js'
+            'mydatepicker': 'npm:mydatepicker/bundles/mydatepicker.umd.min.js',
+            'angular-2-dropdown-multiselect': 'npm:angular-2-dropdown-multiselect/bundles/dropdown.umd.js'
         },
         // packages tells the System loader how to load when no filename and/or no extension
         packages: {
@@ -33,11 +37,20 @@
             },
             rxjs: {
                 defaultExtension: 'js'
-            },
-            flatpickr: {
-                main: './ng2-flatpickr.js',
-                defaultExtension: 'js'
             }
-        }
+        },
+        meta: {
+          'traceur': {
+            format: 'global',
+            exports: 'traceur',
+            scriptLoad: false
+          },
+          'traceur-runtime': {
+            format: 'global',
+            exports: '$traceurRuntime'
+          }
+        },
+        transpiler: 'plugin-traceur',
+        transpilerRuntime: false
     });
 })(this);

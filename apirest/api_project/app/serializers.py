@@ -3,9 +3,6 @@ from django.contrib.auth.models import User
 
 from rest_framework import serializers
 
-
-
-
 class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
     class Meta:
@@ -62,6 +59,12 @@ class ResidentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskTypeSerializer(serializers.HyperlinkedModelSerializer):
+    default_resident = ResidentSerializer(many=True)
+    default_room = RoomSerializer(many=True)
+    default_receiver_user = UserSerializer(many=True)
+    default_receiver_group = GroupSerializer(many=True)
+    default_copyreceiver_user = UserSerializer(many=True)
+    default_copyreceiver_group = GroupSerializer(many=True)
 
     class Meta:
         model = models.TaskType
@@ -71,12 +74,21 @@ class TaskTypeSerializer(serializers.HyperlinkedModelSerializer):
             'default_title',
             'change_title',
             'change_description',
+            'default_description',
+            'change_time',
+            'default_time',
             'change_resident',
+            'default_resident',
             'change_room',
+            'default_room',
             'change_receiver_user',
+            'default_receiver_user',
             'change_receiver_group',
+            'default_receiver_group',
             'change_copyreceiver_user',
+            'default_copyreceiver_user',
             'change_copyreceiver_group',
+            'default_copyreceiver_group',
             'default_need_someone',
             'change_need_someone',
         )
@@ -123,8 +135,8 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 class TaskDateSerializer(serializers.ModelSerializer):
-    task = TaskSerializer(many=False)
-    comments = CommentSerializer(many=True)
+    task = TaskSerializer(many=False, read_only=False)
+    comments = CommentSerializer(many=True, read_only=False)
 
     class Meta:
         model = models.TaskDate

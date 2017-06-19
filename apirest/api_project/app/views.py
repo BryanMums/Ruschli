@@ -1,12 +1,13 @@
 from django.views.generic import DetailView, ListView, UpdateView, CreateView
 from .models import Group, Room, Resident, TaskType, Task, TaskDate, Comment, TaskManager
 from .forms import GroupForm, RoomForm, ResidentForm, TaskTypeForm, TaskForm, TaskDateForm, CommentForm
-from .serializers import TaskDateSerializer, ResidentSerializer, UserSerializer
+from .serializers import TaskDateSerializer, ResidentSerializer, UserSerializer, TaskTypeSerializer
 from django.http import HttpResponse
 from datetime import datetime
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes, detail_route
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET'])
 def get_connected_user(request):
@@ -63,16 +64,24 @@ def get_residents_active(request):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+def get_tasktypes_sector(request, sector_id):
+    sector = Group.objects.get(pk=sector_id)
+    data = TaskType.objects.filter(group=sector)
+    serializer = TaskTypeSerializer(data, many=True, context={'request': request})
+    return Response(serializer.data)
+
+
 @api_view(['POST'])
+@permission_classes([IsAuthenticated])
 def add_task(request):
-    post = request.POST.copy()
-    taskdate = TaskManager.create_task(post, request.user)
+    taskdate = TaskManager.create_task(request.data, request.user)
     if taskdate is None:
         content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
         serializer = TaskDateSerializer(taskdate, many=False, context={'request': request})
-        return Response(serializer.data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])

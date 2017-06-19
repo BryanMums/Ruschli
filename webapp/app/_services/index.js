@@ -7,4 +7,5 @@ __export(require("./authentication.service"));
 __export(require("./user.service"));
 __export(require("./resident.service"));
 __export(require("./task.service"));
+__export(require("./form.service"));
 //# sourceMappingURL=index.js.map

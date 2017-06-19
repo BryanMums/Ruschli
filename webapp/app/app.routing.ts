@@ -16,7 +16,7 @@ const appRoutes: Routes = [
     { path: 'resident/:id', component: ResidentComponent, canActivate: [AuthGuard]},
     { path: 'task/:id', component: TaskDetailComponent, canActivate: [AuthGuard]},
     { path: 'choose-sector', component: ChooseSectorComponent, canActivate: [AuthGuard]},
-    { path: 'task/add', component: AddTaskComponent, canActivate: [AuthGuard]},
+    { path: 'task-add', component: AddTaskComponent, canActivate: [AuthGuard]},
 
     // otherwise redirect to home
     { path: '**', redirectTo: '' }

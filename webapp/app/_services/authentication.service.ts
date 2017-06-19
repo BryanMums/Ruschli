@@ -12,6 +12,8 @@ export class AuthenticationService {
     public user: User;
     public token: string;
     public selectedGroup: Group;
+    public headers: Headers;
+    public options: RequestOptions;
 
     constructor(private http: Http) {
         // set token if saved in local storage
@@ -21,6 +23,8 @@ export class AuthenticationService {
             var currentUser = null;
         }
         this.token = currentUser && currentUser.token;
+        this.headers = new Headers({ 'Authorization': 'JWT ' + this.token });
+        this.options = new RequestOptions({ headers: this.headers });
     }
 
     login(username: string, password: string): Observable<boolean> {

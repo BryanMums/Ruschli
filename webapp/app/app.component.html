@@ -13,7 +13,7 @@
         <a class="nav-link" [routerLink]="['/residents']">Résidents</a>
       </li>
       <li class="nav-item active">
-        <a class="nav-link" href="#"><i class="fa fa-plus-circle" style="color: #2ecc71" aria-hidden="true"></i> Nouvelle tâche</a>
+        <a class="nav-link" [routerLink]="['/task-add']"><i class="fa fa-plus-circle" style="color: #2ecc71" aria-hidden="true"></i> Nouvelle tâche</a>
       </li>
       <li class="nav-item active">
         <a class="nav-link" [routerLink]="['/login']"><i class="fa fa-power-off" style="color: #e74c3c" aria-hidden="true"></i> Déconnexion</a>
@@ -22,7 +22,7 @@
   </div>
 </nav>
 
-<div class="pt-2">
+<div class="pt-2" style="min-height:76%">
     <div class="container-fluid">
         <div class="col-12 col-md-8 offset-md-2">
             <router-outlet></router-outlet>

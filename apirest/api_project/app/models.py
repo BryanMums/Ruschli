@@ -113,9 +113,12 @@ class TaskType(models.Model):
 
     # Fields
     name = CharField(max_length=50)
-    default_title = CharField(max_length=60, null=True)
+    default_title = CharField(max_length=60, null=True, blank=True)
     change_title = BooleanField(default=True)
+    default_description = TextField(null=True, blank=True)
     change_description = BooleanField(default=True)
+    default_time = TimeField(null=True, blank=True)
+    change_time = BooleanField(default=True)
     change_resident = BooleanField(default=True)
     change_room = BooleanField(default=True)
     change_receiver_user = BooleanField(default=True)
@@ -287,18 +290,20 @@ class TaskManager(models.Manager):
                                             need_someone = post.get('need_someone'),
                                             id_type_task = post.get('id_type_task'),
                                             author = user)
+
+
                 if post.get('resident') is not None:
-                    task.resident.add(post.get('resident'))
+                    task.resident.add(*post.get('resident'))
                 if post.get('room') is not None:
-                    task.room.add(post.get('room'))
+                    task.room.add(*post.get('room'))
                 if post.get('receiver_user') is not None:
-                    task.receiver_user.add(post.get('receiver_user'))
+                    task.receiver_user.add(*post.get('receiver_user'))
                 if post.get('receiver_group') is not None:
-                    task.receiver_group.add(post.get('receiver_group'))
+                    task.receiver_group.add(*post.get('receiver_group'))
                 if post.get('copyreceiver_user') is not None:
-                    task.copyreceiver_user.add(post.get('copyreceiver_user'))
+                    task.copyreceiver_user.add(*post.get('copyreceiver_user'))
                 if post.get('copyreceiver_group') is not None:
-                    task.copyreceiver_group.add(post.get('copyreceiver_group'))
+                    task.copyreceiver_group.add(*post.get('copyreceiver_group'))
 
                 start_date = post.get('start_date')
                 end_date = post.get('end_date')
@@ -335,7 +340,7 @@ class TaskManager(models.Manager):
                     elif periodicType == 1:
                         if post.get('daysOfWeek') is None or post.get('intervalWeek') is None:
                             raise
-                        data_dict['daysOfWeek'] = post.get('daysOfWeek')
+                        #data_dict['daysOfWeek'] = post.get('daysOfWeek')
                         data_dict['intervalWeek'] = post.get('intervalWeek')
                     # Dans le cas : Mensuel
                     elif periodicType == 2:
@@ -352,7 +357,7 @@ class TaskManager(models.Manager):
                             if post.get('weekNumber') is None or post.get('daysOfWeek') is None or post.get('intervalMonth') is None:
                                 raise
                             data_dict['weekNumber'] = post.get('weekNumber')
-                            data_dict['daysOfWeek'] = post.get('daysOfWeek')
+                            #data_dict['daysOfWeek'] = post.get('daysOfWeek')
                             data_dict['intervalMonth'] = post.get('intervalMonth')
                         else:
                             raise
@@ -371,6 +376,12 @@ class TaskManager(models.Manager):
 
                 # On fait l'ajout selon les valeurs gardées
                 result = TaskDate.objects.create(**data_dict)
+
+                # On doit encore ajouter les dépendances avec weeksOfDay si c'est nécessaire
+
+                if eventType == 1:
+                    if periodicType == 1 or (periodicType == 2 and monthlyType == 1):
+                        result.daysOfWeek.add(*post.get('daysOfWeek'))
 
         except Exception as e:
             #return "prout"
@@ -436,21 +447,21 @@ def get_tasks_for_a_day(self, date, group, resident):
 
             # Hebdomadaire
             elif periodicType == 1 :
-                if date.weekday() in taskdate.daysOfWeek :
+                if Day.objects.get(pk=date.weekday()) in taskdate.daysOfWeek.all() :
                 # Se répète chaque semaine
                     if taskdate.intervalWeek == 1 | taskdate.intervalWeek is None:
                         # on doit juste regarder si on est le bon jour de la semaine
                         isToAdd = True
                     # Se répète chaque x semaines
                     else :
-                        dt = datetime.strptime(date.date(), '%Y-%m-%d')
-                        newdate = dt - timedelta(days=dt.weekday())
-                        while newdate <= date.date():
-                            enddate = newdate = datetime.timedelta(days=6)
-                            if date.date() >= newdate & date.date() <= endate :
+                        dt = datetime.strptime(str(date.date()), '%Y-%m-%d')
+                        newdate = dt - datetime2.timedelta(days=dt.weekday())
+                        while newdate.date() <= date.date():
+                            enddate = newdate + datetime2.timedelta(days=6)
+                            if date.date() >= newdate.date() and date.date() <= enddate.date() :
                                 isToAdd = True
                                 break
-                            newdate += datetime.timedelta(days=7 * taskdate.intervalWeek)
+                            newdate += datetime2.timedelta(days=7 * taskdate.intervalWeek)
 
             # Mensuel
             elif periodicType == 2 :

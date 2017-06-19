@@ -17,6 +17,12 @@ var ResidentsComponent = (function () {
         this.residentService = residentService;
         this.router = router;
         this.residents = [];
+        this.tabSort = [];
+        this.selectedSort = 0;
+        this.tabSort[0] = ['Prénom (croissant)', 'firstname', 1];
+        this.tabSort[1] = ['Prénom (décroissant)', 'firstname', -1];
+        this.tabSort[2] = ['Nom (croissant)', 'lastname', 1];
+        this.tabSort[3] = ['Nom (décroissant)', 'lastname', -1];
     }
     ResidentsComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -24,14 +30,15 @@ var ResidentsComponent = (function () {
         this.residentService.getResidents()
             .subscribe(function (residents) {
             _this.residents = residents;
-            console.log(_this.residents);
+            _this.onSort(_this.selectedSort);
         });
     };
     ResidentsComponent.prototype.onSelect = function (resident) {
         this.router.navigate(['/resident', resident.pk]);
     };
-    ResidentsComponent.prototype.onSort = function (param, value) {
-        console.log(param + " : " + value);
+    ResidentsComponent.prototype.onSort = function (index) {
+        var param = this.tabSort[index][1];
+        var value = this.tabSort[index][2];
         this.residents.sort(function (res1, res2) {
             if (res1[param] > res2[param]) {
                 return -1 * parseInt(value);
@@ -44,6 +51,9 @@ var ResidentsComponent = (function () {
             }
         });
         console.log(this.residents);
+    };
+    ResidentsComponent.prototype.test = function (lol) {
+        console.log(lol);
     };
     return ResidentsComponent;
 }());

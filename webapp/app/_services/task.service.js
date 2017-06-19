@@ -25,6 +25,18 @@ var TaskService = (function () {
         return this.http.get('http://localhost:8000/api/taskdate/' + taskDate_id + '/', options)
             .map(function (response) { return response.json(); });
     };
+    TaskService.prototype.getTaskTypes = function () {
+        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+        var options = new http_1.RequestOptions({ headers: headers });
+        return this.http.get('http://localhost:8000/api/tasktypes/' + localStorage["sector"] + '/', options)
+            .map(function (response) { return response.json(); });
+    };
+    TaskService.prototype.getTaskType = function (pk) {
+        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+        var options = new http_1.RequestOptions({ headers: headers });
+        return this.http.get('http://localhost:8000/api/tasktype/' + pk + '/', options)
+            .map(function (response) { return response.json(); });
+    };
     return TaskService;
 }());
 TaskService = __decorate([

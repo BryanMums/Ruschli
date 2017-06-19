@@ -13,6 +13,7 @@ import {IMyDpOptions, IMyDateModel, IMyDate} from 'mydatepicker';
 
 export class ChooseSectorComponent {
     user: User;
+    selectedSector:number = 0
 
     constructor(private userService: UserService ,private router: Router){}
 
@@ -24,7 +25,6 @@ export class ChooseSectorComponent {
     }
 
     change(pk: number){
-      console.log("fiesjfioejnsiofs"+pk)
       localStorage["sector"] = pk
       this.router.navigate(['/'])
     }

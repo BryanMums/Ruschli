@@ -17,6 +17,7 @@ var ChooseSectorComponent = (function () {
     function ChooseSectorComponent(userService, router) {
         this.userService = userService;
         this.router = router;
+        this.selectedSector = 0;
     }
     ChooseSectorComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -26,7 +27,6 @@ var ChooseSectorComponent = (function () {
         });
     };
     ChooseSectorComponent.prototype.change = function (pk) {
-        console.log("fiesjfioejnsiofs" + pk);
         localStorage["sector"] = pk;
         this.router.navigate(['/']);
     };

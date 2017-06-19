@@ -93,3 +93,11 @@ urlpatterns += (
 urlpatterns += (
     url(r'^app/test/create', views.test_create),
 )
+
+urlpatterns += (
+    url(r'^api/createtask/', views.add_task, name='add-task'),
+)
+
+urlpatterns += (
+    url(r'^api/tasktypes/(?P<sector_id>\S+)/$', views.get_tasktypes_sector),
+)

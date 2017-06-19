@@ -4,9 +4,9 @@
   <div class="col-12 col-md-6">
     <p>Dans quel secteur travaillez-vous aujourdĥui ?</p>
     <div class="form-group">
-      <select class="form-control">
-          <option selected="true" disabled="disabled">Veuillez choisir un secteur</option>
-          <option *ngFor="let sector of user.sectors" (click)="change(sector.pk)">{{sector.title}}</option>
+      <select class="form-control" [ngModel]="selectedSector" (ngModelChange)="change($event)">
+          <option value="0" selected="true" disabled="disabled">Veuillez choisir un secteur</option>
+          <option *ngFor="let sector of user.sectors" [ngValue]="sector.pk">{{sector.title}}</option>
       </select>
     </div>
   </div>

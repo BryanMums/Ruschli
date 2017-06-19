@@ -25,6 +25,8 @@ var AuthenticationService = (function () {
             var currentUser = null;
         }
         this.token = currentUser && currentUser.token;
+        this.headers = new http_2.Headers({ 'Authorization': 'JWT ' + this.token });
+        this.options = new http_2.RequestOptions({ headers: this.headers });
     }
     AuthenticationService.prototype.login = function (username, password) {
         var _this = this;

@@ -22,4 +22,22 @@ export class TaskService {
       return this.http.get('http://localhost:8000/api/taskdate/'+taskDate_id+'/', options)
           .map((response: Response) => response.json());
     }
+
+    getTaskTypes(): Observable<any[]>{
+
+      let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+      let options = new RequestOptions({ headers: headers });
+
+      return this.http.get('http://localhost:8000/api/tasktypes/'+localStorage["sector"]+'/', options)
+          .map((response: Response) => response.json());
+    }
+
+    getTaskType(pk: number): Observable<any>{
+
+      let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
+      let options = new RequestOptions({ headers: headers });
+
+      return this.http.get('http://localhost:8000/api/tasktype/'+pk+'/', options)
+        .map((response: Response) => response.json());
+    }
 }
