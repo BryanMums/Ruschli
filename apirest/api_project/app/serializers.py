@@ -22,7 +22,6 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         fields = (
             'id',
             'username',
-            'comments',
             'sectors'
         )
 

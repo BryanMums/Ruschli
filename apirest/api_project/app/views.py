@@ -10,6 +10,33 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET'])
+def test_comment(request):
+    user = request.user
+    sector = Group.objects.get(pk=1)
+    post = {}
+    post["author"] = user.pk
+    taskdate = TaskDate.objects.get(pk=56)
+    post["taskdate"] = taskdate.pk
+    post["text"] = "Ceci est un commentaire de test 2"
+    date = "2017-06-19"
+    comment = TaskManager.add_comment(post, date)
+    taskDateToReturn = comment.taskdate
+    serializer = TaskDateSerializer(taskDateToReturn, many=False, context={'request': request})
+    return Response(serializer.data)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_comment(request):
+    comment = TaskManager.add_comment(request.data, request.user)
+    if comment is None:
+        content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        taskdate = comment.taskdate
+        serializer = TaskDateSerializer(taskdate, many=False, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
 def get_connected_user(request):
     serializer = UserSerializer(request.user, many=False, context={'request': request})
     return Response(serializer.data)
@@ -90,10 +117,6 @@ def update_task(request):
     # La première étape va être de savoir s'il faut créer une nouvelle exception/taskdate
     pass
 
-@api_view(['POST'])
-def add_comment(request, taskDate_id):
-    #TODO : Vérifier s'il faut créer une exception
-    pass
 
 class GroupListView(ListView):
     model = Group

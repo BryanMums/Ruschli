@@ -19,7 +19,7 @@ var TaskCardComponent = (function () {
     }
     TaskCardComponent.prototype.detail = function () {
         console.log("lol");
-        this.router.navigate(['./task', this.taskDate.pk]);
+        //this.router.navigate(['./task',this.taskDate.pk])
     };
     return TaskCardComponent;
 }());

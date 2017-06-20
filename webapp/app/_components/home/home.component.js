@@ -12,9 +12,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var index_1 = require("../../_services/index");
 var HomeComponent = (function () {
-    function HomeComponent(userService) {
+    function HomeComponent(userService, taskService) {
         this.userService = userService;
+        this.taskService = taskService;
         this.tasks = [];
+        this.task = null;
+        this.date = null;
         this.selDate = { year: 2017, month: 6, day: 6 };
         this.myDatePickerOptions = {
             dateFormat: 'yyyy-mm-dd',
@@ -32,8 +35,17 @@ var HomeComponent = (function () {
         var date = new Date();
         this.selDate = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
         var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+        this.date = dateStr;
         // On récupère le résident selon l'id
         this.userService.getTasks(dateStr)
+            .subscribe(function (tasks) {
+            _this.tasks = tasks;
+        });
+    };
+    HomeComponent.prototype.list = function () {
+        var _this = this;
+        this.task = null;
+        this.userService.getTasks(this.date)
             .subscribe(function (tasks) {
             _this.tasks = tasks;
         });
@@ -41,11 +53,21 @@ var HomeComponent = (function () {
     HomeComponent.prototype.onDateChanged = function (event) {
         var _this = this;
         // event properties are: event.date, event.jsdate, event.formatted and event.epoc
+        this.task = null;
         var date = event;
         console.log(date.formatted);
+        this.date = date.formatted;
         this.userService.getTasks(date.formatted)
             .subscribe(function (tasks) {
             _this.tasks = tasks;
+        });
+    };
+    HomeComponent.prototype.onClickTask = function (pk) {
+        var _this = this;
+        console.log("AHAHAHAH" + pk);
+        this.taskService.getTaskDate(pk)
+            .subscribe(function (task) {
+            _this.task = task;
         });
     };
     return HomeComponent;
@@ -55,7 +77,8 @@ HomeComponent = __decorate([
         moduleId: module.id,
         templateUrl: 'home.component.html'
     }),
-    __metadata("design:paramtypes", [index_1.UserService])
+    __metadata("design:paramtypes", [index_1.UserService,
+        index_1.TaskService])
 ], HomeComponent);
 exports.HomeComponent = HomeComponent;
 //# sourceMappingURL=home.component.js.map

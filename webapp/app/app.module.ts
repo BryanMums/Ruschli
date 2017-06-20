@@ -19,6 +19,7 @@ import { AddTaskComponent } from './_components/add_task/index';
 import { MyDatePickerModule } from 'mydatepicker';
 import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
 import { KeysPipe, ValuesPipe } from './_utils/index'
+import { MomentModule } from 'angular2-moment';
 
 @NgModule({
     imports: [
@@ -28,7 +29,8 @@ import { KeysPipe, ValuesPipe } from './_utils/index'
         HttpModule,
         routing,
         MyDatePickerModule,
-        MultiselectDropdownModule
+        MultiselectDropdownModule,
+        MomentModule
     ],
     declarations: [
         AppComponent,

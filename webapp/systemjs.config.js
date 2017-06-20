@@ -27,7 +27,9 @@
             'traceur-runtime': 'npm:traceur/bin/traceur-runtime.js',
             'rxjs': 'npm:rxjs',
             'mydatepicker': 'npm:mydatepicker/bundles/mydatepicker.umd.min.js',
-            'angular-2-dropdown-multiselect': 'npm:angular-2-dropdown-multiselect/bundles/dropdown.umd.js'
+            'angular-2-dropdown-multiselect': 'npm:angular-2-dropdown-multiselect/bundles/dropdown.umd.js',
+            'angular2-moment': 'npm:angular2-moment/',
+            'moment': 'npm:moment/'
         },
         // packages tells the System loader how to load when no filename and/or no extension
         packages: {
@@ -36,6 +38,14 @@
                 defaultExtension: 'js'
             },
             rxjs: {
+                defaultExtension: 'js'
+            },
+            'moment': {
+                main: './moment.js',
+                defaultExtension: 'js'
+            },
+            'angular2-moment': {
+                main: './index.js',
                 defaultExtension: 'js'
             }
         },

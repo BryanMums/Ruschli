@@ -25,6 +25,7 @@ var index_10 = require("./_components/add_task/index");
 var mydatepicker_1 = require("mydatepicker");
 var angular_2_dropdown_multiselect_1 = require("angular-2-dropdown-multiselect");
 var index_11 = require("./_utils/index");
+var angular2_moment_1 = require("angular2-moment");
 var AppModule = (function () {
     function AppModule() {
     }
@@ -39,7 +40,8 @@ AppModule = __decorate([
             http_1.HttpModule,
             app_routing_1.routing,
             mydatepicker_1.MyDatePickerModule,
-            angular_2_dropdown_multiselect_1.MultiselectDropdownModule
+            angular_2_dropdown_multiselect_1.MultiselectDropdownModule,
+            angular2_moment_1.MomentModule
         ],
         declarations: [
             app_component_1.AppComponent,

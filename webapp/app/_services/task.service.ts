@@ -40,4 +40,11 @@ export class TaskService {
       return this.http.get('http://localhost:8000/api/tasktype/'+pk+'/', options)
         .map((response: Response) => response.json());
     }
+
+    addComment(data:any): Observable<TaskDate>{
+        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token , 'Content-Type': 'application/json'});
+        let options = new RequestOptions({ headers: headers });
+        return this.http.post('http://localhost:8000/api/addcomment/', data, options)
+          .map((response: Response) => response.json());
+    }
 }

@@ -101,3 +101,8 @@ urlpatterns += (
 urlpatterns += (
     url(r'^api/tasktypes/(?P<sector_id>\S+)/$', views.get_tasktypes_sector),
 )
+
+urlpatterns += (
+    url(r'^api/addcomment/', views.add_comment),
+    url(r'^api/testcomment/', views.test_comment),
+)

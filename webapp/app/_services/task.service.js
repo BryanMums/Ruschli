@@ -37,6 +37,12 @@ var TaskService = (function () {
         return this.http.get('http://localhost:8000/api/tasktype/' + pk + '/', options)
             .map(function (response) { return response.json(); });
     };
+    TaskService.prototype.addComment = function (data) {
+        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token, 'Content-Type': 'application/json' });
+        var options = new http_1.RequestOptions({ headers: headers });
+        return this.http.post('http://localhost:8000/api/addcomment/', data, options)
+            .map(function (response) { return response.json(); });
+    };
     return TaskService;
 }());
 TaskService = __decorate([

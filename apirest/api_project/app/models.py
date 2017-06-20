@@ -252,6 +252,26 @@ class TaskDate(models.Model):
     def __str__(self):
         return self.task.title + " : " + str(self.id)
 
+    def is_an_exception(self):
+        # A modifier en OR avec eventType == 0 or parent != None ?
+        if self.eventType == 0:
+            return True
+        else:
+            if self.parent == None:
+                return False
+            return True
+
+    def can_comment(self, user, sector):
+        # S'il la tâche est destinée à l'utilisateur ou s'il est l'auteur
+        return user is self.task.author or user in (self.task.receiver_user.all() or self.task.copyreceiver_user.all()) \
+         or sector in (self.task.receiver_group.all() or self.task.copyreceiver_group.all())
+
+    def can_take(self, user):
+        pass
+
+    def can_modify(self, user):
+        pass
+
 
 class Comment(models.Model):
 
@@ -279,6 +299,36 @@ class Comment(models.Model):
 
 
 class TaskManager(models.Manager):
+    def create_an_exception(taskDate, date):
+        ancient = TaskDate.objects.get(pk=taskDate.pk)
+        exception = taskDate
+        exception.pk = None
+        exception.start_date = date
+        exception.eventType = 0
+        exception.save()
+        exception.parent = ancient
+        exception.save()
+        return exception.pk
+
+    def add_taker(post, user):
+        pass
+
+    def add_comment(post, user):
+        taskDate = TaskDate.objects.get(pk=post['taskdate'])
+        if not taskDate.is_an_exception():
+            # Il faut encore faire le test s'il y a une exception qui existe déjà.
+            # Le cas où la personne est sur la tâche qui n'est pas encore une exception mais qu'une exception a été créée.
+            possibleTaskDate = TaskDate.objects.filter(parent = taskDate, start_date = post['date']).first()
+            if possibleTaskDate == None :
+                post["taskdate"] = TaskManager().create_an_exception(taskDate, post['date'])
+            else:
+                post["taskdate"] = possibleTaskDate.pk
+
+        comment = Comment.objects.create(text = post['text'],
+                                        author = User.objects.get(pk=user.pk),
+                                        taskdate = TaskDate.objects.get(pk=post['taskdate']))
+        return comment
+
 
     def create_task(post, user):
         result = None

@@ -14,42 +14,67 @@ var index_1 = require("../../_models/index");
 var index_2 = require("../../_services/index");
 var router_1 = require("@angular/router");
 require("rxjs/add/operator/switchMap");
+var forms_1 = require("@angular/forms");
 var TaskDetailComponent = (function () {
-    function TaskDetailComponent(userService, taskService, route, router) {
+    function TaskDetailComponent(userService, taskService, route, router, _fb) {
         this.userService = userService;
         this.taskService = taskService;
         this.route = route;
         this.router = router;
+        this._fb = _fb;
         this.today = { year: 2017, month: 6, day: 6 };
         this.canTakeInCharge = true;
     }
     TaskDetailComponent.prototype.ngOnInit = function () {
-        var _this = this;
         var date = new Date();
         this.today = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
         var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
         // On récupère le résident selon l'id
-        this.route.params
-            .switchMap(function (params) { return _this.taskService.getTaskDate(+params['id']); })
+        this.myForm = this._fb.group({
+            text: ['', forms_1.Validators.required]
+        });
+    };
+    TaskDetailComponent.prototype.addComment = function (model, isValid) {
+        var _this = this;
+        console.log(model.text, this.date, this.taskDate.pk);
+        var data = {};
+        data["text"] = model.text;
+        data["date"] = this.date;
+        data["taskdate"] = this.taskDate.pk;
+        this.taskService.addComment(data)
             .subscribe(function (taskDate) {
-            _this.taskDate = taskDate;
+            if (taskDate.pk != null) {
+                _this.taskDate = taskDate;
+            }
+            else {
+                console.log("Erreur");
+            }
+        });
+        this.myForm = this._fb.group({
+            text: ['', forms_1.Validators.required]
         });
     };
     return TaskDetailComponent;
 }());
 __decorate([
     core_1.Input(),
+    __metadata("design:type", Object)
+], TaskDetailComponent.prototype, "date", void 0);
+__decorate([
+    core_1.Input(),
     __metadata("design:type", index_1.TaskDate)
 ], TaskDetailComponent.prototype, "taskDate", void 0);
 TaskDetailComponent = __decorate([
     core_1.Component({
+        selector: 'task-detail',
         moduleId: module.id,
         templateUrl: 'task_detail.component.html'
     }),
     __metadata("design:paramtypes", [index_2.UserService,
         index_2.TaskService,
         router_1.ActivatedRoute,
-        router_1.Router])
+        router_1.Router,
+        forms_1.FormBuilder])
 ], TaskDetailComponent);
 exports.TaskDetailComponent = TaskDetailComponent;
 //# sourceMappingURL=task_detail.component.js.map

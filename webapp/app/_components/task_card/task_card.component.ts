@@ -18,7 +18,7 @@ export class TaskCardComponent {
 
     detail(){
       console.log("lol")
-      this.router.navigate(['./task',this.taskDate.pk])
+      //this.router.navigate(['./task',this.taskDate.pk])
     }
 
 }
