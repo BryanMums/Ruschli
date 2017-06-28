@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
 import { User, TaskDate } from '../../_models/index';
 import { TaskService, FormService } from '../../_services/index';
 import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
@@ -8,6 +8,7 @@ import { IMultiSelectOption, IMultiSelectSettings, IMultiSelectTexts } from 'ang
 import { Router, ActivatedRoute, Params } from '@angular/router';
 
 @Component({
+    selector: 'add-task',
     moduleId: module.id,
     templateUrl: 'add_task.component.html'
 })
@@ -16,7 +17,11 @@ export class AddTaskComponent implements OnInit {
     taskTypes : any[] = [];
     state = 1;
     taskType: any = null;
-    selectedSector = 0;
+    @Input() date: Date = null;
+    @Input() taskToAdd: Boolean = true
+    @Input() taskDate: TaskDate = null
+    @Input() onlyAtDate: Boolean = false
+
     // Tableaux des différents choix
     optionsDaysOfWeekModel: number[] = [];
     optionsResidentsModel: number[] = [];
@@ -25,7 +30,7 @@ export class AddTaskComponent implements OnInit {
     optionsSectorsModel: number[] = [];
     optionsCopyUsersModel: number[] = [];
     optionsCopySectorsModel: number[] = [];
-    optionsWeekNumberModel: number = [];
+    optionsWeekNumberModel: number = null;
 
     // Options pour le choix des jours
     daysOptions: IMultiSelectOption[] = [
@@ -121,97 +126,123 @@ export class AddTaskComponent implements OnInit {
         let date = new Date();
         this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
         let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
-
-        // On va récupérer les types de tâches
-        this.formService.getTaskTypes()
-            .subscribe(types => {
-                this.taskTypes = types
-            })
+        if(!this.taskToAdd && this.taskDate != null){
+            this.state = 2
+            this.taskService.getTaskType(this.taskDate.task.id_type_task)
+                .subscribe(taskType => {
+                  this.taskType = taskType
+                  this.getAllOptions()
+                })
+        }else{
+          // On va récupérer les types de tâches
+          this.formService.getTaskTypes()
+              .subscribe(types => {
+                  this.taskTypes = types
+              })
+        }
     }
 
     chooseType(pk: number){
       this.taskService.getTaskType(pk)
         .subscribe(taskType => {
           this.taskType = taskType
-          console.log(this.taskType)
-          // Configuration du formulaire
-          this.myForm = this._fb.group({
-              title: [this.taskType.default_title, Validators.required],
-              description: [this.taskType.default_description],
-              need_someone: [this.taskType.default_need_someone],
-              resident: [''],
-              room: [''],
-              receiver_user: [''],
-              receiver_group: [''],
-              copyreceiver_user: [''],
-              copyreceiver_group: [''],
-              time: [this.taskType.time],
-              eventType: this.initEventFormGroup(),
-          });
-
-          // Va nous servir par la suite
-          let that:any = this;
-
-          // On va écouter les changements au niveau de la périodicité
-          this.subscribeEventTypeChanges();
-          this.subscribePeriodicTypeChanges();
-          this.subscribeMonthlyTypeChanges();
-
-          // Permet de mettre à défaut les valeurs pour la périodicité
-          this.setEventType(this.EVENT_TYPES.NONPERIODIC);
-          this.setPeriodicType(this.PERIODIC_TYPES.QUOTIDIEN);
-          this.setMonthlyType(this.MONTHLY_TYPES.DAYDATE);
-
-          // On va récupérer les informations sur les résidents
-          this.formService.getResidents()
-              .subscribe(residents => {
-                  residents.forEach(function(resident){
-                    that.residentsOptions.push({id: resident.pk, name: resident.lastname + ' ' +resident.firstname})
-                  })
-                  this.taskType.default_resident.forEach(function(resident){
-                      that.optionsResidentsModel.push(resident.pk)
-                  });
-              });
-          // On va récupérer les informations sur les chambres
-          this.formService.getRooms()
-              .subscribe(rooms => {
-                  rooms.forEach(function(room){
-                    that.roomsOptions.push({id: room.pk, name: room.title})
-                  })
-                  this.taskType.default_room.forEach(function(room){
-                      that.optionsRoomsModel.push(room.pk)
-                  });
-              });
-          // On va récupérer les informations sur les utilisateurs
-          this.formService.getUsers()
-              .subscribe(users => {
-                  users.forEach(function(user){
-                    that.usersOptions.push({id: user.id, name: user.username})
-                    console.log(that.usersOptions)
-                  })
-                  this.taskType.default_receiver_user.forEach(function(user){
-                      that.optionsUsersModel.push(user.pk)
-                  });
-                  this.taskType.default_copyreceiver_user.forEach(function(user){
-                      that.optionsCopyUsersModel.push(user.pk)
-                  });
-
-              })
-          // On va récupérer les informations sur les secteurs
-          this.formService.getGroups()
-              .subscribe(groups => {
-                  groups.forEach(function(group){
-                    that.sectorsOptions.push({id: group.pk, name: group.title})
-                  })
-                  this.taskType.default_receiver_group.forEach(function(sector){
-                      that.optionsSectorsModel.push(sector.pk)
-                  });
-                  this.taskType.default_copyreceiver_group.forEach(function(sector){
-                      that.optionsCopySectorsModel.push(sector.pk)
-                  });
-              })
+          this.getAllOptions()
         })
       this.state = 2
+    }
+
+    getAllOptions(){
+      // Configuration du formulaire
+      this.myForm = this._fb.group({
+          title: [this.taskType.default_title, Validators.required],
+          description: [this.taskType.default_description],
+          need_someone: [this.taskType.default_need_someone],
+          resident: [''],
+          room: [''],
+          receiver_user: [''],
+          receiver_group: [''],
+          copyreceiver_user: [''],
+          copyreceiver_group: [''],
+          time: [this.taskType.time],
+          eventType: this.initEventFormGroup(),
+      });
+
+      // Va nous servir par la suite
+      let that:any = this;
+
+      // On va écouter les changements au niveau de la périodicité
+      this.subscribeEventTypeChanges();
+      this.subscribePeriodicTypeChanges();
+      this.subscribeMonthlyTypeChanges();
+
+      // Permet de mettre à défaut les valeurs pour la périodicité
+      this.setEventType(this.EVENT_TYPES.NONPERIODIC);
+      this.setPeriodicType(this.PERIODIC_TYPES.QUOTIDIEN);
+      this.setMonthlyType(this.MONTHLY_TYPES.DAYDATE);
+
+      // Définir de où l'on va récupérer les informations par défaut
+      if(this.taskToAdd){
+        let default_residents = this.taskType.default_resident
+        let default_rooms = this.taskType.default_room
+        let default_receiver_users = this.taskType.default_receiver_user
+        let default_receiver_groups = this.taskType.default_receiver_group
+        let default_copyreceiver_users = this.taskType.default_copyreceiver_user
+        let default_copyreceiver_groups = this.taskType.default_copyreceiver_group
+      }else{
+        let default_residents = this.taskDate.task.resident
+        let default_rooms = this.taskDate.task.room
+        let default_receiver_users = this.taskDate.task.receiver_user
+        let default_receiver_groups = this.taskDate.task.receiver_group
+        let default_copyreceiver_users = this.taskDate.task.copyreceiver_user
+        let default_copyreceiver_groups = this.taskDate.task.copyreceiver_group
+      }
+
+      // On va récupérer les informations sur les résidents
+      this.formService.getResidents()
+          .subscribe(residents => {
+              residents.forEach(function(resident){
+                that.residentsOptions.push({id: resident.pk, name: resident.lastname + ' ' +resident.firstname})
+              })
+              default_residents.forEach(function(resident){
+                  that.optionsResidentsModel.push(resident.pk)
+              });
+          });
+      // On va récupérer les informations sur les chambres
+      this.formService.getRooms()
+          .subscribe(rooms => {
+              rooms.forEach(function(room){
+                that.roomsOptions.push({id: room.pk, name: room.title})
+              })
+              default_rooms.forEach(function(room){
+                  that.optionsRoomsModel.push(room.pk)
+              });
+          });
+      // On va récupérer les informations sur les utilisateurs
+      this.formService.getUsers()
+          .subscribe(users => {
+              users.forEach(function(user){
+                that.usersOptions.push({id: user.id, name: user.username})
+              })
+              default_receiver_users.forEach(function(user){
+                  that.optionsUsersModel.push(user.pk)
+              });
+              default_copyreceiver_users.forEach(function(user){
+                  that.optionsCopyUsersModel.push(user.pk)
+              });
+          })
+      // On va récupérer les informations sur les secteurs
+      this.formService.getGroups()
+          .subscribe(groups => {
+              groups.forEach(function(group){
+                that.sectorsOptions.push({id: group.pk, name: group.title})
+              })
+              default_receiver_groups.forEach(function(sector: any){
+                  that.optionsSectorsModel.push(sector.pk)
+              });
+              default_copyreceiver_groups.forEach(function(sector: any){
+                  that.optionsCopySectorsModel.push(sector.pk)
+              });
+          })
     }
 
     save(model: TaskInterface, isValid: boolean){
@@ -234,7 +265,16 @@ export class AddTaskComponent implements OnInit {
       // Si c'est périodique
       else if(model['eventType'].type == this.EVENT_TYPES.PERIODIC){
           data['start_date'] = model.eventType.periodic.start_date.formatted
-          data['end_date'] = model.eventType.periodic.end_date.formatted;
+          if(model.eventType.periodic.end_date == null){
+              data["end_date"] = null
+          }else{
+              if(model.eventType.periodic.end_date.formatted == '0-00-00'){
+                  data['end_date'] = null;
+              }else{
+                  data['end_date'] = model.eventType.periodic.end_date.formatted;
+              }
+          }
+
           data['periodicType'] = model.eventType.periodic.type.id
           // Si c'est quotidien ou annuel, on ne fait rien de plus
           // Si c'est hebdomadaire
@@ -258,23 +298,34 @@ export class AddTaskComponent implements OnInit {
       }
       // Informations sur les destinataires
       data['receiver_user'] = this.optionsUsersModel
-      data['receiver_group'] = this.optionsCopyUsersModel
+      data['receiver_group'] = this.optionsSectorsModel
       data['copyreceiver_user'] = this.optionsCopyUsersModel
       data['copyreceiver_group'] = this.optionsCopySectorsModel
+
+      // Information sur le type de tâche
+      data['id_type_task'] = this.taskType.pk
       console.log(data)
 
-      this.formService.addTask(data)
-        .subscribe(response => {
-            if(response.pk != null){
-                console.log(response)
-                console.log("Ca a marché !")
-                this.router.navigate(['/task', response.pk])
-            }else{
-                console.log(response)
-                console.log("Il y a une erreur !")
-            }
-        })
+      if(this.taskToAdd){
+        this.formService.addTask(data)
+          .subscribe(response => {
+              if(response.pk != null){
+                  this.state = 3
+              }else{
+                  this.state = 4
+              }
+          })
+      }else{
 
+          console.log("ON MODIFIE")
+          let post = {}
+          post['values'] = data
+          post['taskdate'] = this.taskDate.pk
+          post['onlyAtDate'] = this.onlyAtDate
+          post['date'] = this.date
+
+          console.log(post)
+      }
     }
 
 
@@ -346,7 +397,6 @@ export class AddTaskComponent implements OnInit {
     }
 
     setPeriodicType(type: any) {
-        console.log((<any>this.myForm).controls.eventType)
         const ctrl: FormControl = (<any>this.myForm).controls.eventType.controls.periodic.controls.type;
         ctrl.setValue(type)
     }
@@ -391,7 +441,6 @@ export class AddTaskComponent implements OnInit {
               // remove all validators from card fields
               Object.keys(nonpCtrl.controls).forEach(key => {
                   nonpCtrl.controls[key].setValidators(null);
-                  console.log(key)
                   nonpCtrl.controls[key].updateValueAndValidity();
               });
             }
@@ -412,7 +461,4 @@ export class AddTaskComponent implements OnInit {
             console.log("Il y a un changement de monthlyType")
         })
     }
-
-
-
 }

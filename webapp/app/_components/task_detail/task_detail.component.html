@@ -27,12 +27,12 @@
   </div>
   <div class="row">
     <!-- A changer en true -->
-    <div class="col-md-6 col-12" *ngIf="taskDate.task.need_someone == false">
+    <div class="col-md-6 col-12" *ngIf="taskDate.task.need_someone == true">
       <div class="d-flex flex-column">
         <small><strong>Preneur</strong></small>
         <p>
-          <!--<button class="btn btn-success btn-sm btn-block" style="max-width:200px;">Je m'en charge !</button>-->
-          <span class="badge badge-success">Bryan Muhmenthaler</span>
+          <button *ngIf="!taskDate.taker" (click)="take()" class="btn btn-success btn-sm btn-block" style="max-width:200px;">Je m'en charge !</button>
+          <span *ngIf="taskDate.taker" class="badge badge-success">{{taskDate.taker.username}}</span>
         </p>
       </div>
     </div>

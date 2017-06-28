@@ -10,6 +10,50 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
 @api_view(['GET'])
+def test_modify(request):
+    post = {}
+    post["taskdate"] = 111 #27 ->
+    post["values"] = {}
+    post["values"]["eventType"] = 1
+    post["values"]["periodicType"] = 0
+    post["values"]["title"] = "Périodique 2"
+    post["values"]["start_date"] = "2017-06-29"
+    post["updateType"] = False # True --> Uniquement le jour J, False --> A partir du jour J
+    post["date"] = "2017-06-29"
+
+
+    post["values"]["description"] = "Normalement"
+    output = TaskManager.modify_task(post, request.user)
+    serializer = TaskDateSerializer(output, many=False, context={'request': request})
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def test_stop(request):
+    post = {}
+    # Test ok avec une tâche non-périodique de base.
+    # Test ok avec une tâche exception où on veut juste la désactiver.
+    # Test ok avec une tâche exception où on veut désactiver la tâche parent.
+    # Test ok avec une tâche périodique où veut l'arrêter.
+    post["taskdate"] = 71
+    post["date"] = "2017-06-21"
+    post["type"] = 0
+    post["includeDate"] = False
+    # output : "La tâche est non-périodique \nCe n'est pas une exception, elle ne dépend de rien, on la supprime \n"
+    output = TaskManager.stop_task(post, request.user)
+    return Response(output)
+
+@api_view(['GET'])
+def test_taker(request):
+    post = {}
+    post["taskdate"] = TaskDate.objects.get(pk=63).pk
+    post["date"] = "2017-06-20"
+    post["sector"] = "1"
+    taskDate = TaskManager.add_taker(post, request.user)
+    serializer = TaskDateSerializer(taskDate, many=False, context={'request': request})
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
 def test_comment(request):
     user = request.user
     sector = Group.objects.get(pk=1)
@@ -23,6 +67,40 @@ def test_comment(request):
     taskDateToReturn = comment.taskdate
     serializer = TaskDateSerializer(taskDateToReturn, many=False, context={'request': request})
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+def update_task(request):
+    taskDate = TaskManager.update_task(request.data, request.user)
+    if taskDate is None:
+        content = {'Erreur': 'problème lors de la modification'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        serializer = TaskDateSerializer(taskDate, many=false, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def stop_task(request):
+    taskDate = TaskManager.stop_task(request.data, request.user)
+    if taskDate is None:
+        content = {'Erreur': 'problème lors de la modification'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        serializer = TaskDateSerializer(taskDate, many=false, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def add_taker(request):
+    taskDate = TaskManager.add_taker(request.data, request.user)
+    if taskDate is None:
+        content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        serializer = TaskDateSerializer(taskDate, many=False, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -58,10 +136,6 @@ def test_create(request):
         serializer = TaskDateSerializer(data, many=False, context={'request': request})
         return Response(serializer.data)
 
-
-@api_view(['GET'])
-def test_update(request):
-    pass
 
 @api_view(['GET'])
 def get_tasks_for_a_day(request, date_url, group_id, resident_id=None):
@@ -110,12 +184,6 @@ def add_task(request):
         serializer = TaskDateSerializer(taskdate, many=False, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-@api_view(['POST'])
-def update_task(request):
-    #TODO : On va recevoir en POST les informations des 2 entités.
-    # La première étape va être de savoir s'il faut créer une nouvelle exception/taskdate
-    pass
 
 
 class GroupListView(ListView):

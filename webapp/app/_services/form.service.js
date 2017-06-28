@@ -47,6 +47,12 @@ var FormService = (function () {
         return this.http.post('http://localhost:8000/api/createtask/', data, options)
             .map(function (response) { return response.json(); });
     };
+    FormService.prototype.updateTask = function (data) {
+        var headers = new http_1.Headers({ 'Authorization': 'JWT' + this.authenticationService.token, 'Content-Type': 'application/json' });
+        var options = new http_1.RequestOptions({ headers: headers });
+        return this.http.post('http://localhost:8000/api/updatetask/', data, options)
+            .map(function (response) { return response.json(); });
+    };
     return FormService;
 }());
 FormService = __decorate([

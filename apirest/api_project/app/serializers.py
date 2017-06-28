@@ -93,7 +93,7 @@ class TaskTypeSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 
-class TaskSerializer(serializers.HyperlinkedModelSerializer):
+class TaskSerializer(serializers.ModelSerializer):
     room = RoomSerializer(many=True)
     resident = ResidentSerializer(many=True)
     receiver_user = UserSerializer(many=True)
@@ -117,7 +117,8 @@ class TaskSerializer(serializers.HyperlinkedModelSerializer):
             'receiver_group',
             'copyreceiver_user',
             'copyreceiver_group',
-            'author'
+            'author',
+            'id_type_task'
         )
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
@@ -136,6 +137,7 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
 class TaskDateSerializer(serializers.ModelSerializer):
     task = TaskSerializer(many=False, read_only=False)
     comments = CommentSerializer(many=True, read_only=False)
+    taker = UserSerializer(many=False, read_only=True)
 
     class Meta:
         model = models.TaskDate
@@ -157,5 +159,6 @@ class TaskDateSerializer(serializers.ModelSerializer):
             'dayNumber',
             'intervalMonth',
             'weekNumber',
-            'daysOfWeek'
+            'daysOfWeek',
+            'taker'
         )

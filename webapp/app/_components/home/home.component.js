@@ -18,6 +18,13 @@ var HomeComponent = (function () {
         this.tasks = [];
         this.task = null;
         this.date = null;
+        this.states = {
+            LIST: 0,
+            DETAIL: 1,
+            UPDATE: 2
+        };
+        this.state = this.states.LIST;
+        this.onlyAtDate = true;
         this.selDate = { year: 2017, month: 6, day: 6 };
         this.myDatePickerOptions = {
             dateFormat: 'yyyy-mm-dd',
@@ -44,6 +51,7 @@ var HomeComponent = (function () {
     };
     HomeComponent.prototype.list = function () {
         var _this = this;
+        this.state = this.states.LIST;
         this.task = null;
         this.userService.getTasks(this.date)
             .subscribe(function (tasks) {
@@ -55,7 +63,6 @@ var HomeComponent = (function () {
         // event properties are: event.date, event.jsdate, event.formatted and event.epoc
         this.task = null;
         var date = event;
-        console.log(date.formatted);
         this.date = date.formatted;
         this.userService.getTasks(date.formatted)
             .subscribe(function (tasks) {
@@ -64,11 +71,15 @@ var HomeComponent = (function () {
     };
     HomeComponent.prototype.onClickTask = function (pk) {
         var _this = this;
-        console.log("AHAHAHAH" + pk);
         this.taskService.getTaskDate(pk)
             .subscribe(function (task) {
             _this.task = task;
+            _this.state = _this.states.DETAIL;
         });
+    };
+    HomeComponent.prototype.modify = function (bool) {
+        this.onlyAtDate = bool;
+        this.state = this.states.UPDATE;
     };
     return HomeComponent;
 }());

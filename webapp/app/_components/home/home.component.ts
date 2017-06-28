@@ -13,6 +13,14 @@ export class HomeComponent implements OnInit {
     tasks: TaskDate[] = [];
     task: TaskDate = null;
     date: any = null;
+    states = {
+      LIST: 0,
+      DETAIL: 1,
+      UPDATE: 2
+    }
+    state :any = this.states.LIST
+    onlyAtDate = true
+
     private selDate: IMyDate = {year: 2017, month: 6, day: 6};
     private myDatePickerOptions: IMyDpOptions = {
       dateFormat: 'yyyy-mm-dd',
@@ -45,6 +53,7 @@ export class HomeComponent implements OnInit {
     }
 
     list(){
+        this.state = this.states.LIST
         this.task = null;
         this.userService.getTasks(this.date)
           .subscribe(tasks => {
@@ -56,7 +65,6 @@ export class HomeComponent implements OnInit {
         // event properties are: event.date, event.jsdate, event.formatted and event.epoc
         this.task = null;
         let date = event
-        console.log(date.formatted)
         this.date = date.formatted
         this.userService.getTasks(date.formatted)
           .subscribe(tasks => {
@@ -65,11 +73,16 @@ export class HomeComponent implements OnInit {
     }
 
     onClickTask(pk: number){
-      console.log("AHAHAHAH"+pk)
       this.taskService.getTaskDate(pk)
         .subscribe(task => {
             this.task = task;
+            this.state = this.states.DETAIL
         })
+    }
+
+    modify(bool: boolean){
+        this.onlyAtDate = bool
+        this.state = this.states.UPDATE
     }
 
 }

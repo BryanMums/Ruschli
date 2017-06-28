@@ -35,6 +35,7 @@ export class TaskDetailComponent implements OnInit {
       this.myForm = this._fb.group({
           text: ['', Validators.required]
         })
+        console.log("ID: "+this.taskDate.pk)
     }
 
     addComment(model: any, isValid: Boolean){
@@ -54,7 +55,22 @@ export class TaskDetailComponent implements OnInit {
         this.myForm = this._fb.group({
             text: ['', Validators.required]
           })
+    }
 
+    take(){
+        console.log("Je m'en occupe !")
+        let data = {}
+        data["sector"] = localStorage["sector"]
+        data["taskdate"] = this.taskDate.pk
+        data["date"] = this.date
+        this.taskService.addTaker(data)
+          .subscribe(taskDate => {
+            if(taskDate.pk != null){
+              this.taskDate = taskDate
+            }else{
+              console.log("Erreur")
+            }
+          })
     }
 
 }

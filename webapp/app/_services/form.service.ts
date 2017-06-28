@@ -47,4 +47,11 @@ export class FormService {
         return this.http.post('http://localhost:8000/api/createtask/', data, options)
           .map((response: Response) => response.json());
     }
+
+    updateTask(data:any): Observable<Response>{
+        let headers = new Headers({ 'Authorization': 'JWT' + this.authenticationService.token, 'Content-Type': 'application/json'});
+        let options = new RequestOptions({ headers: headers });
+        return this.http.post('http://localhost:8000/api/updatetask/', data, options)
+          .map((response: Response) => response.json());
+    }
 }

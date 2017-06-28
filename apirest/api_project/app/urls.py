@@ -106,3 +106,17 @@ urlpatterns += (
     url(r'^api/addcomment/', views.add_comment),
     url(r'^api/testcomment/', views.test_comment),
 )
+
+urlpatterns += (
+    url(r'^api/addtaker/', views.add_taker),
+    url(r'^api/testtaker/', views.test_taker),
+)
+
+urlpatterns += (
+    url(r'^api/teststop/', views.test_stop),
+)
+
+urlpatterns += (
+    url(r'^api/updatetask/', views.update_task, name='update-task'),
+    url(r'^api/testmodify/', views.test_modify),
+)

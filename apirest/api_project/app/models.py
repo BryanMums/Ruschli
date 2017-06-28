@@ -235,7 +235,7 @@ class TaskDate(models.Model):
     parent = ForeignKey('self', null=True, blank=True)
     task = ForeignKey(Task)
     daysOfWeek = ManyToManyField(Day, null=True, blank=True)
-    #taker = ForeignKey(User)
+    taker = ForeignKey(User, related_name='task_takers', null=True, blank=True)
 
     class Meta:
         ordering = ('-pk',)
@@ -266,8 +266,8 @@ class TaskDate(models.Model):
         return user is self.task.author or user in (self.task.receiver_user.all() or self.task.copyreceiver_user.all()) \
          or sector in (self.task.receiver_group.all() or self.task.copyreceiver_group.all())
 
-    def can_take(self, user):
-        pass
+    def can_take(self, user, sector):
+        return user in self.task.receiver_user.all() or sector in self.task.receiver_group.all()
 
     def can_modify(self, user):
         pass
@@ -299,6 +299,7 @@ class Comment(models.Model):
 
 
 class TaskManager(models.Manager):
+    @staticmethod
     def create_an_exception(taskDate, date):
         ancient = TaskDate.objects.get(pk=taskDate.pk)
         exception = taskDate
@@ -308,10 +309,324 @@ class TaskManager(models.Manager):
         exception.save()
         exception.parent = ancient
         exception.save()
-        return exception.pk
+        return exception
+
+
+    @staticmethod
+    def copy_task_if_necessary(task):
+        if TaskDate.objects.filter(task=task).count() > 1 :
+            ancient = Task.objects.get(pk=task.pk)
+            modifiedTask = task
+            modifiedTask.pk = None
+            modifiedTask.save()
+            modifiedTask.resident.set(ancient.resident.all())
+            modifiedTask.room.set(ancient.room.all())
+            modifiedTask.receiver_user.set(ancient.receiver_user.all())
+            modifiedTask.receiver_group.set(ancient.receiver_group.all())
+            modifiedTask.copyreceiver_user.set(ancient.copyreceiver_user.all())
+            modifiedTask.copyreceiver_group.set(ancient.copyreceiver_group.all())
+            return modifiedTask
+        return task
+
+    def update_task(post, user):
+        # TODO : Vérifier si l'utilisateur a les droits.
+        output = ""
+        taskDate = TaskDate.objects.get(pk=post["taskdate"])
+        values = post["values"] # Les valeurs du formulaire pour la modification des informations basiques et de la périodicité.
+        onlyAtTheDate = post["onlyAtDate"] # True --> Uniquement le jour J, False --> A partir du jour J
+        date = post["date"] # La date à laquelle on veut modifier
+
+        # Les valeurs passées dans le POST que l'on va trier pour les 2 différentes entités et les filtrer.
+        keys_of_task = ['title', 'description', 'need_someone', 'id_type_task', 'resident', 'room', 'receiver_user', 'receiver_group', 'copyreceiver_user', 'copyreceiver_group']
+        keys_of_taskDate = ['eventType', 'periodicType', 'monthlyType', 'start_date', 'end_date', 'time', 'intervalWeek', 'dayNumber', 'intervalMonth', 'weekNumber', 'active', 'daysOfWeek', 'taker']
+
+        # Création des dictionnaires qui vont servir pour l'ajout/modification
+        dict_values_task = { k: values[k] for k in keys_of_task if k in values if k in values }
+        dict_values_task["author"] = user.pk
+        dict_values_taskDate = { k: values[k] for k in keys_of_taskDate if k in values }
+        dict_values_taskDate_exception = { k: dict_values_taskDate[k] for k in ['time', 'active', 'taker'] if k in dict_values_taskDate }
+
+        # Dans le cas d'une tâche non-périodique et qui n'est pas une exception.
+        if taskDate.eventType == 0 and taskDate.parent == None:
+            print("non-p et aucun parent")
+
+            # Si avec la modification on reste dans une tâche non-périodique
+            if values["eventType"] == 0:
+                # On fait une copie de la tâche (et non taskDate) pour éviter de modifier les anciennes s'il y a besoin
+                taskDate.task = TaskManager().copy_task_if_necessary(taskDate.task)
+                taskDate.save()
+
+                # On modifie la tâche
+                Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+
+                # On modifie la taskDate
+                TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+
+                return taskDate
+
+            # Si avec la modification on passe d'une tâche non-périodique à une tâche périodique
+            else:
+                # On va devoir regarder si la tâche a des commentaires ou un quelqu'un qui s'en occupe.
+                # Si elle en a
+                if Comment.objects.filter(taskdate=taskDate.pk).count() > 0 or taskDate.taker != None:
+                    # Dans ce cas, il faudra créer une copie de la tâche. Passer celle de base en exception de la nouvelle qui sera périodique.
+                    # On fait une copie de la tâche (et non taskDate) pour éviter de modifier les anciennes s'il y a besoin
+                    taskDate.task = TaskManager().copy_task_if_necessary(taskDate.task)
+                    taskDate.save()
+
+                    # On va faire les modifications au niveau de la tâche
+                    Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+
+                    # On fait les modifications concernant la périodicité
+                    TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                    exception_pk = taskDate.pk
+                    taskDate = TaskDate.objects.get(pk=taskDate.pk)
+
+                    # On fait la copie de la taskdate
+                    copiedTaskDate = taskDate
+                    copiedTaskDate.pk = None
+                    copiedTaskDate.taker = None
+                    copiedTaskDate.save()
+
+                    # On remet les infos de base pour une exception
+                    exception = TaskDate.objects.get(pk=exception_pk)
+                    exception.start_date = date
+                    exception.eventType = 0
+                    exception.end_date = None
+
+                    # On met à l'exception, le nouveau parent.
+                    exception.parent = copiedTaskDate
+                    exception.save()
+
+                    return exception
+
+                else:
+                    # Dans ce cas, il n'y pas besoin d'avoir une exception. On peut simplement modifier
+                    # On fait une copie de la tâche (et non taskDate) pour éviter de modifier les anciennes s'il y a besoin
+                    taskDate.task = TaskManager().copy_task_if_necessary(taskDate.task)
+                    taskDate.save()
+
+                    # On applique les modifications
+                    TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                    Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+                    taskDate = taskDate.objects.get(pk=taskDate.pk)
+
+
+                return taskDate
+
+        # Dans le cas d'une tâche qui est une exception.
+        elif taskDate.eventType == 0 and taskDate.parent != None:
+            # Si la modification ne s'applique que pour le jour J.
+            if onlyAtTheDate:
+
+                # On fait une copie de la tâche (et non taskDate) pour éviter de modifier les anciennes s'il y a besoin
+                taskDate.task = TaskManager().copy_task_if_necessary(taskDate.task)
+                taskDate.save()
+
+                # On va faire les modifications voulues
+                TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+                taskDate = TaskDate.objects.get(pk=taskDate.pk)
+
+                return taskDate
+
+
+            # Si la modification s'applique à partir de cette date.
+            else:
+                # On va commencer par supprimer les exceptions de la tâche parent après le jour J.
+                parentTaskDate = taskDate.parent
+                TaskDate.objects.filter(Q(parent=parentTaskDate) & Q(start_date__gt=date)).delete()
+
+                # On va ensuite arrêter la tâche parent au jour J-1.
+                truedate = datetime.strptime(date, '%Y-%m-%d')
+                end_date = (truedate - datetime2.timedelta(days=1)).date()
+                parentTaskDate.end_date = end_date
+                parentTaskDate.save()
+
+                # On va appliquer les modifications de base.
+                taskDate.task = TaskManager().copy_task_if_necessary(taskDate.task)
+                taskDate.save()
+                Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+                taskDate = TaskDate.objects.get(pk=taskDate.pk)
+
+                # Si elle doit rester une exception car elle a des commentaires ou quelqu'un s'en occupe
+                if Comment.objects.filter(taskdate=taskDate.pk).count() > 0 or taskDate.taker != None:
+
+                    saved_pk = taskDate.pk
+                    # On va ensuite faire une copie de la tâche.
+                    copiedTaskDate = taskDate
+                    copiedTaskDate.pk = None
+                    copiedTaskDate.parent = None
+                    copiedTaskDate.save()
+
+                    # Modifier la tâche exception et Transformer la tâche copiée en tâche périodique.
+                    TaskDate.objects.filter(pk=saved_pk).update(**dict_values_taskDate_exception)
+                    TaskDate.objects.filter(pk=copiedTaskDate.pk).update(**dict_values_taskDate)
+
+                    taskDate = TaskDate.objects.get(pk=saved_pk)
+                    copiedTaskDate = TaskDate.objects.get(pk=copiedTaskDate.pk)
+                    # Définir la tâche copiée comme parent de la tâche de base.
+                    taskDate.parent = copiedTaskDate
+                    taskDate.save()
+
+                    return taskDate
+
+                # Si elle ne doit pas forcément être une exception car elle sera identique en tout point à la nouvelle tâche (si c'était une tâche modifiée)
+                else:
+                    # On va la modifier directement et la passer en tant que tâche principale.
+                    TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                    taskDate = TaskDate.objects.get(pk=taskDate.pk)
+                    taskDate.parent = None
+                    taskDate.save()
+
+                    return taskDate
+
+
+        # Dans le cas d'une tâche périodique.
+        elif taskDate.eventType == 1:
+            # Si on veut uniquement modifier le jour J
+            if onlyAtTheDate:
+                # Créer une exception.
+                exception = TaskManager().create_an_exception(taskDate, date)
+                # modifier l'exception.
+                TaskDate.objects.filter(pk=exception.pk).update(**dict_values_taskDate_exception)
+                exception = TaskDate.objects.get(pk=exception.pk)
+                exception.task = TaskManager().copy_task_if_necessary(exception.task)
+                exception.save()
+                Task.objects.filter(pk=exception.task.pk).update(**dict_values_task)
+                exception = TaskDate.objects.get(pk=exception.pk)
+                return exception
+
+            # Si on veut modifier tous les jours à partir de la date.
+            else:
+                saved_pk = taskDate.pk
+                # On fait une copie de la tâche.
+                copiedTaskDate = taskDate
+                copiedTaskDate.pk = None
+                copiedTaskDate.save()
+
+                # On arrête la tâche de base avec end_date = Jour J-1
+                truedate = datetime.strptime(date, '%Y-%m-%d')
+                end_date = (truedate - datetime2.timedelta(days=1)).date()
+                taskDate =  TaskDate.objects.get(pk=saved_pk)
+                taskDate.end_date = end_date
+                taskDate.save()
+
+                # On supprime les tâches exceptions qui sont après le jour J par rapport à la tâche de base.
+                TaskDate.objects.filter(Q(parent=taskDate) & Q(start_date__gt=date)).delete()
+
+                # On modifie la tâche de la taskdate
+                copiedTaskDate.task = TaskManager().copy_task_if_necessary(copiedTaskDate.task)
+                copiedTaskDate.save()
+                Task.objects.filter(pk=copiedTaskDate.task.pk).update(**dict_values_task)
+
+                # On modifie la taskdate
+                TaskDate.objects.filter(pk=copiedTaskDate.pk).update(**dict_values_taskDate)
+                copiedTaskDate = TaskDate.objects.get(pk=copiedTaskDate.pk)
+                return copiedTaskDate
+
+        # Dans un cas impossible.
+        else:
+            pass
+
+        return None
+
+    def stop_task(post, user):
+        output = "" #Debug
+        taskDate = TaskDate.objects.get(pk=post["taskdate"])
+        # La première chose à faire sera de vérifier si l'utilisateur a les droits pour faire ça.
+        # TODO
+        date = post["date"]
+        typeStop = post["type"] # 0 --> uniquement à la date. 1 --> la date et les suivantes.
+        includeDate = post["includeDate"] # True -- > end_date = date - 1 jour, False --> end_date = date
+        parentTaskDate = None
+
+        # On va récupérer le parent de la tâche.
+        if taskDate.parent != None:
+            parentTaskDate = taskDate.parent
+
+        # On va calculer la end_date pour un arrêt de type périodique
+        # Si on veut que le jour J soit pris, end_date = date - 1 jour
+        if includeDate:
+            truedate = datetime.strptime(date, '%Y-%m-%d')
+            end_date = (truedate - datetime2.timedelta(days=1)).date()
+            output += str(end_date)
+        # Si on veut arrêter après la date, end_date = date
+        else:
+            end_date = date
+            output += end_date
+
+        # Si la tâche de base est non périodique
+        if taskDate.eventType == 0:
+            output += "La tâche est non-périodique \n"
+            # Si c'est une tâche non périodique
+            if parentTaskDate is None:
+                output += "Ce n'est pas une exception, elle ne dépend de rien, on la supprime \n"
+                # On va simplement la supprimer (Désactiver pour le moment)
+                taskDate.active = False
+                taskDate.save()
+            # Si c'est une exception
+            else:
+                output += "C'est une exception d'une tâche périodique ! \n"
+                # Si on veut juste arrêter au jour J, donc l'exception uniquement
+                if typeStop == 0:
+                    output += "On va juste désactiver l'exception \n"
+                    # On va mettre le champ active à false
+                    taskDate.active = False
+                    taskDate.save()
+                # Si on veut arrêter la tâche périodique
+                elif typeStop == 1:
+                    output += "On veut arrêter la tâche périodique \n"
+                    # On va changer le end_date du parent avec le end_date calculé au-dessus.
+                    parentTaskDate.end_date = end_date
+                    parentTaskDate.save()
+                    # On va également supprimer les exceptions APRES le end_date. Les tâches qui ont en parent, le tâche parente.
+                    exceptions = TaskDate.objects.filter(Q(parent=parentTaskDate.pk) & Q(start_date__gt=end_date)).delete()
+
+
+        # Si c'est une tâche périodique
+        elif taskDate.eventType == 1:
+            output += "La tâche est périodique \n"
+            # Si on veut arrêter au jour J, donc l'exception uniquement.
+            if typeStop == 0:
+                output += "On veut juste enlever désactiver la tâche à la date, on crée une exception avec active = false \n"
+                # On va commencer par regarder s'il existe une exception à la date voulue, si c'est pas le cas. On crée une exception.
+                exception = TaskDate.objects.filter(Q(parent=taskDate) & Q(start_date=end_date)).first()
+                if exception == None:
+                    exception = TaskManager().create_an_exception(taskDate, end_date)
+                # On va mettre le champ active de l'exception à false.
+                exception.active = False
+                exception.save()
+
+            # Si on veut arrêter la tâche périodique
+            elif typeStop == 1:
+                output += "On va arrêter la tâche périodique \n"
+                # On va changer le end_date avec le end_date calculé au-dessus.
+                taskDate.end_date = end_date
+                # On va également supprimer les exceptions APRES le end_date. Les tâches qui ont en parent, le tâche.
+                exceptions = TaskDate.objects.filter(Q(parent=taskDate) & Q(start_date__gt=end_date)).delete()
+
+        return output #A changer par un vrai return
+
 
     def add_taker(post, user):
-        pass
+        # On va d'abord voir s'il y a besoin d'un taker ou s'il en existe un.
+        taskDate = TaskDate.objects.get(pk=post["taskdate"])
+        sector = Group.objects.get(pk=post["sector"])
+        if not taskDate.is_an_exception():
+            possibleTaskDate = TaskDate.objects.filter(parent = taskDate, start_date = post['date']).first()
+            if possibleTaskDate == None :
+                taskDate = TaskManager().create_an_exception(taskDate, post["date"])
+            else:
+                taskDate = possibleTaskDate
+        if taskDate.can_take(user, sector):
+            if taskDate.task.need_someone == False or taskDate.taker != None:
+                return None
+            taskDate.taker = user
+            taskDate.save()
+            return taskDate
+        return None
+
 
     def add_comment(post, user):
         taskDate = TaskDate.objects.get(pk=post['taskdate'])
@@ -320,7 +635,7 @@ class TaskManager(models.Manager):
             # Le cas où la personne est sur la tâche qui n'est pas encore une exception mais qu'une exception a été créée.
             possibleTaskDate = TaskDate.objects.filter(parent = taskDate, start_date = post['date']).first()
             if possibleTaskDate == None :
-                post["taskdate"] = TaskManager().create_an_exception(taskDate, post['date'])
+                post["taskdate"] = TaskManager().create_an_exception(taskDate, post['date']).pk
             else:
                 post["taskdate"] = possibleTaskDate.pk
 
@@ -338,7 +653,7 @@ class TaskManager(models.Manager):
                 task = Task.objects.create(title = post.get('title'),
                                             description = post.get('description'),
                                             need_someone = post.get('need_someone'),
-                                            id_type_task = post.get('id_type_task'),
+                                            id_type_task = TaskType.objects.get(pk=post.get('id_type_task')),
                                             author = user)
 
 
@@ -460,7 +775,7 @@ def get_tasks_for_a_day(self, date, group, resident):
             (
             Q(task__receiver_user = self.id) | Q(task__copyreceiver_user = self.id) |
             Q(task__receiver_group = group.id) | Q(task__copyreceiver_group = group.id)
-            ))
+            )).distinct()
     else :
         TaskDates =  TaskDate.objects.filter(
             Q(start_date__lte = date)
@@ -468,7 +783,8 @@ def get_tasks_for_a_day(self, date, group, resident):
             (Q(end_date__gte = date) | Q(end_date__isnull = True))
             &
             Q(task__resident = resident)
-            )
+            ).distinct()
+
 
     # On va calculer pour ne garder que celle qui tombent le jour J
     accurateTaskDates = []
@@ -568,7 +884,8 @@ def get_tasks_for_a_day(self, date, group, resident):
 
     # On va les enlever de la liste
     for index in ids_to_remove:
-        accurateTaskDates.remove(index)
+        if(index in accurateTaskDates):
+            accurateTaskDates.remove(index)
 
     return accurateTaskDates
 

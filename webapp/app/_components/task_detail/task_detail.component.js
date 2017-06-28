@@ -33,6 +33,7 @@ var TaskDetailComponent = (function () {
         this.myForm = this._fb.group({
             text: ['', forms_1.Validators.required]
         });
+        console.log("ID: " + this.taskDate.pk);
     };
     TaskDetailComponent.prototype.addComment = function (model, isValid) {
         var _this = this;
@@ -52,6 +53,23 @@ var TaskDetailComponent = (function () {
         });
         this.myForm = this._fb.group({
             text: ['', forms_1.Validators.required]
+        });
+    };
+    TaskDetailComponent.prototype.take = function () {
+        var _this = this;
+        console.log("Je m'en occupe !");
+        var data = {};
+        data["sector"] = localStorage["sector"];
+        data["taskdate"] = this.taskDate.pk;
+        data["date"] = this.date;
+        this.taskService.addTaker(data)
+            .subscribe(function (taskDate) {
+            if (taskDate.pk != null) {
+                _this.taskDate = taskDate;
+            }
+            else {
+                console.log("Erreur");
+            }
         });
     };
     return TaskDetailComponent;
