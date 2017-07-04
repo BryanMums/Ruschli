@@ -1,5 +1,6 @@
 sandbox/
 webapp/node_modules
+mobileapp/mobileapp/node_modules
 apirest/env
 # Byte-compiled / optimized / DLL files
 __pycache__/

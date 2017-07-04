@@ -17,6 +17,7 @@
   <h5 *ngIf="taskToAdd">Etape 2 | Informations de la tâche</h5>
   <h4 *ngIf="!taskToAdd && onlyAtDate">Uniquement à cette date</h4>
   <h4 *ngIf="!taskToAdd && !onlyAtDate">A partir de cette date</h4>
+  
   <form *ngIf="taskType" [formGroup]="myForm" novalidate (ngSubmit)="save(myForm.value, myForm.valid)">
         <!-- We'll add our form controls here -->
         <div class="row">
