@@ -1,0 +1,48 @@
+<!--<div class="col-12 col-md-6 offset-md-3">
+    <h2>Résidents</h2>
+    <hr/>
+    <select *ngIf="tabSort != []" id="sort" class="custom-select" style="width:100%" [ngModel]="selectedSort" (ngModelChange)="onSort($event)">
+      <option *ngFor="let sort of tabSort; let i = index" [ngValue]=i>{{sort[0]}}</option>
+    </select>
+    <h5 class="mt-2">Liste</h5>
+    <div>
+        <div class="list-group">
+          <a *ngFor="let resident of residents" (click)="onSelect(resident)" class="list-group-item list-group-item-action">
+            <div class="d-flex flex-column">
+              <span>
+                {{resident.firstname}} {{resident.lastname}}
+              </span>
+              <small class="text-muted" *ngIf="resident.room">
+                {{resident.room.title}}
+              </small>
+            </div>
+          </a>
+        </div>
+    </div>
+</div>-->
+<ion-header>
+  <ion-navbar>
+    <button menuToggle ion-button>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Liste des résidents</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label color="primary" stacked>Trier par</ion-label>
+      <ion-select [(ngModel)]="selectedSort" (ionChange)="onSort($event)">
+        <ion-option *ngFor="let sort of tabSort; let i = index" value="{{i}}">{{sort[0]}}</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-label color="primary" margin-left stacked>Liste</ion-label>
+    <ion-list>
+      <button ion-item *ngFor="let resident of residents" (click)="onSelect(resident)">
+        <h2>{{resident.lastname}} {{resident.firstname}}</h2>
+        <p *ngIf="resident.room">{{resident.room.title}}</p>
+      </button>
+    </ion-list>
+  </ion-list>
+</ion-content>

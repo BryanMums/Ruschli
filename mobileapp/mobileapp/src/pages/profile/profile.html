@@ -1,0 +1,39 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle >
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Connexion</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div *ngIf="!auth.authenticated()">
+    <h3>Connexion</h3>
+    <p>
+      Si vous n'avez pas de compte ou que vous ne vous souvenez plus de votre mot de passe, contactez l'adminstrateur
+    </p>
+    <form #signForm="ngForm" (ngSubmit)="authenticate(signForm.value)">
+      <ion-item>
+        <ion-label stacked color="primary">Nom d'utilisateur</ion-label>
+        <ion-input type="text" name="username" ngModel></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label stacked color="primary">Mot de passe</ion-label>
+        <ion-input type="password" name="password" ngModel></ion-input>
+      </ion-item>
+
+      <div>
+        <button margin-top color="secondary" ion-button full type="submit">Connexion</button>
+      </div>
+    </form>
+  </div>
+  <div *ngIf="auth.authenticated()">
+    <h2>Vous êtes connecté !</h2>
+    <choose-sector></choose-sector>
+    <div padding>
+      <button ion-button color="danger" ion-button full (click)="logout()">Se déconnecter</button>
+    </div>
+  </div>
+</ion-content>

@@ -1,0 +1,89 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Résident</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="has-header has-subheader">
+  <div *ngIf="resident">
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-item text-center>
+            <h1>{{resident.firstname}} {{resident.lastname}}</h1>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-label stacked color="primary">Date d'anniversaire</ion-label>
+          <p>{{resident.birthdate}}</p>
+        </ion-col>
+        <ion-col *ngIf="resident.room">
+          <ion-label stacked color="primary">Chambre</ion-label>
+          <p>{{resident.room.title}}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-label stacked color="primary">Personne de contact</ion-label>
+          <p>{{resident.contact_name}}</p>
+        </ion-col>
+        <ion-col>
+          <ion-label stacked color="primary">Numéro de contact</ion-label>
+          <p>{{resident.contact_phone}}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-label stacked color="primary">Commentaire</ion-label>
+          <p>{{resident.comment}}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-label stacked color="primary">Allergies</ion-label>
+          <p>{{resident.allergies}}</p>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <ion-label stacked color="primary">Médicaments</ion-label>
+          <p>{{resident.medications}}</p>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <ion-item text-center>
+            <h2>Tâches</h2>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col>
+          <my-date-picker [options]="myDatePickerOptions" [selDate]="selDate" (dateChanged)="onDateChanged($event)"></my-date-picker>
+        </ion-col>
+      </ion-row>
+      <div *ngIf="tasks">
+        <ion-row *ngFor="let taskDate of tasks">
+          <ion-col>
+            <task-card [taskDate]="taskDate" (click)="onClickTask(taskDate.pk)" ></task-card>
+          </ion-col>
+        </ion-row>
+      </div>
+      <div *ngIf="!tasks" [style.display]="tasks.length == 0 ? 'block' : 'none'">
+        <ion-row>
+          <ion-col>
+            <p>Aucune tâche pour cette date.</p>
+          </ion-col>
+        </ion-row>
+      </div>
+    </ion-grid>
+  </div>
+</ion-content>

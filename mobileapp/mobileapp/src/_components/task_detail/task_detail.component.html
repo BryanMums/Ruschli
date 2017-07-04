@@ -1,0 +1,129 @@
+<div *ngIf=taskDate >
+  <h2>{{taskDate.task.title}}</h2>
+  <hr/>
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex flex-column">
+        <small><strong>Description</strong></small>
+        <p>{{taskDate.task.description}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6 col-12" *ngIf="taskDate.task.resident">
+      <div class="d-flex flex-column">
+        <small><strong>Résident(s)</strong></small>
+        <p>
+          <span class="badge badge-primary mr-1" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</span>
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-12" *ngIf="taskDate.task.room">
+      <div class="d-flex flex-column">
+        <small><strong>Chambre(s)</strong></small>
+        <p><span class="badge badge-default mr-1" *ngFor="let room of taskDate.task.room">{{room.title}}</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <!-- A changer en true -->
+    <div class="col-md-6 col-12" *ngIf="taskDate.task.need_someone == true">
+      <div class="d-flex flex-column">
+        <small><strong>Preneur</strong></small>
+        <p>
+          <button *ngIf="!taskDate.taker" (click)="take()" class="btn btn-success btn-sm btn-block" style="max-width:200px;">Je m'en charge !</button>
+          <span *ngIf="taskDate.taker" class="badge badge-success">{{taskDate.taker.username}}</span>
+        </p>
+      </div>
+    </div>
+    <div class="col-md-6 col-12">
+      <div class="d-flex flex-column">
+        <small><strong>Auteur</strong></small>
+        <p>{{taskDate.task.author.username}}</p>
+      </div>
+    </div>
+  </div>
+  <h4>Destinataire(s)</h4>
+  <div class="row">
+    <div class="col-12 col-md-6" *ngIf="taskDate.task.receiver_user.length > 0">
+      <div class="d-flex flex-column">
+        <small class=""><strong>Employé(s)</strong></small>
+        <p>
+          <span class="badge badge-danger" *ngFor="let user of taskDate.task.receiver_user">{{user.username}}</span>
+        </p>
+      </div>
+    </div>
+    <div class="col-12 col-md-6" *ngIf="taskDate.task.receiver_group.length > 0">
+      <div class="d-flex flex-column">
+        <small class=""><strong>Groupes(s)</strong></small>
+        <p><span class="badge badge-danger" *ngFor="let sector of taskDate.task.receiver_group">{{sector.title}}</span></p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-6" *ngIf="taskDate.task.copyreceiver_user.length > 0">
+      <div class="d-flex flex-column">
+        <small class=""><strong>Employé(s) en copie</strong></small>
+        <p><span class="badge badge-warning" *ngFor="let user of taskDate.task.copyreceiver_user">{{user.username}}</span></p>
+      </div>
+    </div>
+    <div class="col-12 col-md-6" *ngIf="taskDate.task.copyreceiver_group.length > 0">
+      <div class="d-flex flex-column">
+        <small class=""><strong>Groupes(s) en copie</strong></small>
+        <p><span class="badge badge-warning" *ngFor="let sector of taskDate.task.copyreceiver_group">{{sector.title}}</span></p>
+      </div>
+    </div>
+  </div>
+
+
+  <h4>Répétition dans le temps</h4>
+  <div class="row">
+    <div class="col-12" *ngIf="taskDate.eventType == 0">
+      <div class="d-flex flex-column">
+        <small class=""><strong>Date unique</strong></small>
+        <p>{{taskDate.start_date}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12" *ngIf="taskDate.eventType == 1">
+      <div class="d-flex flex-column" *ngIf="taskDate.periodicType == 0">
+        <small class=""><strong>Quotidien</strong></small>
+        <p>Tous les jours depuis le {{taskDate.start_date}} <span *ngIf="taskDate.end_date != null">jusqu'au {{taskDate.end_date}}</span></p>
+      </div>
+      <div class="d-flex flex-column" *ngIf="taskDate.periodicType == 1">
+        <small class=""><strong>Hebdomadaire</strong></small>
+        <p>Les <span *ngFor="let day of taskDate.daysOfWeek">{{day}}, </span> toutes les {{taskDate.intervalWeek}} semaine(s), depuis le {{taskDate.start_date}} <span *ngIf="taskDate.end_date != null">jusqu'au {{taskDate.end_date}}</span></p>
+      </div>
+      <div class="d-flex flex-column" *ngIf="taskDate.periodicType == 2">
+        <small class=""><strong>Mensuel</strong></small>
+        <p>Tous les jours depuis le {{taskDate.start_date}} <span *ngIf="taskDate.end_date != null">jusqu'au {{taskDate.end_date}}</span></p>
+      </div>
+      <div class="d-flex flex-column" *ngIf="taskDate.periodicType == 3">
+        <small class=""><strong>Annuel</strong></small>
+        <p>Tous les {{taskDate.start_date}} de chaque année, depuis le {{taskDate.start_date}} <span *ngIf="taskDate.end_date != null">jusqu'au {{taskDate.end_date}}</span></p>
+      </div>
+    </div>
+  </div>
+
+  <h4>Commentaires</h4>
+  <div class="row">
+    <div class="col-12 d-flex flex-column-reverse" *ngIf="taskDate.comments.length > 0">
+      <div class="d-flex flex-column" *ngFor="let comment of taskDate.comments">
+        <div class="d-flex flex-row justify-content-start">
+          <small class=""><strong>{{comment.author.username}}</strong></small>
+          <small class="text-muted ml-auto">{{comment.created_at | amDateFormat:'LL'}}</small>
+        </div>
+        <p>{{comment.text}}</p>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-12 col-md-6">
+      <form *ngIf="taskDate" [formGroup]="myForm" novalidate (ngSubmit)="addComment(myForm.value, myForm.valid)">
+        <textarea formControlName="text" class="md-textarea" rows="4"></textarea>
+        <button type="submit" [disabled]="!myForm.valid" class="btn btn-success btn-block">Ajouter votre commentaire</button>
+      </form>
+    </div>
+  </div>
+</div>
