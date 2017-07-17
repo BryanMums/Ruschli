@@ -28,28 +28,28 @@
         </ion-col>
       </ion-row>
       <ion-row>
-        <ion-col>
+        <ion-col *ngIf="resident.contact_name">
           <ion-label stacked color="primary">Personne de contact</ion-label>
           <p>{{resident.contact_name}}</p>
         </ion-col>
-        <ion-col>
+        <ion-col *ngIf="resident.contact_phone">
           <ion-label stacked color="primary">Numéro de contact</ion-label>
           <p>{{resident.contact_phone}}</p>
         </ion-col>
       </ion-row>
-      <ion-row>
+      <ion-row *ngIf="resident.comment">
         <ion-col>
           <ion-label stacked color="primary">Commentaire</ion-label>
           <p>{{resident.comment}}</p>
         </ion-col>
       </ion-row>
-      <ion-row>
+      <ion-row *ngIf="resident.allergies">
         <ion-col>
           <ion-label stacked color="primary">Allergies</ion-label>
           <p>{{resident.allergies}}</p>
         </ion-col>
       </ion-row>
-      <ion-row>
+      <ion-row *ngIf="resident.medications">
         <ion-col>
           <ion-label stacked color="primary">Médicaments</ion-label>
           <p>{{resident.medications}}</p>
@@ -77,7 +77,7 @@
           </ion-col>
         </ion-row>
       </div>
-      <div *ngIf="!tasks" [style.display]="tasks.length == 0 ? 'block' : 'none'">
+      <div *ngIf="tasks" [style.display]="tasks.length == 0 ? 'block' : 'none'">
         <ion-row>
           <ion-col>
             <p>Aucune tâche pour cette date.</p>

@@ -305,7 +305,7 @@ export class AddTaskComponent implements OnInit {
       // Information sur le type de tâche
       data['id_type_task'] = this.taskType.pk
       console.log(data)
-
+      /*
       if(this.taskToAdd){
         this.formService.addTask(data)
           .subscribe(response => {
@@ -325,7 +325,7 @@ export class AddTaskComponent implements OnInit {
           post['date'] = this.date
 
           console.log(post)
-      }
+      }*/
     }
 
 

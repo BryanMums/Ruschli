@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle >
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Modification</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content id="ionContent" class="has-header has-subheader">
+  <div *ngIf="s == 1">
+    <ion-grid>
+      <form [formGroup]="myForm" novalidate (ngSubmit)="chooseTypeModif(myForm.value, myForm.valid)">
+      <ion-row>
+        <ion-col>
+          <p>Vous avez le choix entre modifier la tâche uniquement pour cette date ou à partir de cette date.</p>
+          <p>Si c'est une tâche périodique, les jours précédant cette date ne seront pas modifiés et les jours après oui, donc les commentaires et personne en charge concernant les prochaines dates ne seront plus pris en compte</p>
+          <ion-item>
+            <ion-label stacked color="primary">Type de modification</ion-label>
+            <ion-select formControlName="type">
+              <ion-option value="0">Uniquement cette date</ion-option>
+              <ion-option value="1">A partir de cette date</ion-option>
+            </ion-select>
+          </ion-item>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col >
+          <button margin-top color="secondary" ion-button full [disabled]="!myForm.valid" type="submit">Continuer</button>
+        </ion-col>
+      </ion-row>
+    </form>
+    </ion-grid>
+  </div>
+  <div *ngIf="s == 2">
+    <form-task [date]="date" [taskToAdd]="taskToAdd" [taskDate]="taskDate" [onlyAtDate]="onlyAtDate"></form-task>
+    <ion-grid><ion-row><ion-col>
+      <button ion-button block outline color="danger" (click)="reset()">Annuler</button>
+    </ion-col></ion-row></ion-grid>
+  </div>
+</ion-content>

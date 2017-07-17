@@ -39,7 +39,7 @@ def test_stop(request):
     post["type"] = 0
     post["includeDate"] = False
     # output : "La tâche est non-périodique \nCe n'est pas une exception, elle ne dépend de rien, on la supprime \n"
-    output = TaskManager.stop_task(post, request.user)
+    success, output = TaskManager.stop_task(post, request.user)
     return Response(output)
 
 @api_view(['GET'])
@@ -76,19 +76,21 @@ def update_task(request):
         content = {'Erreur': 'problème lors de la modification'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
-        serializer = TaskDateSerializer(taskDate, many=false, context={'request': request})
+        serializer = TaskDateSerializer(taskDate, many=False, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def stop_task(request):
-    taskDate = TaskManager.stop_task(request.data, request.user)
-    if taskDate is None:
-        content = {'Erreur': 'problème lors de la modification'}
+    success, taskDate = TaskManager.stop_task(request.data, request.user)
+
+    if not success:
+        content = {'Erreur': 'problème lors de l\'arrêt de la tâche'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
-        serializer = TaskDateSerializer(taskDate, many=false, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        content = "Réussi !"
+        #serializer = TaskDateSerializer(taskDate, many=false, context={'request': request})
+        return Response(content, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -140,7 +142,12 @@ def test_create(request):
 @api_view(['GET'])
 def get_tasks_for_a_day(request, date_url, group_id, resident_id=None):
     date = datetime.strptime(date_url, '%Y-%m-%d')
-    group = Group.objects.get(pk=group_id)
+    if(group_id == 0 or group_id == '0'):
+        group = {}
+        group["id"] = 0
+    else:
+        group = Group.objects.get(pk=group_id)
+        
     if resident_id is not None :
         resident = Resident.objects.get(resident_id)
         data = request.user.get_tasks_for_a_day(date, group, resident)

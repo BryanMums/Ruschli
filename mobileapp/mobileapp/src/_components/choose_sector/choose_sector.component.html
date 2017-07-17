@@ -1,6 +1,5 @@
 <div *ngIf="user">
-  <div class="col-12 col-md-6">
-    <p>Dans quel secteur travaillez-vous aujourdĥui ?</p>
+    <p>Dans quel secteur travaillez-vous aujourdĥui {{user.username}} ?</p>
     <ion-item>
       <ion-label color="primary" stacked>Secteur</ion-label>
       <ion-select [(ngModel)]="selectedSector" (ionChange)="change($event)">
@@ -8,5 +7,4 @@
         <ion-option *ngFor="let sector of user.sectors" value="{{sector.pk}}">{{sector.title}}</ion-option>
       </ion-select>
     </ion-item>
-  </div>
 </div>

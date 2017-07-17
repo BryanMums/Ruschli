@@ -1,26 +1,20 @@
 ﻿import { Component, OnInit } from '@angular/core';
-
-import { User, TaskDate } from '../../_models/index';
-import { UserService, TaskService } from '../../_services/index';
+import { NavController } from 'ionic-angular';
+import { TaskDate } from '../../_models/index';
+import { TaskService } from '../../_services/index';
 import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
+import { TaskDetailComponent } from '../task_detail/index'
 
 @Component({
     templateUrl: 'home.component.html'
 })
 
 export class HomeComponent implements OnInit {
-    tasks: TaskDate[] = [];
-    task: TaskDate = null;
-    date: any = null;
-    states = {
-      LIST: 0,
-      DETAIL: 1,
-      UPDATE: 2
-    }
-    state :any = this.states.LIST
-    onlyAtDate = true
+    tasks: TaskDate[] = []; // La liste des tâches
+    date: any = null; // La date qui sera sélectionnée utilisée pour les appels à l'API
 
-    private selDate: IMyDate = {year: 2017, month: 6, day: 6};
+    private selDate: IMyDate = {year: 2017, month: 6, day: 6}; // La date sélectionnée dans le date picker
+    // Les options du date picker
     private myDatePickerOptions: IMyDpOptions = {
       dateFormat: 'yyyy-mm-dd',
       dayLabels: {su: 'Dim', mo: 'Lun', tu: 'Mar', we: 'Mer', th: 'Jeu', fr: 'Ven', sa: 'Sam'},
@@ -33,55 +27,45 @@ export class HomeComponent implements OnInit {
     }
 
     constructor(
-      private userService: UserService,
-      private taskService: TaskService
-
+      private taskService: TaskService,
+      public navCtrl: NavController
     ) { }
 
     ngOnInit() {
+        // On va prendre la date d'aujourd'hui et la formatter pour le date picker et l'appel API
         let date = new Date();
         this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
         let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
         this.date = dateStr
-        // On récupère le résident selon l'id
-        this.userService.getTasks(dateStr)
-          .subscribe(tasks => {
-              this.tasks = tasks;
-          });
-
     }
 
-    list(){
-        this.state = this.states.LIST
-        this.task = null;
-        this.userService.getTasks(this.date)
-          .subscribe(tasks => {
-            this.tasks = tasks;
-          })
-    }
-
-    onDateChanged(event: IMyDateModel) {
-        // event properties are: event.date, event.jsdate, event.formatted and event.epoc
-        this.task = null;
-        let date = event
+    // Méthode appelée lorsque la date du date picker change
+    onDateChanged(date: IMyDateModel) {
+        // On met à jour la date formattée
         this.date = date.formatted
-        this.userService.getTasks(date.formatted)
-          .subscribe(tasks => {
-            this.tasks = tasks;
-          })
+        // On met à jour à la liste des tâches selon la date
+        this.updateList(date.formatted)
+
     }
 
+    // Méthode appelée lorsque l'on clique sur la tâche
     onClickTask(pk: number){
-      this.taskService.getTaskDate(pk)
-        .subscribe(task => {
-            this.task = task;
-            this.state = this.states.DETAIL
-        })
+      // On va aller sur la page de la tâche à l'état à la date sélectionnée
+      this.navCtrl.push(TaskDetailComponent, {taskDate: pk, date: this.date})
     }
 
-    modify(bool: boolean){
-        this.onlyAtDate = bool
-        this.state = this.states.UPDATE
+    // Méthode appelée lorsqu'on vient sur la page, important !
+    ionViewWillEnter() {
+        // On met à jour à la liste des tâches selon la date
+        this.updateList(this.date)
+    }
+
+    // Méthode appelée permettant de mettre à jour la liste des tâches
+    updateList(date: any){
+        this.taskService.getTasks(date)
+          .subscribe(tasks => {
+              this.tasks = tasks
+          });
     }
 
 }

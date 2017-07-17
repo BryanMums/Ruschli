@@ -232,7 +232,6 @@ var AddTaskComponent = (function () {
         });
     };
     AddTaskComponent.prototype.save = function (model, isValid) {
-        var _this = this;
         //console.log(model, isValid);
         // On va transformer notre TaskInterface.
         var data = {};
@@ -289,26 +288,27 @@ var AddTaskComponent = (function () {
         // Information sur le type de tâche
         data['id_type_task'] = this.taskType.pk;
         console.log(data);
-        if (this.taskToAdd) {
-            this.formService.addTask(data)
-                .subscribe(function (response) {
-                if (response.pk != null) {
-                    _this.state = 3;
+        /*
+        if(this.taskToAdd){
+          this.formService.addTask(data)
+            .subscribe(response => {
+                if(response.pk != null){
+                    this.state = 3
+                }else{
+                    this.state = 4
                 }
-                else {
-                    _this.state = 4;
-                }
-            });
-        }
-        else {
-            console.log("ON MODIFIE");
-            var post = {};
-            post['values'] = data;
-            post['taskdate'] = this.taskDate.pk;
-            post['onlyAtDate'] = this.onlyAtDate;
-            post['date'] = this.date;
-            console.log(post);
-        }
+            })
+        }else{
+  
+            console.log("ON MODIFIE")
+            let post = {}
+            post['values'] = data
+            post['taskdate'] = this.taskDate.pk
+            post['onlyAtDate'] = this.onlyAtDate
+            post['date'] = this.date
+  
+            console.log(post)
+        }*/
     };
     AddTaskComponent.prototype.initEventFormGroup = function () {
         var group = this._fb.group({

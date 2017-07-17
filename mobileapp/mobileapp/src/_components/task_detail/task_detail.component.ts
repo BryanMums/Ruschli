@@ -1,10 +1,11 @@
 import { Component, OnInit, Input } from '@angular/core';
-import { User, TaskDate } from '../../_models/index';
-import { UserService, TaskService } from '../../_services/index';
-import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
-//import { Router, ActivatedRoute, Params } from '@angular/router';
-import 'rxjs/add/operator/switchMap';
+import { TaskDate } from '../../_models/index';
+import { TaskService } from '../../_services/index';
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
+import { NavController, NavParams, ToastController } from 'ionic-angular';
+import { UpdateTaskComponent } from '../update_task/index';
+import { StopTaskComponent } from '../stop_task/index';
+
 
 @Component({
     selector: 'task-detail',
@@ -12,64 +13,109 @@ import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
 })
 
 export class TaskDetailComponent implements OnInit {
-    private today: IMyDate = {year: 2017, month: 6, day: 6}
     @Input() date: any;
     @Input() taskDate: TaskDate;
     canTakeInCharge = true;
     public myForm: FormGroup;
 
     constructor(
-      private userService: UserService,
       private taskService: TaskService,
-      //private route: ActivatedRoute,
-      //private router: Router,
       private _fb: FormBuilder,
+      private navParams: NavParams,
+      public navCtrl: NavController,
+      private toastCtrl: ToastController,
     ) { }
 
     ngOnInit() {
-      let date = new Date();
-      this.today = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
-      let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
       // On récupère le résident selon l'id
       this.myForm = this._fb.group({
           text: ['', Validators.required]
         })
-        console.log("ID: "+this.taskDate.pk)
+      // On récupère la tâche et la date
+      let pk = this.navParams.get("taskDate")
+      this.date = this.navParams.get("date")
+      this.taskService.getTaskDate(pk)
+      .subscribe((taskDate: TaskDate) => {
+        this.taskDate = taskDate
+        })
     }
 
+    // Méthode permettant d'ajouter un commentaire
     addComment(model: any, isValid: Boolean){
-        console.log(model.text, this.date, this.taskDate.pk)
+      if(isValid){
+        // On prépare les données à envoyer
         let data = {}
         data["text"] = model.text
         data["date"] = this.date
         data["taskdate"] = this.taskDate.pk
+        // On envoie à l'API le commentaire
         this.taskService.addComment(data)
           .subscribe(taskDate => {
             if(taskDate.pk != null){
+              // On met à jour la tâche
               this.taskDate = taskDate
+              this.toastCtrl.create({
+                message: 'Votre commentaire a bien été enregistré !',
+                duration: 3000,
+                position: 'bottom',
+                cssClass: 'success'
+              }).present()
+              // On remet le formulaire à 0
+              this.myForm = this._fb.group({
+                  text: ['', Validators.required]
+                })
             }else{
-              console.log("Erreur")
+              this.toastCtrl.create({
+                message: 'Votre commentaire n\'a pas pu être envoyé !',
+                duration: 3000,
+                position: 'bottom',
+                cssClass: 'error'
+              }).present()
             }
           })
-        this.myForm = this._fb.group({
-            text: ['', Validators.required]
-          })
+      }
     }
 
+    // Méthode permettant de prendre en charge une tâche
     take(){
-        console.log("Je m'en occupe !")
+        // On prépare les données à envoyer à l'API
         let data = {}
         data["sector"] = localStorage["sector"]
         data["taskdate"] = this.taskDate.pk
         data["date"] = this.date
+        // On envoie à l'API pour dire que l'utilisateur s'occupe de la tâche
         this.taskService.addTaker(data)
           .subscribe(taskDate => {
             if(taskDate.pk != null){
+              // On met à jour les infos de la tâche
               this.taskDate = taskDate
+              this.toastCtrl.create({
+                message: 'Vous vous occupez de cette tâche !',
+                duration: 3000,
+                position: 'bottom',
+                cssClass: 'success'
+              }).present()
             }else{
-              console.log("Erreur")
+              this.toastCtrl.create({
+                message: 'Une erreur s\'est produite !',
+                duration: 3000,
+                position: 'bottom',
+                cssClass: 'error'
+              }).present()
             }
           })
+    }
+
+    // Méthode appelée pour permettre la modification
+    openModif(){
+      // On affiche la page de modification d'une tâche
+      this.navCtrl.push(UpdateTaskComponent, {pk: this.taskDate.pk, date: this.date})
+    }
+
+    // Méthode appelée pour permettre d'arrêter la tâche
+    openStop(){
+      // On affiche la page d'arrêt d'une tâche
+      this.navCtrl.push(StopTaskComponent, {pk: this.taskDate.pk, date: this.date})
     }
 
 }

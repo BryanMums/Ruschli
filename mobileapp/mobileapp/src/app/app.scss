@@ -14,8 +14,6 @@
 // To declare rules for a specific mode, create a child rule
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
-@import "../pages/profile/profile";
-@import "../pages/quotes/quotes";
 
 ion-toast.success .toast-wrapper {
   background: #2ecc71;
@@ -25,4 +23,24 @@ ion-toast.success .toast-wrapper {
 ion-toast.error .toast-wrapper {
   background: #c0392b;
   color: white;
+}
+
+.selection{
+  text-align: center;
+  font-weight: bold;
+  color: #488aff !important;
+}
+
+.cardTask{
+  border-top:3px solid #488aff;
+}
+
+.cardNotActive{
+  opacity: 0.5;
+  border-top:3px solid #f53d3d;
+}
+
+.selector{
+  width: 100% !important;
+  height: 100% !important;
 }

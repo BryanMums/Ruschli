@@ -113,6 +113,7 @@ urlpatterns += (
 )
 
 urlpatterns += (
+    url(r'^api/stoptask/', views.stop_task, name='stop-task'),
     url(r'^api/teststop/', views.test_stop),
 )
 

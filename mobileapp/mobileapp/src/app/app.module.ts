@@ -7,10 +7,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { HttpModule } from '@angular/http';
 import { IonicStorageModule } from '@ionic/storage';
 
-import { AuthGuard } from '../_guards/index';
-import { AuthenticationService, UserService, ResidentService, TaskService, FormService } from '../_services/index';
+import { AuthenticationService, UserService, ResidentService, TaskService, RoomService, SectorService } from '../_services/index';
 
-import { LoginComponent } from '../_components/login/index';
+import { TabsComponent } from '../_components/tabs/index';
+import { ProfileComponent } from '../_components/profile/index';
 import { ChooseSectorComponent } from '../_components/choose_sector/index';
 import { HomeComponent } from '../_components/home/index';
 import { AddTaskComponent } from '../_components/add_task/index';
@@ -18,17 +18,14 @@ import { ResidentsComponent } from '../_components/residents/index';
 import { ResidentComponent } from '../_components/resident/index';
 import { TaskCardComponent } from '../_components/task_card/index';
 import { TaskDetailComponent } from '../_components/task_detail/index';
+import { UpdateTaskComponent } from '../_components/update_task/index';
+import { FormTaskComponent } from '../_components/form_task/index';
+import { StopTaskComponent } from '../_components/stop_task/index';
 
 import { MyDatePickerModule } from 'mydatepicker';
 import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
-import { KeysPipe, ValuesPipe } from '../_utils/index';
+import { KeysPipe, ValuesPipe, ReplaceLineBreaks } from '../_utils/index';
 import { MomentModule } from 'angular2-moment';
-
-import { HelloIonicPage } from '../pages/hello-ionic/hello-ionic';
-import { ItemDetailsPage } from '../pages/item-details/item-details';
-import { ListPage } from '../pages/list/list';
-import { Profile } from '../pages/profile/profile';
-import { QuotesPage } from '../pages/quotes/quotes';
 
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
@@ -36,12 +33,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 @NgModule({
   declarations: [
     MyApp,
-    HelloIonicPage,
-    ItemDetailsPage,
-    ListPage,
-    Profile,
-    QuotesPage,
-    LoginComponent,
+    ProfileComponent,
+    TabsComponent,
     ChooseSectorComponent,
     HomeComponent,
     AddTaskComponent,
@@ -49,8 +42,12 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     ResidentComponent,
     TaskCardComponent,
     TaskDetailComponent,
+    UpdateTaskComponent,
+    FormTaskComponent,
+    StopTaskComponent,
     KeysPipe,
-    ValuesPipe
+    ValuesPipe,
+    ReplaceLineBreaks
   ],
   imports: [
     BrowserModule,
@@ -65,23 +62,26 @@ import { SplashScreen } from '@ionic-native/splash-screen';
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    HelloIonicPage,
-    ItemDetailsPage,
-    ListPage,
-    Profile,
-    QuotesPage,
+    TabsComponent,
+    ProfileComponent,
     ResidentsComponent,
-    ResidentComponent
+    ResidentComponent,
+    HomeComponent,
+    TaskDetailComponent,
+    AddTaskComponent,
+    UpdateTaskComponent,
+    FormTaskComponent,
+    StopTaskComponent
   ],
   providers: [
     StatusBar,
     SplashScreen,
-    AuthGuard,
     AuthenticationService,
     UserService,
     ResidentService,
     TaskService,
-    FormService,
+    RoomService,
+    SectorService,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     Storage
   ]

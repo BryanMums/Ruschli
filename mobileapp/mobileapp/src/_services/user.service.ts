@@ -1,10 +1,9 @@
-﻿import { Injectable } from '@angular/core';
-import { Http, Headers, RequestOptions, Response } from '@angular/http';
-import { Observable } from 'rxjs';
+﻿import { Injectable } from '@angular/core'
+import { Http, Headers, RequestOptions, Response } from '@angular/http'
+import { Observable } from 'rxjs'
+import { AuthenticationService } from './index'
+import { User, TaskDate } from '../_models/index'
 import 'rxjs/add/operator/map'
-
-import { AuthenticationService } from './index';
-import { User, TaskDate } from '../_models/index';
 
 @Injectable()
 export class UserService {
@@ -13,36 +12,20 @@ export class UserService {
         private authenticationService: AuthenticationService) {
     }
 
+    // Méthode permettant de récupérer la liste des utilisateurs (employés)
     getUsers(): Observable<User[]> {
-        // add authorization header with jwt token
-        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        let options = new RequestOptions({ headers: headers });
-
-        // get users
-        return this.http.get('http://localhost:8000/api/user/', options)
+        return this.http.get(this.authenticationService.URL + 'api/user/', this.authenticationService.options)
             .map((response: Response) => response.json());
     }
 
     getConnectedUser(): Observable<User> {
-      let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-      let options = new RequestOptions({ headers: headers });
-
-      // get users from api
-      return this.http.get('http://localhost:8000/api/get_connected_user/', options)
+      return this.http.get(this.authenticationService.URL + 'api/get_connected_user/', this.authenticationService.options)
           .map((response: Response) => response.json());
     }
 
     getTasks(date:any): Observable<TaskDate[]>{
-
-      let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-      let options = new RequestOptions({ headers: headers });
       let sector = localStorage["sector"];
-      console.log(localStorage["sector"]);
-
-      // get tasks for the resident at a specified date
-
-      return this.http.get('http://localhost:8000/api/tasks/'+ date +'/'+sector+'/', options)
+      return this.http.get(this.authenticationService.URL + 'api/tasks/'+ date +'/'+sector+'/', this.authenticationService.options)
           .map((response: Response) => response.json());
-
     }
 }

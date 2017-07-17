@@ -1,1 +1,0 @@
-{"version":3,"file":"stop_task.component.js","sourceRoot":"","sources":["stop_task.component.ts"],"names":[],"mappings":";;;;;;;;AAAA,sCAAyD;AAKzD,uCAAqC;AASrC,IAAa,iBAAiB;IAA9B;IAA+B,CAAC;IAAD,wBAAC;AAAD,CAAC,AAAhC,IAAgC;AAAnB,iBAAiB;IAN7B,gBAAS,CAAC;QACP,QAAQ,EAAE,WAAW;QACrB,QAAQ,EAAE,MAAM,CAAC,EAAE;QACnB,WAAW,EAAE,0BAA0B;KAC1C,CAAC;GAEW,iBAAiB,CAAE;AAAnB,8CAAiB"}

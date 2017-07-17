@@ -69,6 +69,9 @@ class Room(models.Model):
     class Meta:
         ordering = ('-pk',)
 
+    def __str__(self):
+        return self.title
+
     def __unicode__(self):
         return u'%s' % self.pk
 
@@ -97,6 +100,9 @@ class Resident(models.Model):
 
     class Meta:
         ordering = ('-pk',)
+
+    def __str__(self):
+        return self.firstname + " " + self.lastname
 
     def __unicode__(self):
         return u'%s' % self.pk
@@ -139,6 +145,9 @@ class TaskType(models.Model):
 
     class Meta:
         ordering = ('-pk',)
+
+    def __str__(self):
+        return self.name
 
     def __unicode__(self):
         return u'%s' % self.pk
@@ -311,10 +320,20 @@ class TaskManager(models.Manager):
         exception.save()
         return exception
 
+    @staticmethod
+    def update_relational_fields_task(task, values):
+        task.resident.set(values["resident"])
+        task.room.set(values["room"])
+        task.receiver_user.set(values["receiver_user"])
+        task.receiver_group.set(values["receiver_group"])
+        task.copyreceiver_user.set(values["copyreceiver_user"])
+        task.copyreceiver_group.set(values["copyreceiver_group"])
+
 
     @staticmethod
     def copy_task_if_necessary(task):
         if TaskDate.objects.filter(task=task).count() > 1 :
+            print("On crée !")
             ancient = Task.objects.get(pk=task.pk)
             modifiedTask = task
             modifiedTask.pk = None
@@ -337,15 +356,18 @@ class TaskManager(models.Manager):
         date = post["date"] # La date à laquelle on veut modifier
 
         # Les valeurs passées dans le POST que l'on va trier pour les 2 différentes entités et les filtrer.
-        keys_of_task = ['title', 'description', 'need_someone', 'id_type_task', 'resident', 'room', 'receiver_user', 'receiver_group', 'copyreceiver_user', 'copyreceiver_group']
+        keys_of_task = ['title', 'description', 'need_someone', 'id_type_task']
+        keys_of_task_relational_fields = ['resident', 'room', 'receiver_user', 'receiver_group', 'copyreceiver_user', 'copyreceiver_group']
         keys_of_taskDate = ['eventType', 'periodicType', 'monthlyType', 'start_date', 'end_date', 'time', 'intervalWeek', 'dayNumber', 'intervalMonth', 'weekNumber', 'active', 'daysOfWeek', 'taker']
 
         # Création des dictionnaires qui vont servir pour l'ajout/modification
         dict_values_task = { k: values[k] for k in keys_of_task if k in values if k in values }
         dict_values_task["author"] = user.pk
+        dict_values_task_relational_fields = { k: values[k] for k in keys_of_task_relational_fields if k in values if k in values }
         dict_values_taskDate = { k: values[k] for k in keys_of_taskDate if k in values }
         dict_values_taskDate_exception = { k: dict_values_taskDate[k] for k in ['time', 'active', 'taker'] if k in dict_values_taskDate }
 
+        # TODO : Les tests depuis une tâche non périodique ont été fait !
         # Dans le cas d'une tâche non-périodique et qui n'est pas une exception.
         if taskDate.eventType == 0 and taskDate.parent == None:
             print("non-p et aucun parent")
@@ -358,6 +380,9 @@ class TaskManager(models.Manager):
 
                 # On modifie la tâche
                 Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+                # TODO : Les champs relationnels
+                task = Task.objects.get(pk=taskDate.task.pk)
+                TaskManager().update_relational_fields_task(task, dict_values_task_relational_fields)
 
                 # On modifie la taskDate
                 TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
@@ -368,6 +393,8 @@ class TaskManager(models.Manager):
             else:
                 # On va devoir regarder si la tâche a des commentaires ou un quelqu'un qui s'en occupe.
                 # Si elle en a
+
+
                 if Comment.objects.filter(taskdate=taskDate.pk).count() > 0 or taskDate.taker != None:
                     # Dans ce cas, il faudra créer une copie de la tâche. Passer celle de base en exception de la nouvelle qui sera périodique.
                     # On fait une copie de la tâche (et non taskDate) pour éviter de modifier les anciennes s'il y a besoin
@@ -376,6 +403,9 @@ class TaskManager(models.Manager):
 
                     # On va faire les modifications au niveau de la tâche
                     Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+                    # TODO : Les champs relationnels
+                    task = Task.objects.get(pk=taskDate.task.pk)
+                    TaskManager().update_relational_fields_task(task, dict_values_task_relational_fields)
 
                     # On fait les modifications concernant la périodicité
                     TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
@@ -409,7 +439,12 @@ class TaskManager(models.Manager):
                     # On applique les modifications
                     TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
                     Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
-                    taskDate = taskDate.objects.get(pk=taskDate.pk)
+
+                    # TODO : Les champs relationnels
+                    task = Task.objects.get(pk=taskDate.task.pk)
+                    TaskManager().update_relational_fields_task(task, dict_values_task_relational_fields)
+
+                    taskDate = TaskDate.objects.get(pk=taskDate.pk)
 
 
                 return taskDate
@@ -418,7 +453,6 @@ class TaskManager(models.Manager):
         elif taskDate.eventType == 0 and taskDate.parent != None:
             # Si la modification ne s'applique que pour le jour J.
             if onlyAtTheDate:
-
                 # On fait une copie de la tâche (et non taskDate) pour éviter de modifier les anciennes s'il y a besoin
                 taskDate.task = TaskManager().copy_task_if_necessary(taskDate.task)
                 taskDate.save()
@@ -426,6 +460,10 @@ class TaskManager(models.Manager):
                 # On va faire les modifications voulues
                 TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
                 Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+                # TODO : Les champs relationnels
+                task = Task.objects.get(pk=taskDate.task.pk)
+                TaskManager().update_relational_fields_task(task, dict_values_task_relational_fields)
+
                 taskDate = TaskDate.objects.get(pk=taskDate.pk)
 
                 return taskDate
@@ -447,6 +485,10 @@ class TaskManager(models.Manager):
                 taskDate.task = TaskManager().copy_task_if_necessary(taskDate.task)
                 taskDate.save()
                 Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
+                # TODO : Les champs relationnels
+                task = Task.objects.get(pk=taskDate.task.pk)
+                TaskManager().update_relational_fields_task(task, dict_values_task_relational_fields)
+
                 taskDate = TaskDate.objects.get(pk=taskDate.pk)
 
                 # Si elle doit rester une exception car elle a des commentaires ou quelqu'un s'en occupe
@@ -483,9 +525,13 @@ class TaskManager(models.Manager):
 
 
         # Dans le cas d'une tâche périodique.
+        # TODO : Les tests ont été faits et c'est ok.
         elif taskDate.eventType == 1:
+            print("Périodique")
             # Si on veut uniquement modifier le jour J
             if onlyAtTheDate:
+                print("OnlyAtTheDate")
+
                 # Créer une exception.
                 exception = TaskManager().create_an_exception(taskDate, date)
                 # modifier l'exception.
@@ -494,11 +540,17 @@ class TaskManager(models.Manager):
                 exception.task = TaskManager().copy_task_if_necessary(exception.task)
                 exception.save()
                 Task.objects.filter(pk=exception.task.pk).update(**dict_values_task)
+                # TODO : Les champs relationnels
+                task = Task.objects.get(pk=exception.task.pk)
+                TaskManager().update_relational_fields_task(task, dict_values_task_relational_fields)
+
                 exception = TaskDate.objects.get(pk=exception.pk)
                 return exception
 
             # Si on veut modifier tous les jours à partir de la date.
             else:
+                print("Toutes les dates")
+
                 saved_pk = taskDate.pk
                 # On fait une copie de la tâche.
                 copiedTaskDate = taskDate
@@ -512,6 +564,8 @@ class TaskManager(models.Manager):
                 taskDate.end_date = end_date
                 taskDate.save()
 
+                #TODO: A améliorer -> Si c'est le premier jour de la tâche, on peut directement la modifier.
+
                 # On supprime les tâches exceptions qui sont après le jour J par rapport à la tâche de base.
                 TaskDate.objects.filter(Q(parent=taskDate) & Q(start_date__gt=date)).delete()
 
@@ -519,6 +573,10 @@ class TaskManager(models.Manager):
                 copiedTaskDate.task = TaskManager().copy_task_if_necessary(copiedTaskDate.task)
                 copiedTaskDate.save()
                 Task.objects.filter(pk=copiedTaskDate.task.pk).update(**dict_values_task)
+                # TODO : Les champs relationnels
+                task = Task.objects.get(pk=copiedTaskDate.task.pk)
+                TaskManager().update_relational_fields_task(task, dict_values_task_relational_fields)
+
 
                 # On modifie la taskdate
                 TaskDate.objects.filter(pk=copiedTaskDate.pk).update(**dict_values_taskDate)
@@ -606,7 +664,7 @@ class TaskManager(models.Manager):
                 # On va également supprimer les exceptions APRES le end_date. Les tâches qui ont en parent, le tâche.
                 exceptions = TaskDate.objects.filter(Q(parent=taskDate) & Q(start_date__gt=end_date)).delete()
 
-        return output #A changer par un vrai return
+        return True, output #A changer par un vrai return
 
 
     def add_taker(post, user):

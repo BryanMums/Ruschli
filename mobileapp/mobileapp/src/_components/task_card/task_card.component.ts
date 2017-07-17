@@ -1,9 +1,5 @@
-import { Component, OnInit, Input } from '@angular/core';
-//import { Router, ActivatedRoute, Params } from '@angular/router';
-import 'rxjs/add/operator/switchMap';
-import { Resident, TaskDate } from '../../_models/index';
-import { ResidentService } from '../../_services/index';
-import {IMyDpOptions, IMyDateModel, IMyDate} from 'mydatepicker';
+import { Component, Input } from '@angular/core'
+import { TaskDate } from '../../_models/index'
 
 @Component({
     selector: 'task-card',
@@ -13,13 +9,5 @@ import {IMyDpOptions, IMyDateModel, IMyDate} from 'mydatepicker';
 export class TaskCardComponent {
     @Input() taskDate: TaskDate
 
-    constructor(
-      //private router: Router
-    ){}
-
-    detail(){
-      console.log("lol")
-      //this.router.navigate(['./task',this.taskDate.pk])
-    }
-
+    constructor(){}
 }

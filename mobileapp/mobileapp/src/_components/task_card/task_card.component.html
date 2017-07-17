@@ -1,44 +1,26 @@
-<!--<div class="d-flex flex-column task_card" (click)="detail()">
-    <div style="border-bottom:1px solid whitesmoke;background:#2c3e50;color:whitesmoke;padding-left:5px;">
-      <div class="d-flex justify-content-end">
-        <small class="mr-auto" [style.display]="taskDate.eventType == 0 ? 'block' : 'none'">Non périodique</small>
-        <small class="mr-auto" [style.display]="taskDate.eventType == 1 ? 'block' : 'none'">Périodique</small>
-        <small class="pr-2" *ngIf="taskDate.time">{{taskDate.time}}</small>
-      </div>
-    </div>
-    <div style="background:white;padding:5px;">
-      <h5 style="margin-bottom:0px;">{{taskDate.task.title}}</h5>
-    </div>
-    <div class="col-12"  style="overflow-x:scroll;background:white;">
-      <div *ngIf="taskDate.task.resident" class="small row flex-row flex-nowrap"  style="padding:5px">
-          <span class="badge badge-primary mr-1" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</span>
-      </div>
-    </div>
-    <div class="col-12"  style="overflow-x:scroll;background:white;">
-      <div *ngIf="taskDate.task.room" class="small row flex-row flex-nowrap" style="padding:5px">
-          <span class="badge badge-default mr-1" *ngFor="let room of taskDate.task.room">{{room.title}}</span>
-      </div>
-    </div>
-</div>
--->
-<ion-card>
+<ion-card [class.cardTask]="taskDate.active" [class.cardNotActive]="!taskDate.active">
   <ion-card-content>
-    <ion-card-title>
+    <ion-card-title style="color:#488aff">
       {{taskDate.task.title}}
     </ion-card-title>
+    <div *ngIf="taskDate.active">
     <p>
       {{taskDate.task.description}}
     </p>
     <div *ngIf="taskDate.time">
-      <p>Heure : {{taskDate.time.split(':')[0]+'h'+taskDate.time.split(':')[1]}}</p>
+      <hr/>
+      <p><b>Heure</b> : {{taskDate.time.split(':')[0]+'h'+taskDate.time.split(':')[1]}}</p>
     </div>
     <div *ngIf="taskDate.task.resident" style="padding:5px">
-        <ion-badge *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</ion-badge>
+        <ion-badge margin-right *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</ion-badge>
     </div>
     <div *ngIf="taskDate.task.room" style="padding:5px">
-        <ion-badge color="danger" *ngFor="let room of taskDate.task.room">{{room.title}}</ion-badge>
+        <ion-badge margin-right color="danger" *ngFor="let room of taskDate.task.room">{{room.title}}</ion-badge>
+    </div>
+    <hr/>
     </div>
   </ion-card-content>
+  <div *ngIf="taskDate.active">
   <ion-row>
     <ion-col>
       <button ion-button icon-left clear small>
@@ -47,12 +29,17 @@
       </button>
     </ion-col>
     <ion-col *ngIf="taskDate.task.need_someone">
-      <ion-item *ngIf="taskDate.taker" clear small style="color: #32db64">
+      <ion-item *ngIf="taskDate.taker" clear small >
+        <ion-note style="color: #32db64">
           {{taskDate.taker.username}} s'en charge
+        </ion-note>
       </ion-item>
-      <ion-item *ngIf="!taskDate.taker" clear small style="color:#f53d3d">
+      <ion-item *ngIf="!taskDate.taker" clear small >
+        <ion-note style="color:#f53d3d">
           Il faut quelqu'un !
+        </ion-note>
       </ion-item>
     </ion-col>
   </ion-row>
+</div>
 </ion-card>

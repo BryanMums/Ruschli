@@ -1,255 +1,39 @@
-<h3 *ngIf="taskToAdd">Ajout d'une tâche</h3>
-<h3 *ngIf="!taskToAdd">Modification de la tâche</h3>
-<hr/>
-<div *ngIf="state == 1">
-  <div class="row justify-content-center">
-    <div class="col-12 col-sm-12 col-lg-4">
-      <h5>Etape 1 | Type de tâche</h5>
-      <p>Veuillez choisir le type de tâche :</p>
-      <select class="form-control" [ngModel]="selectedType" (ngModelChange)="chooseType($event)">
-        <option selected="selected" disabled="disabled" [ngValue]=-1>Choisir un type</option>
-        <option *ngFor="let type of taskTypes" [ngValue]="type.pk">{{type.name}}</option>
-      </select>
-    </div>
+<ion-header>
+  <ion-navbar>
+    <button menuToggle ion-button>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Nouvelle tâche</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <!-- Début : Choix du type de tâche -->
+  <div *ngIf="state == 1">
+    <ion-grid>
+      <ion-row>
+        <ion-col>
+          <h5>Type de tâche</h5>
+          <p>Veuillez choisir le type de tâche :</p>
+          <ion-item>
+          <ion-label color="primary">Type de tâche</ion-label>
+          <ion-select multiple="false" (ionChange)="chooseType($event)" >
+            <ion-option *ngFor="let type of taskTypes" value="{{type.pk}}">{{type.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
   </div>
-</div>
-<div *ngIf="state == 2">
-  <h5 *ngIf="taskToAdd">Etape 2 | Informations de la tâche</h5>
-  <h4 *ngIf="!taskToAdd && onlyAtDate">Uniquement à cette date</h4>
-  <h4 *ngIf="!taskToAdd && !onlyAtDate">A partir de cette date</h4>
-  
-  <form *ngIf="taskType" [formGroup]="myForm" novalidate (ngSubmit)="save(myForm.value, myForm.valid)">
-        <!-- We'll add our form controls here -->
-        <div class="row">
-          <div class="col-12 col-md-6">
-              <label>Titre</label>
-              <input *ngIf="taskType.change_title" type="text" formControlName="title">
-              <p *ngIf="!taskType.change_title" type="text">{{taskType.default_title}}</p>
-              <small *ngIf="!myForm.controls.title.valid">
-              Le titre est requis.
-              </small>
-          </div>
-          <div class="col-12 col-md-6">
-              <label>Description</label>
-              <textarea *ngIf="taskType.change_description" class="md-textarea" formControlName="description"></textarea>
-              <p *ngIf="!taskType.change_description">{{taskType.default_description}}</p>
-          </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-md-6">
-                <label>Besoin de quelqu'un ?</label><br/>
-                <input *ngIf="taskType.change_need_someone" type="checkbox" formControlName="need_someone">
-                <input *ngIf="!taskType.change_need_someone" onclick="return false;" type="checkbox" formControlName="need_someone">
-            </div>
-            <div class="col-12 col-md-6">
-                <label>Temps</label>
-                <input *ngIf="taskType.change_time" type="time" formControlName="time">
-                <p *ngIf="!taskType.change_time">{{taskType.default_time}}</p>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 col-md-6">
-                <label>Résident(s)</label><br/>
-                <ss-multiselect-dropdown *ngIf="taskType.change_resident" formControlName="resident" [options]="residentsOptions" [settings]="searchSettings" [(ngModel)]="optionsResidentsModel"></ss-multiselect-dropdown>
-                <div *ngIf="!taskType.change_resident">
-                  <span class="badge badge-primary mr-1" *ngFor="let resident of taskType.default_resident">{{resident.firstname}} {{resident.lastname}}</span>
-                </div>
-            </div>
-            <div class="col-12 col-md-6">
-                <label>Chambre(s)</label><br/>
-                <ss-multiselect-dropdown *ngIf="taskType.change_room" formControlName="room" [options]="roomsOptions" [settings]="searchSettings" [(ngModel)]="optionsRoomsModel"></ss-multiselect-dropdown>
-                <div *ngIf="!taskType.change_room">
-                    <span class="badge badge-default mr-1" *ngFor="let room of taskType.default_room">{{room.title}}</span>
-                </div>
-            </div>
-        </div>
+  <!-- Fin : Choix du type de tâche -->
 
-
-
-        <!-- ****************************************************************************** -->
-
-        <div formGroupName="eventType" *ngIf="!onlyAtDate">
-          <hr/>
-          <h4>Périodicité</h4>
-            <div class="row">
-                <div *ngFor="let eventType of EVENT_TYPES | values" >
-                  <button type="button" class="btn" (click)="setEventType(eventType)"
-                  [class.btn-blue-grey]="myForm.controls.eventType.controls.type.value !== eventType"
-                  [class.btn-primary]="myForm.controls.eventType.controls.type.value === eventType">
-                  {{eventType.name}}
-                  </button>
-                </div>
-            </div>
-
-            <!--NON PERIODIC-->
-            <div *ngIf="myForm.controls.eventType.controls.type.value === EVENT_TYPES.NONPERIODIC">
-                <div class="panel-body">
-                  <div formGroupName="nonperiodic" class="col-12 col-md-6">
-                      <label>Date</label>
-                      <my-date-picker formControlName="date" [options]="myDatePickerOptions" [selDate]="selDate"></my-date-picker>
-                      <small *ngIf="!myForm.controls.eventType.controls.nonperiodic.controls.date.valid">
-                      Required.
-                      </small>
-                  </div>
-                </div>
-            </div>
-
-            <!--PERIODIC-->
-            <div *ngIf="myForm.controls.eventType.controls.type.value === EVENT_TYPES.PERIODIC">
-                <div class="panel-body">
-                  <div class="row">
-                  <div formGroupName="periodic" class="col-12 col-md-6">
-                      <label>Date de départ</label>
-                      <my-date-picker formControlName="start_date" [options]="myDatePickerOptions" [selDate]="selDate"></my-date-picker>
-                      <small *ngIf="!myForm.controls.eventType.controls.periodic.controls.start_date.valid">
-                      Required.
-                      </small>
-                  </div>
-
-                  <div formGroupName="periodic" class="col-12 col-md-6">
-                      <label>Date de fin </label>
-                      <my-date-picker formControlName="end_date" [options]="myDatePickerOptions" [selDate]="selDate"></my-date-picker>
-                  </div>
-                </div>
-                  <div formGroupName="periodic">
-
-
-                    <div class="row">
-                        <div *ngFor="let periodicType of PERIODIC_TYPES | values">
-                          <button type="button" class="btn" (click)="setPeriodicType(periodicType)"
-                          [class.btn-blue-grey]="myForm.controls.eventType.controls.periodic.controls.type.value !== periodicType"
-                          [class.btn-primary]="myForm.controls.eventType.controls.periodic.controls.type.value === periodicType">
-                          {{ periodicType.name }}
-                          </button>
-                        </div>
-                    </div>
-
-                    <!-- HEBDOMADAIRE -->
-                    <div *ngIf="myForm.controls.eventType.controls.periodic.controls.type.value === PERIODIC_TYPES.HEBDOMADAIRE">
-                        <div class="panel-body">
-                          <div class="row">
-                              <div formGroupName="hebdomadaire" class="col-12 col-md-6">
-                                  <label>Les jours de la semaine</label><br/>
-                                  <ss-multiselect-dropdown formControlName="daysOfWeek" [options]="daysOptions" [settings]="nosearchSettings" [(ngModel)]="optionsDaysOfWeekModel" ></ss-multiselect-dropdown>
-                                  <small *ngIf="!myForm.controls.eventType.controls.periodic.controls.hebdomadaire.controls.daysOfWeek.valid">
-                                  Required.
-                                  </small>
-                              </div>
-                              <div formGroupName="hebdomadaire" class="col-12 col-md-6">
-                                <label>Interval de semaine</label>
-                                <input type="number" min="1" formControlName="intervalWeek">
-                                <small *ngIf="!myForm.controls.eventType.controls.periodic.controls.hebdomadaire.controls.intervalWeek.valid">
-                                Required.
-                                </small>
-                              </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- MENSUEL -->
-                    <div *ngIf="myForm.controls.eventType.controls.periodic.controls.type.value === PERIODIC_TYPES.MENSUEL">
-                      <div formGroupName="mensuel" class="col-12 col-md-6">
-                        <label>Interval du mois</label>
-                        <input type="number" min="1" formControlName="intervalMonth">
-                        <small *ngIf="!myForm.controls.eventType.controls.periodic.controls.mensuel.controls.intervalMonth.valid">
-                        Required.
-                        </small>
-                      </div>
-                        <div formGroupName="mensuel">
-
-                          <div class="row">
-                              <div *ngFor="let monthlyType of MONTHLY_TYPES | values">
-                                <button type="button" class="btn" (click)="setMonthlyType(monthlyType)"
-                                [class.btn-blue-grey]="myForm.controls.eventType.controls.periodic.controls.mensuel.controls.type.value !== monthlyType"
-                                [class.btn-primary]="myForm.controls.eventType.controls.periodic.controls.mensuel.controls.type.value === monthlyType">
-                                {{ monthlyType.name }}
-                                </button>
-                              </div>
-                          </div>
-
-                          <!-- DAYDATE -->
-                          <div *ngIf="myForm.controls.eventType.controls.periodic.controls.mensuel.controls.type.value === MONTHLY_TYPES.DAYDATE">
-                              <div class="panel-body">
-                                <div formGroupName="daydate">
-                                    <label>Quel jour du mois ? (1 - 31)</label>
-                                    <input type="text" formControlName="dayNumber">
-                                </div>
-                              </div>
-                          </div>
-                          <div *ngIf="myForm.controls.eventType.controls.periodic.controls.mensuel.controls.type.value === MONTHLY_TYPES.DAYNUMBERWEEK">
-                              <div class="panel-body">
-                                <div formGroupName="daynumberweek">
-                                    <label>Quelle semaine ? (première à cinquième)</label><br/>
-                                    <select formControlName="weekNumber" class="btn btn-default" style="margin-left:0px;">
-                                        <option *ngFor="let week of weekNumberOptions" value="week.id">{{week.name}}</option>
-                                    </select>
-
-                                </div>
-                                <div formGroupName="daynumberweek">
-                                    <label>Quels jours ?</label><br/>
-                                    <ss-multiselect-dropdown formControlName="daysOfWeek" [options]="daysOptions" [settings]="nosearchSettings" [(ngModel)]="optionsDaysOfWeekModel" ></ss-multiselect-dropdown>
-                                </div>
-                              </div>
-                          </div>
-
-                        </div>
-                    </div>
-                </div>
-              </div>
-            </div>
-        </div>
-        <hr/>
-        <!-- DESTINATAIRES -->
-        <h4>Destinataire(s)</h4>
-        <div class="row">
-            <div class="col-12 col-md-6">
-              <label>Employé(s)</label><br/>
-              <ss-multiselect-dropdown *ngIf="taskType.change_receiver_user" formControlName="receiver_user" [options]="usersOptions" [settings]="searchSettings" [(ngModel)]="optionsUsersModel"></ss-multiselect-dropdown>
-              <div *ngIf="!taskType.change_receiver_user">
-                <span class="badge badge-danger mr-1" *ngFor="let user of taskType.default_receiver_user">{{user.username}}</span>
-              </div>
-            </div>
-            <div class="col-12 col-md-6">
-              <label>Secteur(s)</label><br/>
-              <ss-multiselect-dropdown *ngIf="taskType.change_receiver_group" formControlName="receiver_group" [options]="sectorsOptions" [settings]="searchSettings" [(ngModel)]="optionsSectorsModel"></ss-multiselect-dropdown>
-              <div *ngIf="!taskType.change_receiver_group">
-                <span class="badge badge-danger mr-1" *ngFor="let sector of taskType.default_receiver_group">{{sector.title}}</span>
-              </div>
-            </div>
-        </div>
-        <div class="row">
-          <div class="col-12 col-md-6">
-            <label>Employé(s) en copie</label><br/>
-            <ss-multiselect-dropdown *ngIf="taskType.change_copyreceiver_user" formControlName="copyreceiver_user" [options]="usersOptions" [settings]="searchSettings" [(ngModel)]="optionsCopyUsersModel"></ss-multiselect-dropdown>
-            <div *ngIf="!taskType.change_copyreceiver_user">
-              <span class="badge badge-warning mr-1" *ngFor="let user of taskType.default_copyreceiver_user">{{user.username}}</span>
-            </div>
-          </div>
-          <div class="col-12 col-md-6">
-            <label>Secteur(s) en copie</label><br/>
-            <ss-multiselect-dropdown *ngIf="taskType.change_copyreceiver_group" formControlName="copyreceiver_group" [options]="sectorsOptions" [settings]="searchSettings" [(ngModel)]="optionsCopySectorsModel"></ss-multiselect-dropdown>
-            <div *ngIf="!taskType.change_copyreceiver_group">
-              <span class="badge badge-warning mr-1" *ngFor="let sector of taskType.default_copyreceiver_group">{{sector.title}}</span>
-            </div>
-          </div>
-        </div>
-
-        <div>
-            <hr/>
-            <button *ngIf="taskToadd" type="submit" class="btn btn-block btn-success" [disabled]="!myForm.valid">Ajouter</button>
-            <button *ngIf="!taskToAdd" type="submit" class="btn btn-block btn-success" [disabled]="!myForm.valid">Modifier</button>
-        </div>
-    </form>
-</div>
-
-<div *ngIf="state == 3">
-  <div class="row justify-content-center">
-    <h4>La tâche a été ajoutée !</h4>
+  <!-- Début : Formulaire de la tâche -->
+  <div *ngIf="state == 2">
+    <h5>Informations de la tâche</h5>
+    <form-task [taskToAdd]="taskToAdd" [taskType]="taskType"></form-task>
+    <ion-grid><ion-row><ion-col>
+      <button ion-button block outline color="danger" (click)="reset()">Annuler</button>
+    </ion-col></ion-row></ion-grid>
   </div>
-</div>
-
-<div *ngIf="state == 4">
-  <div class="row justify-content-center">
-    <h4>La tâche n'a pas été ajoutée ! Veuillez re-essayer</h4>
-  </div>
-</div>
+  <!-- Fin : Formulaire de la tâche -->
+</ion-content>

@@ -1,0 +1,159 @@
+<ion-grid>
+  <ion-row>
+    <ion-col>
+      <form *ngIf="taskDate && taskType" [formGroup]="myForm" novalidate (ngSubmit)="save(myForm.value, myForm.valid)">
+      <ion-list>
+        <ion-item>
+          <ion-label color="primary">Titre</ion-label>
+          <ion-input [(ngModel)]="taskDate.task.title" [disabled]="!taskType.change_title" placeholder="Votre titre" formControlName="title"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked color="primary">Description</ion-label>
+          <ion-textarea [(ngModel)]="taskDate.task.description" rows="4" [disabled]="!taskType.change_description" placeholder="Votre description" formControlName="description"></ion-textarea>
+        </ion-item>
+        <ion-item>
+          <ion-label color="primary">Besoin de quelqu'un ?</ion-label>
+          <ion-checkbox [(ngModel)]="taskDate.task.need_someone" item-right [disabled]="!taskType.change_need_someone" formControlName="need_someone"></ion-checkbox>
+        </ion-item>
+        <ion-item>
+          <ion-label color="primary">Heure</ion-label>
+          <ion-datetime [(ngModel)]="taskDate.time" [disabled]="!change_time" displayFormat="HH:mm" formControlName="time" ></ion-datetime>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked color="primary">Résident(s)</ion-label>
+          <ion-select [(ngModel)]="optionsResidentsModel" [disabled]="!taskType.change_resident" multiple="true" formControlName="resident">
+            <ion-option *ngFor="let resident of residentsOptions" value="{{resident.id}}">{{resident.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label stacked color="primary">Chambre(s)</ion-label>
+          <ion-select [(ngModel)]="optionsRoomsModel" [disabled]="!taskType.change_room" multiple formControlName="room">
+            <ion-option *ngFor="let room of roomsOptions" value="{{room.id}}">{{room.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+        <div *ngIf="!onlyAtDate">
+          <ion-list-header>
+            Périodicité
+          </ion-list-header>
+          <ion-item>
+            <ion-label color="primary">Type</ion-label>
+            <ion-select [(ngModel)]="taskDate.eventType" formControlName="eventType">
+              <ion-option *ngFor="let eventType of EVENT_TYPES | values" [value]="eventType.id">{{eventType.name}}</ion-option>
+            </ion-select>
+          </ion-item>
+
+          <div *ngIf="taskDate.eventType == 0">
+            <ion-label stacked color="primary">Date</ion-label>
+            <my-date-picker [selDate]="start_date" formControlName="start_date" [options]="myDatePickerOptions"></my-date-picker>
+          </div>
+
+          <div *ngIf="taskDate.eventType == 1">
+
+            <ion-label color="primary">Date de début</ion-label>
+            <my-date-picker [selDate]="start_date" formControlName="start_date" [options]="myDatePickerOptions"></my-date-picker>
+
+
+            <ion-label color="primary">Date de fin</ion-label>
+            <my-date-picker formControlName="end_date" [options]="myDatePickerOptions" [selDate]="taskDate.end_date"></my-date-picker>
+
+            <ion-item>
+              <ion-label color="primary">Type de périodicité</ion-label>
+              <ion-select [(ngModel)]="taskDate.periodicType" formControlName="periodicType">
+                <ion-option *ngFor="let periodicType of PERIODIC_TYPES | values" [value]="periodicType.id">{{periodicType.name}}</ion-option>
+              </ion-select>
+            </ion-item>
+
+            <div *ngIf="taskDate.periodicType == 1">
+              <ion-item>
+                <ion-label color="primary">Les jours de la semaine</ion-label>
+                <ion-select [(ngModel)]="taskDate.daysOfWeek" multiple formControlName="daysOfWeek">
+                  <ion-option *ngFor="let day of daysOptions" [value]="day.id">{{day.name}}</ion-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <ion-label color="primary">Semaine(s) d'intervalle</ion-label>
+                <ion-input [(ngModel)]="taskDate.intervalWeek" type="number" min="1" formControlName="intervalWeek"></ion-input>
+              </ion-item>
+            </div>
+
+            <div *ngIf="taskDate.periodicType == 2">
+              <ion-item>
+                <ion-label color="primary">Mois d'intervalle</ion-label>
+                <ion-input [(ngModel)]="taskDate.intervalMonth" item-right type="number" min="1" formControlName="intervalMonth"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-label color="primary">Rép. par mois</ion-label>
+                <ion-select (ionChange)="setMonthlyType($event)" formControlName="monthlyType">
+                  <ion-option *ngFor="let monthlyType of MONTHLY_TYPES | values" [value]="monthlyType">{{monthlyType.name}}</ion-option>
+                </ion-select>
+              </ion-item>
+
+              <div *ngIf="taskDate.monthlyType == 0">
+                <ion-item>
+                  <ion-label color="primary">Quel jour du mois ?</ion-label>
+                  <ion-datetime formControlName="dayNumber" displayFormat="D"></ion-datetime>
+                </ion-item>
+              </div>
+
+              <div *ngIf="taskDate.monthlyType == 1">
+                <ion-item>
+                  <ion-label color="primary">Quelle semaine</ion-label>
+                  <ion-select [(ngModel)]="taskDate.weekNumber" formControlName="weekNumber">
+                    <ion-option *ngFor="let week of weekNumberOptions" [value]="week.id">{{week.name}}</ion-option>
+                  </ion-select>
+                </ion-item>
+
+                <ion-item>
+                  <ion-label color="primary">Quels jours ?</ion-label>
+                  <ion-select [(ngModel)]="taskDate.daysOfWeek" multiple formControlName="daysOfWeek">
+                    <ion-option *ngFor="let day of daysOptions" [value]="day.id">{{day.name}}</ion-option>
+                  </ion-select>
+                </ion-item>
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <ion-list-header>
+          Destinataire(s)
+        </ion-list-header>
+
+        <ion-item>
+          <ion-label stacked color="primary">Employé(s)</ion-label>
+          <ion-select [(ngModel)]="optionsUsersModel" [disabled]="!taskType.change_receiver_user" multiple="true" formControlName="receiver_user">
+            <ion-option *ngFor="let user of usersOptions" [value]="user.id">{{user.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label stacked color="primary">Secteur(s)</ion-label>
+          <ion-select [(ngModel)]="optionsSectorsModel" [disabled]="!taskType.change_receiver_group" multiple="true" formControlName="receiver_group">
+            <ion-option *ngFor="let sector of sectorsOptions" value="{{sector.id}}">{{sector.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label stacked color="primary">Employé(s) en copie</ion-label>
+          <ion-select [(ngModel)]="optionsCopyUsersModel" [disabled]="!taskType.change_copyreceiver_user" multiple="true" formControlName="copyreceiver_user">
+            <ion-option *ngFor="let user of usersOptions" value="{{user.id}}">{{user.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label stacked color="primary">Secteur(s) en copie</ion-label>
+          <ion-select [(ngModel)]="optionsCopySectorsModel" [disabled]="!taskType.change_copyreceiver_group" multiple="true" formControlName="copyreceiver_group">
+            <ion-option *ngFor="let sector of sectorsOptions" value="{{sector.id}}">{{sector.name}}</ion-option>
+          </ion-select>
+        </ion-item>
+
+      </ion-list>
+      <button margin-top color="secondary" ion-button full type="submit" [disabled]="!myForm.valid">  <ion-icon name="checkmark"></ion-icon></button>
+
+    </form>
+    </ion-col>
+  </ion-row>
+</ion-grid>

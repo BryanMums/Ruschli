@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle >
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Arrêt de la tâche</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content id="ionContent" class="has-header has-subheader">
+  <ion-grid *ngIf="taskDate">
+    <h2>Confirmation</h2>
+    <div *ngIf="taskDate.eventType == 0 && taskDate.parent == null">
+      <p>Vous allez supprimer cette tâche non-périodique, elle ne sera plus récupérable ensuite, êtes-vous sûr ?</p>
+      <button ion-button full color="secondary" (click)="stop()">Oui je suis sûr</button>
+    </div>
+    <div *ngIf="taskDate.eventType == 1 || taskDate.parent != null">
+      <form>
+        <ion-list>
+          <ion-item>
+            <ion-label stacked color="primary">Type d'arrêt</ion-label>
+            <ion-select [(ngModel)]="onlyAtDate" name="type">
+              <ion-option value="true">Désactiver uniquement pour cette date</ion-option>
+              <ion-option value="false">Arrêter la tâche périodique</ion-option>
+            </ion-select>
+          </ion-item>
+          <ion-item *ngIf="!onlyAtDate">
+            <ion-label stacked color="primary">Date comprise</ion-label>
+            <ion-select [(ngModel)]="included_date" name="included_date">
+              <ion-option value="true">A partir de cette date</ion-option>
+              <ion-option value="false">Après cette date</ion-option>
+            </ion-select>
+          </ion-item>
+          <button ion-button full color="secondary" (click)="stop()">Oui je suis sûr</button>
+
+        </ion-list>
+      </form>
+    </div>
+  </ion-grid>
+</ion-content>

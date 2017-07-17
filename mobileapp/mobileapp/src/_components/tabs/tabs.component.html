@@ -1,0 +1,9 @@
+<ion-tabs #myTabs *ngIf="authenticationService.authenticated()">
+  <ion-tab [root]="tab2Root" tabTitle="Accueil" tabIcon="home"></ion-tab>
+  <ion-tab [root]="tab1Root" tabTitle="Résidents" tabIcon="contacts"></ion-tab>
+  <ion-tab [root]="tab3Root" tabTitle="Ajouter" tabIcon="add-circle"></ion-tab>
+  <ion-tab [root]="tab4Root" tabTitle="Profile" tabIcon="contact"></ion-tab>
+</ion-tabs>
+<ion-tabs #myTabs *ngIf="!authenticationService.authenticated()">
+  <ion-tab [root]="tab4Root" tabTitle="Profile" tabIcon="contact"></ion-tab>
+</ion-tabs>
