@@ -109,6 +109,22 @@ export class FormTaskComponent implements OnInit {
     ngOnInit() {
         // Dans le cas de la modification d'une tâche
         if(!this.taskToAdd && this.taskDate != null){
+            // Si on est sur une tâche exception et qu'on veut modifier à partir de la date
+            // Il va falloir mettre les informations de la tâche parente pour la périodicité
+            if(!this.onlyAtDate && this.taskDate.parent != null){
+              this.taskService.getTaskDate(this.taskDate.parent)
+              .subscribe((taskDate: TaskDate) => {
+                this.taskDate.eventType = taskDate.eventType
+                this.taskDate.periodicType = taskDate.periodicType
+                this.taskDate.monthlyType = taskDate.monthlyType
+                this.taskDate.end_date = taskDate.end_date
+                this.taskDate.weekNumber = taskDate.weekNumber
+                this.taskDate.daysOfWeek = taskDate.daysOfWeek
+                this.taskDate.intervalWeek = taskDate.intervalWeek
+                this.taskDate.intervalMonth = taskDate.intervalMonth
+                this.taskDate.dayNumber = taskDate.dayNumber
+                })
+            }
             // On récupère la date de début comme étant la date à laquelle il veut modifier
             this.start_date = {year:parseInt(this.date.substr(0,4)), day:parseInt(this.date.substr(8,2)), month:parseInt(this.date.substr(5,2))}
 
@@ -262,10 +278,11 @@ export class FormTaskComponent implements OnInit {
             }
             // Si c'est mensuel
             else if(model.periodicType == 2){
+                data['monthlyType'] = model.monthlyType
                 data['intervalMonth'] = model.intervalMonth
                 // Si c'est daydate
                 if(model.monthlyType == 0){
-                    data['dayNumber'] = model.dayNumber
+                    data['dayNumber'] = parseInt(model.dayNumber)
                 }
                 // Si c'est daynumberweek
                 else if(model.monthlyType == 1){
@@ -282,6 +299,8 @@ export class FormTaskComponent implements OnInit {
 
         // Information sur le type de tâche
         data['id_type_task'] = this.taskType.pk
+
+        console.log(data)
 
         // Dans le cas d'une création d'une nouvelle tâche
         if(this.taskToAdd){

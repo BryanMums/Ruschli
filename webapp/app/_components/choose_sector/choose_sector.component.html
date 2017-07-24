@@ -1,13 +1,10 @@
 <div *ngIf="user">
-  <h2>Choix du secteur</h2>
-  <hr/>
-  <div class="col-12 col-md-6">
-    <p>Dans quel secteur travaillez-vous aujourdĥui ?</p>
-    <div class="form-group">
-      <select class="form-control" [ngModel]="selectedSector" (ngModelChange)="change($event)">
-          <option value="0" selected="true" disabled="disabled">Veuillez choisir un secteur</option>
-          <option *ngFor="let sector of user.sectors" [ngValue]="sector.pk">{{sector.title}}</option>
-      </select>
-    </div>
+  <p>Dans quel secteur travaillez-vous aujourdĥui ?</p>
+  <div class="form-group">
+    <label>Secteur</label>
+    <select class="form-control" [(ngModel)]="selectedSector" (ngModelChange)="change($event)">
+        <option value="0" disabled="disabled">Veuillez choisir un secteur</option>
+        <option *ngFor="let sector of user.sectors" [ngValue]="sector.pk">{{sector.title}}</option>
+    </select>
   </div>
 </div>

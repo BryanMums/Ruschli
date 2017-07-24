@@ -11,43 +11,35 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
-require("rxjs/add/operator/map");
 var index_1 = require("./index");
+require("rxjs/add/operator/map");
 var UserService = (function () {
     function UserService(http, authenticationService) {
         this.http = http;
         this.authenticationService = authenticationService;
     }
+    // Méthode permettant de récupérer la liste des utilisateurs (employés)
     UserService.prototype.getUsers = function () {
-        // add authorization header with jwt token
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        // get users from api
-        return this.http.get('http://localhost:8000/api/user/', options)
+        return this.http.get(this.authenticationService.URL + 'api/user/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de récupérer les informations de l'utilisateur connecté
     UserService.prototype.getConnectedUser = function () {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        // get users from api
-        return this.http.get('http://localhost:8000/api/get_connected_user/', options)
+        return this.http.get(this.authenticationService.URL + 'api/get_connected_user/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de récupérer les tâches destinées à l'utilisateur et son secteur sélectionné
     UserService.prototype.getTasks = function (date) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
         var sector = localStorage["sector"];
-        console.log(localStorage["sector"]);
-        // get tasks for the resident at a specified date
-        return this.http.get('http://localhost:8000/api/tasks/' + date + '/' + sector + '/', options)
+        return this.http.get(this.authenticationService.URL + 'api/tasks/' + date + '/' + sector + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    UserService = __decorate([
+        core_1.Injectable(),
+        __metadata("design:paramtypes", [http_1.Http,
+            index_1.AuthenticationService])
+    ], UserService);
     return UserService;
 }());
-UserService = __decorate([
-    core_1.Injectable(),
-    __metadata("design:paramtypes", [http_1.Http,
-        index_1.AuthenticationService])
-], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

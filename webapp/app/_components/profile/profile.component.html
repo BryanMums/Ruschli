@@ -1,0 +1,25 @@
+<div *ngIf="!authenticationService.authenticated()" class="col-md-6 col-md-offset-3">
+    <h2>Connexion</h2>
+    <p>
+      Si vous n'avez pas de compte ou que vous ne vous souvenez plus de votre mot de passe, contactez l'adminstrateur
+    </p>
+    <form #signForm="ngForm" (ngSubmit)="login(signForm.value)">
+        <div class="form-group">
+            <label for="username">Nom d'utilisateur</label>
+            <input type="text" class="form-control" name="username" ngModel required />
+        </div>
+        <div class="form-group">
+            <label for="password">Mot de passe</label>
+            <input type="password" class="form-control" name="password" ngModel required />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Connexion</button>
+        </div>
+        <div *ngIf="error" class="alert alert-danger">{{error}}</div>
+    </form>
+</div>
+<div *ngIf="authenticationService.authenticated()" class="col-md-6 col-md-offset-3">
+  <h2>Vous êtes connecté !</h2>
+  <choose-sector></choose-sector>
+  <button class="btn btn-danger" (click)="logout()">Déconnexion</button>
+</div>

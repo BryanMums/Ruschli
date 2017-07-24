@@ -1,10 +1,10 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { TaskDate } from '../../_models/index';
-import { TaskService } from '../../_services/index';
-import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms';
-import { NavController, NavParams, ToastController } from 'ionic-angular';
-import { UpdateTaskComponent } from '../update_task/index';
-import { StopTaskComponent } from '../stop_task/index';
+import { Component, OnInit, Input } from '@angular/core'
+import { TaskDate } from '../../_models/index'
+import { TaskService } from '../../_services/index'
+import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
+import { NavController, NavParams, ToastController } from 'ionic-angular'
+import { UpdateTaskComponent } from '../update_task/index'
+import { StopTaskComponent } from '../stop_task/index'
 
 
 @Component({
@@ -13,10 +13,10 @@ import { StopTaskComponent } from '../stop_task/index';
 })
 
 export class TaskDetailComponent implements OnInit {
-    @Input() date: any;
-    @Input() taskDate: TaskDate;
-    canTakeInCharge = true;
-    public myForm: FormGroup;
+    @Input() date: any
+    @Input() taskDate: TaskDate
+    canTakeInCharge = true
+    public myForm: FormGroup
 
     constructor(
       private taskService: TaskService,

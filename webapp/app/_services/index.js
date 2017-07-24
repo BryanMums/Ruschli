@@ -8,4 +8,6 @@ __export(require("./user.service"));
 __export(require("./resident.service"));
 __export(require("./task.service"));
 __export(require("./form.service"));
+__export(require("./room.service"));
+__export(require("./sector.service"));
 //# sourceMappingURL=index.js.map

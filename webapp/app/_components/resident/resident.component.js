@@ -20,6 +20,7 @@ var ResidentComponent = (function () {
         this.route = route;
         this.router = router;
         this.tasks = [];
+        this.date = null;
         this.selDate = { year: 2017, month: 6, day: 6 };
         this.myDatePickerOptions = {
             dateFormat: 'yyyy-mm-dd',
@@ -37,43 +38,44 @@ var ResidentComponent = (function () {
         var date = new Date();
         this.selDate = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
         var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+        this.date = dateStr;
         // On récupère le résident selon l'id
         this.route.params
             .switchMap(function (params) { return _this.residentService.getResident(+params['id']); })
             .subscribe(function (resident) {
             _this.resident = resident;
             // On récupère les tâches le concernant selon la date.
-            _this.residentService.getTaskResident(_this.resident.pk, dateStr)
-                .subscribe(function (tasks) {
-                _this.tasks = tasks;
-            });
+            _this.updateList();
         });
     };
-    ResidentComponent.prototype.onDateChanged = function (event) {
+    // Méthode appelée lorsqu'on change de date dans le date picker
+    ResidentComponent.prototype.onDateChanged = function (date) {
+        this.date = date.formatted;
+        this.updateList();
+    };
+    // Permet de mettre à jour la liste des tâches concernant le résident
+    ResidentComponent.prototype.updateList = function () {
         var _this = this;
-        // event properties are: event.date, event.jsdate, event.formatted and event.epoc
-        var date = event;
-        console.log(date.formatted);
-        this.residentService.getTaskResident(this.resident.pk, date.formatted)
+        this.residentService.getTaskResident(this.resident.pk, this.date)
             .subscribe(function (tasks) {
             _this.tasks = tasks;
         });
     };
+    __decorate([
+        core_1.Input(),
+        __metadata("design:type", index_1.Resident)
+    ], ResidentComponent.prototype, "resident", void 0);
+    ResidentComponent = __decorate([
+        core_1.Component({
+            selector: 'resident',
+            moduleId: module.id,
+            templateUrl: 'resident.component.html'
+        }),
+        __metadata("design:paramtypes", [index_2.ResidentService,
+            router_1.ActivatedRoute,
+            router_1.Router])
+    ], ResidentComponent);
     return ResidentComponent;
 }());
-__decorate([
-    core_1.Input(),
-    __metadata("design:type", index_1.Resident)
-], ResidentComponent.prototype, "resident", void 0);
-ResidentComponent = __decorate([
-    core_1.Component({
-        selector: 'resident',
-        moduleId: module.id,
-        templateUrl: 'resident.component.html'
-    }),
-    __metadata("design:paramtypes", [index_2.ResidentService,
-        router_1.ActivatedRoute,
-        router_1.Router])
-], ResidentComponent);
 exports.ResidentComponent = ResidentComponent;
 //# sourceMappingURL=resident.component.js.map

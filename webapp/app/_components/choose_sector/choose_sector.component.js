@@ -13,32 +13,42 @@ var core_1 = require("@angular/core");
 var router_1 = require("@angular/router");
 require("rxjs/add/operator/switchMap");
 var index_1 = require("../../_services/index");
+var angular2_toaster_1 = require("angular2-toaster");
 var ChooseSectorComponent = (function () {
-    function ChooseSectorComponent(userService, router) {
+    function ChooseSectorComponent(userService, router, toasterService) {
         this.userService = userService;
         this.router = router;
-        this.selectedSector = 0;
+        this.toasterService = toasterService;
+        this.selectedSector = 1; // L'ID du secteur où travaille l'utilisateur
     }
     ChooseSectorComponent.prototype.ngOnInit = function () {
         var _this = this;
+        // On récupère les informations de l'utilisateur connecté
         this.userService.getConnectedUser()
             .subscribe(function (user) {
             _this.user = user;
         });
+        // On récupère l'ID du secteur dans lequel il travaille
+        this.selectedSector = parseInt(localStorage["sector"]);
     };
+    // Méthode appelée lors du changement de secteur
     ChooseSectorComponent.prototype.change = function (pk) {
+        // On stock l'ID du nouveau secteur en local storage
         localStorage["sector"] = pk;
-        this.router.navigate(['/']);
+        // On affiche un message
+        this.toasterService.pop('success', 'Choix de secteur', 'Vous avez choisi un secteur !');
     };
+    ChooseSectorComponent = __decorate([
+        core_1.Component({
+            selector: 'choose-sector',
+            moduleId: module.id,
+            templateUrl: 'choose_sector.component.html'
+        }),
+        __metadata("design:paramtypes", [index_1.UserService,
+            router_1.Router,
+            angular2_toaster_1.ToasterService])
+    ], ChooseSectorComponent);
     return ChooseSectorComponent;
 }());
-ChooseSectorComponent = __decorate([
-    core_1.Component({
-        selector: 'choose-sector',
-        moduleId: module.id,
-        templateUrl: 'choose_sector.component.html'
-    }),
-    __metadata("design:paramtypes", [index_1.UserService, router_1.Router])
-], ChooseSectorComponent);
 exports.ChooseSectorComponent = ChooseSectorComponent;
 //# sourceMappingURL=choose_sector.component.js.map

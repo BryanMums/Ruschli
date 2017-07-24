@@ -48,17 +48,17 @@ var FormService = (function () {
             .map(function (response) { return response.json(); });
     };
     FormService.prototype.updateTask = function (data) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT' + this.authenticationService.token, 'Content-Type': 'application/json' });
+        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token, 'Content-Type': 'application/json' });
         var options = new http_1.RequestOptions({ headers: headers });
         return this.http.post('http://localhost:8000/api/updatetask/', data, options)
             .map(function (response) { return response.json(); });
     };
+    FormService = __decorate([
+        core_1.Injectable(),
+        __metadata("design:paramtypes", [http_1.Http,
+            index_1.AuthenticationService])
+    ], FormService);
     return FormService;
 }());
-FormService = __decorate([
-    core_1.Injectable(),
-    __metadata("design:paramtypes", [http_1.Http,
-        index_1.AuthenticationService])
-], FormService);
 exports.FormService = FormService;
 //# sourceMappingURL=form.service.js.map

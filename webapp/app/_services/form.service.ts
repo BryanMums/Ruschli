@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import 'rxjs/add/operator/map'
 
 import { AuthenticationService } from './index';
-import { Resident, TaskDate, Room, User, Group } from '../_models/index';
+import { Resident, TaskDate, Room, User, Sector } from '../_models/index';
 
 @Injectable()
 export class FormService {
@@ -36,7 +36,7 @@ export class FormService {
           .map((response: Response) => response.json());
     }
 
-    getGroups(): Observable<Group[]> {
+    getGroups(): Observable<Sector[]> {
         return this.http.get('http://localhost:8000/api/group/', this.authenticationService.options)
           .map((response: Response) => response.json());
     }
@@ -49,7 +49,7 @@ export class FormService {
     }
 
     updateTask(data:any): Observable<Response>{
-        let headers = new Headers({ 'Authorization': 'JWT' + this.authenticationService.token, 'Content-Type': 'application/json'});
+        let headers = new Headers({ 'Authorization': 'JWT ' + this.authenticationService.token, 'Content-Type': 'application/json'});
         let options = new RequestOptions({ headers: headers });
         return this.http.post('http://localhost:8000/api/updatetask/', data, options)
           .map((response: Response) => response.json());

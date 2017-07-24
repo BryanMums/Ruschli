@@ -24,7 +24,7 @@ import { StopTaskComponent } from '../_components/stop_task/index';
 
 import { MyDatePickerModule } from 'mydatepicker';
 import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
-import { KeysPipe, ValuesPipe, ReplaceLineBreaks } from '../_utils/index';
+import { KeysPipe, ValuesPipe, ReplaceLineBreaks, TruncatePipe } from '../_utils/index';
 import { MomentModule } from 'angular2-moment';
 
 import { StatusBar } from '@ionic-native/status-bar';
@@ -47,7 +47,8 @@ import { SplashScreen } from '@ionic-native/splash-screen';
     StopTaskComponent,
     KeysPipe,
     ValuesPipe,
-    ReplaceLineBreaks
+    ReplaceLineBreaks,
+    TruncatePipe
   ],
   imports: [
     BrowserModule,

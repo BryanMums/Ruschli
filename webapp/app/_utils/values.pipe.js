@@ -14,13 +14,13 @@ var ValuesPipe = (function () {
         if (args === void 0) { args = null; }
         return Object.keys(value).map(function (key) { return value[key]; });
     };
+    ValuesPipe = __decorate([
+        core_1.Pipe({
+            name: 'values',
+            pure: false
+        })
+    ], ValuesPipe);
     return ValuesPipe;
 }());
-ValuesPipe = __decorate([
-    core_1.Pipe({
-        name: 'values',
-        pure: false
-    })
-], ValuesPipe);
 exports.ValuesPipe = ValuesPipe;
 //# sourceMappingURL=values.pipe.js.map

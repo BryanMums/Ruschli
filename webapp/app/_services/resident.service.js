@@ -11,41 +11,33 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
-require("rxjs/add/operator/map");
 var index_1 = require("./index");
 var ResidentService = (function () {
     function ResidentService(http, authenticationService) {
         this.http = http;
         this.authenticationService = authenticationService;
     }
+    // Méthode permettant de récupérer la liste des résidents
     ResidentService.prototype.getResidents = function () {
-        // add authorization header with jwt token
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        // get users from api
-        return this.http.get('http://localhost:8000/api/resident/', options)
+        return this.http.get(this.authenticationService.URL + 'api/resident/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de récupérer les informations d'un résident selon son ID
     ResidentService.prototype.getResident = function (resident_id) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        // get users from api
-        return this.http.get('http://localhost:8000/api/resident/' + resident_id + '/', options)
+        return this.http.get(this.authenticationService.URL + 'api/resident/' + resident_id + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de récupérer les tâches concernant le résident à une date
     ResidentService.prototype.getTaskResident = function (resident_id, date) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        // get tasks for the resident at a specified date
-        return this.http.get('http://localhost:8000/api/tasks_resident/' + date + '/' + resident_id + '/', options)
+        return this.http.get(this.authenticationService.URL + 'api/tasks_resident/' + date + '/' + resident_id + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    ResidentService = __decorate([
+        core_1.Injectable(),
+        __metadata("design:paramtypes", [http_1.Http,
+            index_1.AuthenticationService])
+    ], ResidentService);
     return ResidentService;
 }());
-ResidentService = __decorate([
-    core_1.Injectable(),
-    __metadata("design:paramtypes", [http_1.Http,
-        index_1.AuthenticationService])
-], ResidentService);
 exports.ResidentService = ResidentService;
 //# sourceMappingURL=resident.service.js.map

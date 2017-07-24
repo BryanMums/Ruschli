@@ -1,8 +1,8 @@
-﻿import { Component, OnInit } from '@angular/core';
-import { NavController } from 'ionic-angular';
-import { TaskDate } from '../../_models/index';
-import { TaskService } from '../../_services/index';
-import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
+﻿import { Component, OnInit } from '@angular/core'
+import { NavController } from 'ionic-angular'
+import { TaskDate } from '../../_models/index'
+import { TaskService } from '../../_services/index'
+import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker'
 import { TaskDetailComponent } from '../task_detail/index'
 
 @Component({
@@ -44,7 +44,7 @@ export class HomeComponent implements OnInit {
         // On met à jour la date formattée
         this.date = date.formatted
         // On met à jour à la liste des tâches selon la date
-        this.updateList(date.formatted)
+        this.updateList()
 
     }
 
@@ -57,12 +57,12 @@ export class HomeComponent implements OnInit {
     // Méthode appelée lorsqu'on vient sur la page, important !
     ionViewWillEnter() {
         // On met à jour à la liste des tâches selon la date
-        this.updateList(this.date)
+        this.updateList()
     }
 
     // Méthode appelée permettant de mettre à jour la liste des tâches
-    updateList(date: any){
-        this.taskService.getTasks(date)
+    updateList(){
+        this.taskService.getTasks(this.date)
           .subscribe(tasks => {
               this.tasks = tasks
           });

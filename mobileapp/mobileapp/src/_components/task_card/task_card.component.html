@@ -4,8 +4,8 @@
       {{taskDate.task.title}}
     </ion-card-title>
     <div *ngIf="taskDate.active">
-    <p>
-      {{taskDate.task.description}}
+    <p *ngIf="taskDate.task.description">
+      {{taskDate.task.description | truncate : 30}}
     </p>
     <div *ngIf="taskDate.time">
       <hr/>

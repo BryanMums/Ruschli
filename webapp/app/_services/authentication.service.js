@@ -12,65 +12,70 @@ Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
 var http_2 = require("@angular/http");
-//import { JwtHelper} from 'angular2-jwt';
+var angular2_jwt_1 = require("angular2-jwt");
+var angular2_toaster_1 = require("angular2-toaster");
 require("rxjs/add/operator/map");
 var AuthenticationService = (function () {
-    function AuthenticationService(http) {
+    function AuthenticationService(http, toasterService) {
         this.http = http;
-        // set token if saved in local storage
-        if (localStorage['currentUser']) {
-            var currentUser = JSON.parse(localStorage['currentUser']);
+        this.toasterService = toasterService;
+        this.URL = "http://localhost:8000/";
+        // S'il existe un token en storage local
+        if (localStorage['token']) {
+            this.token = localStorage['token'];
         }
         else {
-            var currentUser = null;
+            this.token = null;
         }
-        this.token = currentUser && currentUser.token;
-        this.headers = new http_2.Headers({ 'Authorization': 'JWT ' + this.token });
+        // On configure les en-têtes pour les appels à l'API
+        this.headers = new http_2.Headers({ 'Authorization': 'JWT ' + this.token, "Content-Type": "application/json" });
         this.options = new http_2.RequestOptions({ headers: this.headers });
     }
-    AuthenticationService.prototype.login = function (username, password) {
+    // Méthode permettant de s'authentifier à l'API
+    AuthenticationService.prototype.login = function (credentials) {
         var _this = this;
-        var body = JSON.stringify({ username: username, password: password });
-        var headers = new http_2.Headers({ 'Content-Type': 'application/json' });
-        var options = new http_2.RequestOptions({ headers: headers });
-        return this.http.post('http://localhost:8000/api-jwt-auth/', body, options)
-            .map(function (response) {
-            // login successful if there's a jwt token in the response
-            var token = response.json() && response.json().token;
-            if (token) {
-                // set token property
-                _this.token = token;
-                // store username and jwt token in local storage to keep user logged in between page refreshes
-                localStorage['currentUser'] = JSON.stringify({ username: username, token: token });
-                //let jwtHelper = new JwtHelper();
-                // On va récupérer les groupes
-                //console.log(this.user);
-                // return true to indicate successful login
-                return true;
-            }
-            else {
-                // return false to indicate failed login
-                return false;
-            }
+        var body = JSON.stringify(credentials);
+        return this.http.post(this.URL + 'api-jwt-auth/', body, this.options)
+            .map(function (res) { return res.json(); })
+            .subscribe(function (data) {
+            // On va enregistrer le token et les différentes entités permettant de faire des appels à l'API
+            _this.token = data.token;
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('sector', '0');
+            _this.headers = new http_2.Headers({ 'Authorization': 'JWT ' + _this.token, "Content-Type": "application/json" });
+            _this.options = new http_2.RequestOptions({ headers: _this.headers });
+            _this.toasterService.pop('success', 'Connexion réussie', 'La connexion a réussi ! Bienvenue !');
+        }, function (err) {
+            _this.toasterService.pop('error', 'Connexion échouée', 'Vos informations de connexion sont faux !');
         });
     };
+    // Méthode permettant de récupérer les informations de l'utilisateur connecté
     AuthenticationService.prototype.getUser = function () {
-        var headers = new http_2.Headers({ 'Authorization': 'JWT ' + this.token });
-        var options = new http_2.RequestOptions({ headers: headers });
-        return this.http.get('http://localhost:8000/api/get_connected_user/', options)
+        return this.http.get(this.URL + 'api/get_connected_user/', this.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de se déconnecter
     AuthenticationService.prototype.logout = function () {
-        // clear token remove user from local storage to log user out
+        // On enlève les différentes valeurs en localStorage
         this.token = null;
-        delete localStorage['currentUser'];
-        //localStorage.clear();
+        delete localStorage['token'];
+        delete localStorage['sector'];
+        this.user = null;
     };
+    // Méthode appelée pour savoir si l'utilisateur est connectée.
+    AuthenticationService.prototype.authenticated = function () {
+        // tokenNotExpired permet de savoir si le token est valide
+        return angular2_jwt_1.tokenNotExpired();
+    };
+    // Méthode permettant de savoir si l'utilisateur a un secteur en cours
+    AuthenticationService.prototype.has_a_sector = function () {
+        return localStorage["sector"] != '0';
+    };
+    AuthenticationService = __decorate([
+        core_1.Injectable(),
+        __metadata("design:paramtypes", [http_1.Http, angular2_toaster_1.ToasterService])
+    ], AuthenticationService);
     return AuthenticationService;
 }());
-AuthenticationService = __decorate([
-    core_1.Injectable(),
-    __metadata("design:paramtypes", [http_1.Http])
-], AuthenticationService);
 exports.AuthenticationService = AuthenticationService;
 //# sourceMappingURL=authentication.service.js.map

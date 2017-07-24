@@ -11,8 +11,12 @@
 
             // angular bundles
             '@angular/core': 'npm:@angular/core/bundles/core.umd.js',
+            '@angular/animations': 'npm:@angular/animations/bundles/animations.umd.js',
             '@angular/common': 'npm:@angular/common/bundles/common.umd.js',
             '@angular/compiler': 'npm:@angular/compiler/bundles/compiler.umd.js',
+            '@angular/animations': 'npm:@angular/animations/bundles/animations.umd.js',
+            '@angular/animations/browser': 'npm:@angular/animations/bundles/animations-browser.umd.js',
+            '@angular/platform-browser/animations': 'npm:@angular/platform-browser/bundles/platform-browser-animations.umd.js',
             '@angular/platform-browser': 'npm:@angular/platform-browser/bundles/platform-browser.umd.js',
             '@angular/platform-browser-dynamic': 'npm:@angular/platform-browser-dynamic/bundles/platform-browser-dynamic.umd.js',
             '@angular/http': 'npm:@angular/http/bundles/http.umd.js',
@@ -29,7 +33,9 @@
             'mydatepicker': 'npm:mydatepicker/bundles/mydatepicker.umd.min.js',
             'angular-2-dropdown-multiselect': 'npm:angular-2-dropdown-multiselect/bundles/dropdown.umd.js',
             'angular2-moment': 'npm:angular2-moment/',
-            'moment': 'npm:moment/'
+            'moment': 'npm:moment/',
+            'angular2-jwt': 'npm:angular2-jwt/angular2-jwt.js',
+            'angular2-toaster': 'npm:angular2-toaster/bundles/angular2-toaster.umd.js'
         },
         // packages tells the System loader how to load when no filename and/or no extension
         packages: {
@@ -46,6 +52,9 @@
             },
             'angular2-moment': {
                 main: './index.js',
+                defaultExtension: 'js'
+            },
+            'angular2-jwt': {
                 defaultExtension: 'js'
             }
         },

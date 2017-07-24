@@ -16,13 +16,13 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-6 col-12">
+    <div class="col-md-6 col-12" *ngIf="resident.contact_name">
       <div class="d-flex flex-column">
         <small><strong>Personne de contact</strong></small>
         <p>{{resident.contact_name}}</p>
       </div>
     </div>
-    <div class="col-md-6 col-12">
+    <div class="col-md-6 col-12" *ngIf="resident.contact_phone">
       <div class="d-flex flex-column">
         <small><strong>Téléphone de contact</strong></small>
         <p>{{resident.contact_phone}}</p>
@@ -30,7 +30,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-12">
+    <div class="col-12" *ngIf="resident.comment">
       <div class="d-flex flex-column">
         <small class=""><strong>Commentaire</strong></small>
         <p>{{resident.comment}}</p>
@@ -38,7 +38,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-12">
+    <div class="col-12" *ngIf="resident.allergies">
       <div class="d-flex flex-column">
         <small class=""><strong>Allergies</strong></small>
         <p>{{resident.allergies}}</p>
@@ -46,7 +46,7 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-12">
+    <div class="col-12" *ngIf="resident.medications">
       <div class="d-flex flex-column">
         <small class=""><strong>Médicaments</strong></small>
         <p>{{resident.medications}}</p>

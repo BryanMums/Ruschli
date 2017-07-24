@@ -9,68 +9,25 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 
-@api_view(['GET'])
-def test_modify(request):
-    post = {}
-    post["taskdate"] = 111 #27 ->
-    post["values"] = {}
-    post["values"]["eventType"] = 1
-    post["values"]["periodicType"] = 0
-    post["values"]["title"] = "Périodique 2"
-    post["values"]["start_date"] = "2017-06-29"
-    post["updateType"] = False # True --> Uniquement le jour J, False --> A partir du jour J
-    post["date"] = "2017-06-29"
-
-
-    post["values"]["description"] = "Normalement"
-    output = TaskManager.modify_task(post, request.user)
-    serializer = TaskDateSerializer(output, many=False, context={'request': request})
-    return Response(serializer.data)
-
-@api_view(['GET'])
-def test_stop(request):
-    post = {}
-    # Test ok avec une tâche non-périodique de base.
-    # Test ok avec une tâche exception où on veut juste la désactiver.
-    # Test ok avec une tâche exception où on veut désactiver la tâche parent.
-    # Test ok avec une tâche périodique où veut l'arrêter.
-    post["taskdate"] = 71
-    post["date"] = "2017-06-21"
-    post["type"] = 0
-    post["includeDate"] = False
-    # output : "La tâche est non-périodique \nCe n'est pas une exception, elle ne dépend de rien, on la supprime \n"
-    success, output = TaskManager.stop_task(post, request.user)
-    return Response(output)
-
-@api_view(['GET'])
-def test_taker(request):
-    post = {}
-    post["taskdate"] = TaskDate.objects.get(pk=63).pk
-    post["date"] = "2017-06-20"
-    post["sector"] = "1"
-    taskDate = TaskManager.add_taker(post, request.user)
-    serializer = TaskDateSerializer(taskDate, many=False, context={'request': request})
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def test_comment(request):
-    user = request.user
-    sector = Group.objects.get(pk=1)
-    post = {}
-    post["author"] = user.pk
-    taskdate = TaskDate.objects.get(pk=56)
-    post["taskdate"] = taskdate.pk
-    post["text"] = "Ceci est un commentaire de test 2"
-    date = "2017-06-19"
-    comment = TaskManager.add_comment(post, date)
-    taskDateToReturn = comment.taskdate
-    serializer = TaskDateSerializer(taskDateToReturn, many=False, context={'request': request})
-    return Response(serializer.data)
+@api_view(['POST'])
+def add_task(request):
+    '''
+    Vue permettant de créer une nouvelle tâche dans le temps (Tâche et apparition).
+    '''
+    taskdate = TaskManager.create_task(request.data, request.user)
+    if taskdate is None:
+        content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        serializer = TaskDateSerializer(taskdate, many=False, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def update_task(request):
+    '''
+    Vue permettant de modifier une tâche dans le temps (Tâche et apparition).
+    '''
     taskDate = TaskManager.update_task(request.data, request.user)
     if taskDate is None:
         content = {'Erreur': 'problème lors de la modification'}
@@ -82,19 +39,23 @@ def update_task(request):
 
 @api_view(['POST'])
 def stop_task(request):
-    success, taskDate = TaskManager.stop_task(request.data, request.user)
-
+    '''
+    Vue permettant d'arrêter une tâche dans le temps (Tâche et apparition).
+    '''
+    success = TaskManager.stop_task(request.data, request.user)
     if not success:
         content = {'Erreur': 'problème lors de l\'arrêt de la tâche'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
     else:
-        content = "Réussi !"
-        #serializer = TaskDateSerializer(taskDate, many=false, context={'request': request})
+        content = {'Succès': 'La tâche a bien été arrêtée'}
         return Response(content, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 def add_taker(request):
+    '''
+    Vue permettant d'ajouter l'utilisateur comme personne s'occupant d'une tâche
+    '''
     taskDate = TaskManager.add_taker(request.data, request.user)
     if taskDate is None:
         content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
@@ -105,8 +66,10 @@ def add_taker(request):
 
 
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])
 def add_comment(request):
+    '''
+    Vue permettant de créer et ajouter un commentaire à une tâche (TaskDate)
+    '''
     comment = TaskManager.add_comment(request.data, request.user)
     if comment is None:
         content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
@@ -118,202 +81,75 @@ def add_comment(request):
 
 @api_view(['GET'])
 def get_connected_user(request):
+    '''
+    Vue permettant simplement de récupérer les informations de l'utilisateur.
+    '''
     serializer = UserSerializer(request.user, many=False, context={'request': request})
-    return Response(serializer.data)
-
-@api_view(['GET'])
-def test_create(request):
-    post = {}
-    post['title'] = "Ceci est un titre"
-    post['need_someone'] = False
-    post['start_date'] = '2017-05-30'
-    post['eventType'] = 0
-    post['periodicType'] = 0
-
-    data = TaskManager.create_task(post, request.user)
-    if data is None:
-        content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
-        return Response(content, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        serializer = TaskDateSerializer(data, many=False, context={'request': request})
-        return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
-def get_tasks_for_a_day(request, date_url, group_id, resident_id=None):
-    date = datetime.strptime(date_url, '%Y-%m-%d')
-    if(group_id == 0 or group_id == '0'):
-        group = {}
-        group["id"] = 0
-    else:
-        group = Group.objects.get(pk=group_id)
-        
-    if resident_id is not None :
-        resident = Resident.objects.get(resident_id)
-        data = request.user.get_tasks_for_a_day(date, group, resident)
-    else:
+def get_tasks_for_a_day(request, date_url, group_id):
+    '''
+    Vue permettant de récupérer les tâches concernant un utilisateur et son secteur
+    dans lequel il travaille en fonction de la date.
+    '''
+    try:
+        date = datetime.strptime(date_url, '%Y-%m-%d')
+        if(group_id == 0 or group_id == '0'):
+            group = {}
+            group["id"] = 0
+        else:
+            group = Group.objects.get(pk=group_id)
+
         data = request.user.get_tasks_for_a_day(date, group, None)
-    serializer = TaskDateSerializer(data, many=True, context={'request': request})
-    return Response(serializer.data)
+        serializer = TaskDateSerializer(data, many=True, context={'request': request})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print(e)
+        content = {'Erreur': 'Le secteur ou la date ne sont pas corrects !'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 def get_tasks_for_a_day_resident(request, date_url, resident_id):
-    date = datetime.strptime(date_url, '%Y-%m-%d')
-    resident = Resident.objects.get(pk=resident_id)
-    data = request.user.get_tasks_for_a_day(date, None, resident)
-    serializer = TaskDateSerializer(data, many=True, context={'request': request})
-    return Response(serializer.data)
+    '''
+    Vue permettant de récupérer les tâches liées à un résident en fonction de la date.
+    '''
+    try:
+        date = datetime.strptime(date_url, '%Y-%m-%d')
+        resident = Resident.objects.get(pk=resident_id)
+        data = request.user.get_tasks_for_a_day(date, None, resident)
+        serializer = TaskDateSerializer(data, many=True, context={'request': request})
+        return Response(serializer.data)
+    except Exception as e:
+        content = {'Erreur': 'Le résident ou la date ne sont pas corrects !'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['GET'])
 def get_residents_active(request):
+    '''
+    Vue permettant de récupérer la liste des résidents actifs.
+    '''
     data = Resident.objects.filter(active=True)
     serializer = ResidentSerializer(data, many=True, context={'request': request})
-    return Response(serializer.data)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def get_tasktypes_sector(request, sector_id):
-    sector = Group.objects.get(pk=sector_id)
-    data = TaskType.objects.filter(group=sector)
-    serializer = TaskTypeSerializer(data, many=True, context={'request': request})
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def add_task(request):
-    taskdate = TaskManager.create_task(request.data, request.user)
-    if taskdate is None:
-        content = {'Erreur': 'Veuillez fournir les champs de manière correcte'}
-        return Response(content, status=status.HTTP_400_BAD_REQUEST)
-    else:
-        serializer = TaskDateSerializer(taskdate, many=False, context={'request': request})
+    '''
+    Vue permettant de récupérer les types qu'un secteur a le droit de créer.
+    '''
+    try:
+        sector = Group.objects.get(pk=sector_id)
+        data = TaskType.objects.filter(group=sector)
+        serializer = TaskTypeSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
+    except Exception as e:
+        content = {'Erreur': 'Le secteur donné n\'existe pas !'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
-
-
-class GroupListView(ListView):
-    model = Group
-
-
-class GroupCreateView(CreateView):
-    model = Group
-    form_class = GroupForm
-
-
-class GroupDetailView(DetailView):
-    model = Group
-
-
-class GroupUpdateView(UpdateView):
-    model = Group
-    form_class = GroupForm
-
-
-class RoomListView(ListView):
-    model = Room
-
-
-class RoomCreateView(CreateView):
-    model = Room
-    form_class = RoomForm
-
-
-class RoomDetailView(DetailView):
-    model = Room
-
-
-class RoomUpdateView(UpdateView):
-    model = Room
-    form_class = RoomForm
-
-
-class ResidentListView(ListView):
-    model = Resident
-
-
-class ResidentCreateView(CreateView):
-    model = Resident
-    form_class = ResidentForm
-
-
-class ResidentDetailView(DetailView):
-    model = Resident
-
-
-class ResidentUpdateView(UpdateView):
-    model = Resident
-    form_class = ResidentForm
-
-
-class TaskTypeListView(ListView):
-    model = TaskType
-
-
-class TaskTypeCreateView(CreateView):
-    model = TaskType
-    form_class = TaskTypeForm
-
-
-class TaskTypeDetailView(DetailView):
-    model = TaskType
-
-
-class TaskTypeUpdateView(UpdateView):
-    model = TaskType
-    form_class = TaskTypeForm
-
-
-class TaskListView(ListView):
-    model = Task
-
-
-class TaskCreateView(CreateView):
-    model = Task
-    form_class = TaskForm
-
-
-class TaskDetailView(DetailView):
-    model = Task
-
-
-class TaskUpdateView(UpdateView):
-    model = Task
-    form_class = TaskForm
-
-
-class TaskDateListView(ListView):
-    model = TaskDate
-
-
-class TaskDateCreateView(CreateView):
-    model = TaskDate
-    form_class = TaskDateForm
-
-
-class TaskDateDetailView(DetailView):
-    model = TaskDate
-
-
-class TaskDateUpdateView(UpdateView):
-    model = TaskDate
-    form_class = TaskDateForm
-
-
-class CommentListView(ListView):
-    model = Comment
-
-
-class CommentCreateView(CreateView):
-    model = Comment
-    form_class = CommentForm
-
-
-class CommentDetailView(DetailView):
-    model = Comment
-
-
-class CommentUpdateView(UpdateView):
-    model = Comment
-    form_class = CommentForm
+#TODO : Récupérer tâches selon ID et date.
+#TODO : Permissions

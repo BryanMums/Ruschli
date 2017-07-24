@@ -10,30 +10,23 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
-var router_1 = require("@angular/router");
-require("rxjs/add/operator/switchMap");
 var index_1 = require("../../_models/index");
 var TaskCardComponent = (function () {
-    function TaskCardComponent(router) {
-        this.router = router;
+    function TaskCardComponent() {
     }
-    TaskCardComponent.prototype.detail = function () {
-        console.log("lol");
-        //this.router.navigate(['./task',this.taskDate.pk])
-    };
+    __decorate([
+        core_1.Input(),
+        __metadata("design:type", index_1.TaskDate)
+    ], TaskCardComponent.prototype, "taskDate", void 0);
+    TaskCardComponent = __decorate([
+        core_1.Component({
+            selector: 'task-card',
+            moduleId: module.id,
+            templateUrl: 'task_card.component.html'
+        }),
+        __metadata("design:paramtypes", [])
+    ], TaskCardComponent);
     return TaskCardComponent;
 }());
-__decorate([
-    core_1.Input(),
-    __metadata("design:type", index_1.TaskDate)
-], TaskCardComponent.prototype, "taskDate", void 0);
-TaskCardComponent = __decorate([
-    core_1.Component({
-        selector: 'task-card',
-        moduleId: module.id,
-        templateUrl: 'task_card.component.html'
-    }),
-    __metadata("design:paramtypes", [router_1.Router])
-], TaskCardComponent);
 exports.TaskCardComponent = TaskCardComponent;
 //# sourceMappingURL=task_card.component.js.map

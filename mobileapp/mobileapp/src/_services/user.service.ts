@@ -18,11 +18,13 @@ export class UserService {
             .map((response: Response) => response.json());
     }
 
+    // Méthode permettant de récupérer les informations de l'utilisateur connecté
     getConnectedUser(): Observable<User> {
       return this.http.get(this.authenticationService.URL + 'api/get_connected_user/', this.authenticationService.options)
           .map((response: Response) => response.json());
     }
 
+    // Méthode permettant de récupérer les tâches destinées à l'utilisateur et son secteur sélectionné
     getTasks(date:any): Observable<TaskDate[]>{
       let sector = localStorage["sector"];
       return this.http.get(this.authenticationService.URL + 'api/tasks/'+ date +'/'+sector+'/', this.authenticationService.options)

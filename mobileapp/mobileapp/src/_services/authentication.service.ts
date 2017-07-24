@@ -4,7 +4,7 @@ import { Observable, Observer } from 'rxjs'
 import { Headers, RequestOptions } from '@angular/http'
 import { Sector, User } from '../_models/index'
 import { UserService } from './index'
-import {tokenNotExpired} from 'angular2-jwt'
+import { tokenNotExpired } from 'angular2-jwt'
 import { ToastController } from 'ionic-angular'
 
 @Injectable()
@@ -23,7 +23,7 @@ export class AuthenticationService {
         }else{
             this.token = null;
         }
-        //
+        // On configure les en-têtes pour les appels à l'API
         this.headers = new Headers({ 'Authorization': 'JWT ' + this.token ,"Content-Type": "application/json"});
         this.options = new RequestOptions({ headers: this.headers });
     }

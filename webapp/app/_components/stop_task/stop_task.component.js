@@ -11,14 +11,14 @@ require("rxjs/add/operator/switchMap");
 var StopTaskComponent = (function () {
     function StopTaskComponent() {
     }
+    StopTaskComponent = __decorate([
+        core_1.Component({
+            selector: 'stop-task',
+            moduleId: module.id,
+            templateUrl: 'stop_task.component.html'
+        })
+    ], StopTaskComponent);
     return StopTaskComponent;
 }());
-StopTaskComponent = __decorate([
-    core_1.Component({
-        selector: 'stop-task',
-        moduleId: module.id,
-        templateUrl: 'stop_task.component.html'
-    })
-], StopTaskComponent);
 exports.StopTaskComponent = StopTaskComponent;
 //# sourceMappingURL=stop_task.component.js.map

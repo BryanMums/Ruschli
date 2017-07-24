@@ -1,8 +1,8 @@
-﻿import { Component, OnInit } from '@angular/core';
-
-import { User, TaskDate } from '../../_models/index';
-import { UserService, TaskService } from '../../_services/index';
-import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
+﻿import { Component, OnInit } from '@angular/core'
+import { User, TaskDate } from '../../_models/index'
+import { UserService, TaskService } from '../../_services/index'
+import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker'
+import { Router } from '@angular/router'
 
 @Component({
     moduleId: module.id,
@@ -10,18 +10,11 @@ import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
 })
 
 export class HomeComponent implements OnInit {
-    tasks: TaskDate[] = [];
-    task: TaskDate = null;
-    date: any = null;
-    states = {
-      LIST: 0,
-      DETAIL: 1,
-      UPDATE: 2
-    }
-    state :any = this.states.LIST
-    onlyAtDate = true
+    tasks: TaskDate[] = []; // La liste des tâches
+    date: any = null; // La date qui sera sélectionnée utilisée pour les appels à l'API
 
-    private selDate: IMyDate = {year: 2017, month: 6, day: 6};
+    private selDate: IMyDate = {year: 2017, month: 6, day: 6} // La date sélectionnée dans le date picker
+
     private myDatePickerOptions: IMyDpOptions = {
       dateFormat: 'yyyy-mm-dd',
       dayLabels: {su: 'Dim', mo: 'Lun', tu: 'Mar', we: 'Mer', th: 'Jeu', fr: 'Ven', sa: 'Sam'},
@@ -34,55 +27,42 @@ export class HomeComponent implements OnInit {
     }
 
     constructor(
-      private userService: UserService,
-      private taskService: TaskService
-
+      private taskService: TaskService,
+      private router: Router
     ) { }
 
     ngOnInit() {
-        let date = new Date();
-        this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
-        let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
-        this.date = dateStr
-        // On récupère le résident selon l'id
-        this.userService.getTasks(dateStr)
-          .subscribe(tasks => {
-              this.tasks = tasks;
-          });
+      // On va prendre la date d'aujourd'hui et la formatter pour le date picker et l'appel API
+      let date = new Date();
+      this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
+      let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
+      this.date = dateStr
+
+      // On met à jour à la liste des tâches selon la date
+      this.updateList()
 
     }
 
-    list(){
-        this.state = this.states.LIST
-        this.task = null;
-        this.userService.getTasks(this.date)
-          .subscribe(tasks => {
-            this.tasks = tasks;
-          })
+    // Méthode appelée lorsque la date du date picker change
+    onDateChanged(date: IMyDateModel) {
+      // On met à jour la date formattée
+      this.date = date.formatted
+      // On met à jour à la liste des tâches selon la date
+      this.updateList()
     }
 
-    onDateChanged(event: IMyDateModel) {
-        // event properties are: event.date, event.jsdate, event.formatted and event.epoc
-        this.task = null;
-        let date = event
-        this.date = date.formatted
-        this.userService.getTasks(date.formatted)
-          .subscribe(tasks => {
-            this.tasks = tasks;
-          })
-    }
-
+    // Méthode appelée lorsque l'on clique sur la tâche
     onClickTask(pk: number){
-      this.taskService.getTaskDate(pk)
-        .subscribe(task => {
-            this.task = task;
-            this.state = this.states.DETAIL
-        })
+      // On va aller sur la page de la tâche en spécifiant la date également
+      this.router.navigate(['/task', pk, this.date])
     }
 
-    modify(bool: boolean){
-        this.onlyAtDate = bool
-        this.state = this.states.UPDATE
+    // Méthode appelée permettant de mettre à jour la liste des tâches
+    updateList(){
+        this.taskService.getTasks(this.date)
+          .subscribe(tasks => {
+              this.tasks = tasks
+          });
     }
 
 }

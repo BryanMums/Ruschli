@@ -84,15 +84,15 @@
 
               <ion-item>
                 <ion-label color="primary">Rép. par mois</ion-label>
-                <ion-select (ionChange)="setMonthlyType($event)" formControlName="monthlyType">
-                  <ion-option *ngFor="let monthlyType of MONTHLY_TYPES | values" [value]="monthlyType">{{monthlyType.name}}</ion-option>
+                <ion-select formControlName="monthlyType" [(ngModel)]="taskDate.monthlyType">
+                  <ion-option *ngFor="let monthlyType of MONTHLY_TYPES | values" [value]="monthlyType.id">{{monthlyType.name}}</ion-option>
                 </ion-select>
               </ion-item>
 
               <div *ngIf="taskDate.monthlyType == 0">
                 <ion-item>
                   <ion-label color="primary">Quel jour du mois ?</ion-label>
-                  <ion-datetime formControlName="dayNumber" displayFormat="D"></ion-datetime>
+                  <ion-input [(ngModel)]="taskDate.dayNumber" formControlName="dayNumber" min="1" max="31" ></ion-input>
                 </ion-item>
               </div>
 

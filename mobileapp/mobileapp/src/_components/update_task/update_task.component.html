@@ -8,7 +8,7 @@
 </ion-header>
 
 <ion-content id="ionContent" class="has-header has-subheader">
-  <div *ngIf="s == 1">
+  <div *ngIf="state == 1">
     <ion-grid>
       <form [formGroup]="myForm" novalidate (ngSubmit)="chooseTypeModif(myForm.value, myForm.valid)">
       <ion-row>
@@ -32,7 +32,7 @@
     </form>
     </ion-grid>
   </div>
-  <div *ngIf="s == 2">
+  <div *ngIf="state == 2">
     <form-task [date]="date" [taskToAdd]="taskToAdd" [taskDate]="taskDate" [onlyAtDate]="onlyAtDate"></form-task>
     <ion-grid><ion-row><ion-col>
       <button ion-button block outline color="danger" (click)="reset()">Annuler</button>

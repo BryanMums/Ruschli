@@ -2,7 +2,11 @@ from django.contrib import admin
 from django import forms
 from .models import Day, Group, Room, Resident, TaskType, Task, TaskDate, Comment
 from django.contrib.auth.models import User
+'''
+On désactive certaines entitiés qu'on ne veut pas dans l'admin
+'''
 
+'''
 class DayAdminForm(forms.ModelForm):
     class Meta:
         model = Day
@@ -14,7 +18,7 @@ class DayAdmin(admin.ModelAdmin):
     list_display = ['name', 'pk']
 
 admin.site.register(Day, DayAdmin)
-
+'''
 class GroupAdminForm(forms.ModelForm):
 
     class Meta:

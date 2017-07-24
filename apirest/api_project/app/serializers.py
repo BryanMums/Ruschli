@@ -1,10 +1,14 @@
 from . import models
 from django.contrib.auth.models import User
-
 from rest_framework import serializers
 
-class GroupSerializer(serializers.HyperlinkedModelSerializer):
+# Les sérialiseurs permettent notamment de définir quels informations
+# l'on veut retourner pour nos entités
 
+class GroupSerializer(serializers.HyperlinkedModelSerializer):
+    '''
+    Sérialiseur pour secteur.
+    '''
     class Meta:
         model = models.Group
         fields = (
@@ -14,6 +18,9 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
+    '''
+    Sérialiseur pour utilisateur.
+    '''
     sectors = GroupSerializer(many=True, read_only=True)
 
     class Meta:
@@ -26,7 +33,9 @@ class UserSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 class RoomSerializer(serializers.HyperlinkedModelSerializer):
-
+    '''
+    Sérialiseur pour salle.
+    '''
     class Meta:
         model = models.Room
         fields = (
@@ -38,6 +47,9 @@ class RoomSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class ResidentSerializer(serializers.HyperlinkedModelSerializer):
+    '''
+    Sérialiseur pour résident.
+    '''
     room = RoomSerializer(many=False)
 
     class Meta:
@@ -58,6 +70,10 @@ class ResidentSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskTypeSerializer(serializers.HyperlinkedModelSerializer):
+    '''
+    Sérialiseur pour type de tâche.
+    '''
+
     default_resident = ResidentSerializer(many=True)
     default_room = RoomSerializer(many=True)
     default_receiver_user = UserSerializer(many=True)
@@ -94,6 +110,9 @@ class TaskTypeSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    '''
+    Sérialiseur pour tâche.
+    '''
     room = RoomSerializer(many=True)
     resident = ResidentSerializer(many=True)
     receiver_user = UserSerializer(many=True)
@@ -122,6 +141,9 @@ class TaskSerializer(serializers.ModelSerializer):
         )
 
 class CommentSerializer(serializers.HyperlinkedModelSerializer):
+    '''
+    Sérialiseur pour commentaire.
+    '''
     author = UserSerializer(many=False)
 
     class Meta:
@@ -135,6 +157,9 @@ class CommentSerializer(serializers.HyperlinkedModelSerializer):
         )
 
 class TaskDateSerializer(serializers.ModelSerializer):
+    '''
+    Sérialiseur pour TaskDate (Apparition).
+    '''
     task = TaskSerializer(many=False, read_only=False)
     comments = CommentSerializer(many=True, read_only=False)
     taker = UserSerializer(many=False, read_only=True)

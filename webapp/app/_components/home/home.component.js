@@ -11,21 +11,14 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var index_1 = require("../../_services/index");
+var router_1 = require("@angular/router");
 var HomeComponent = (function () {
-    function HomeComponent(userService, taskService) {
-        this.userService = userService;
+    function HomeComponent(taskService, router) {
         this.taskService = taskService;
-        this.tasks = [];
-        this.task = null;
-        this.date = null;
-        this.states = {
-            LIST: 0,
-            DETAIL: 1,
-            UPDATE: 2
-        };
-        this.state = this.states.LIST;
-        this.onlyAtDate = true;
-        this.selDate = { year: 2017, month: 6, day: 6 };
+        this.router = router;
+        this.tasks = []; // La liste des tâches
+        this.date = null; // La date qui sera sélectionnée utilisée pour les appels à l'API
+        this.selDate = { year: 2017, month: 6, day: 6 }; // La date sélectionnée dans le date picker
         this.myDatePickerOptions = {
             dateFormat: 'yyyy-mm-dd',
             dayLabels: { su: 'Dim', mo: 'Lun', tu: 'Mar', we: 'Mer', th: 'Jeu', fr: 'Ven', sa: 'Sam' },
@@ -38,58 +31,43 @@ var HomeComponent = (function () {
         };
     }
     HomeComponent.prototype.ngOnInit = function () {
-        var _this = this;
+        // On va prendre la date d'aujourd'hui et la formatter pour le date picker et l'appel API
         var date = new Date();
         this.selDate = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
         var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
         this.date = dateStr;
-        // On récupère le résident selon l'id
-        this.userService.getTasks(dateStr)
-            .subscribe(function (tasks) {
-            _this.tasks = tasks;
-        });
+        // On met à jour à la liste des tâches selon la date
+        this.updateList();
     };
-    HomeComponent.prototype.list = function () {
-        var _this = this;
-        this.state = this.states.LIST;
-        this.task = null;
-        this.userService.getTasks(this.date)
-            .subscribe(function (tasks) {
-            _this.tasks = tasks;
-        });
-    };
-    HomeComponent.prototype.onDateChanged = function (event) {
-        var _this = this;
-        // event properties are: event.date, event.jsdate, event.formatted and event.epoc
-        this.task = null;
-        var date = event;
+    // Méthode appelée lorsque la date du date picker change
+    HomeComponent.prototype.onDateChanged = function (date) {
+        // On met à jour la date formattée
         this.date = date.formatted;
-        this.userService.getTasks(date.formatted)
+        // On met à jour à la liste des tâches selon la date
+        this.updateList();
+    };
+    // Méthode appelée lorsque l'on clique sur la tâche
+    HomeComponent.prototype.onClickTask = function (pk) {
+        // On va aller sur la page de la tâche en spécifiant la date également
+        this.router.navigate(['/task', pk, this.date]);
+    };
+    // Méthode appelée permettant de mettre à jour la liste des tâches
+    HomeComponent.prototype.updateList = function () {
+        var _this = this;
+        this.taskService.getTasks(this.date)
             .subscribe(function (tasks) {
             _this.tasks = tasks;
         });
     };
-    HomeComponent.prototype.onClickTask = function (pk) {
-        var _this = this;
-        this.taskService.getTaskDate(pk)
-            .subscribe(function (task) {
-            _this.task = task;
-            _this.state = _this.states.DETAIL;
-        });
-    };
-    HomeComponent.prototype.modify = function (bool) {
-        this.onlyAtDate = bool;
-        this.state = this.states.UPDATE;
-    };
+    HomeComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            templateUrl: 'home.component.html'
+        }),
+        __metadata("design:paramtypes", [index_1.TaskService,
+            router_1.Router])
+    ], HomeComponent);
     return HomeComponent;
 }());
-HomeComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        templateUrl: 'home.component.html'
-    }),
-    __metadata("design:paramtypes", [index_1.UserService,
-        index_1.TaskService])
-], HomeComponent);
 exports.HomeComponent = HomeComponent;
 //# sourceMappingURL=home.component.js.map

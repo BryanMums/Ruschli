@@ -106,6 +106,15 @@
     </div>
   </div>
 
+
+  <div class="row">
+    <div class="col-12">
+      <button *ngIf="taskDate.active" (click)="openModif()" class="btn btn-success">Modifier</button>
+      <button *ngIf="taskDate.active" (click)="openStop()" class="btn btn-danger">Arrêter</button>
+      <button *ngIf="!taskDate.active" (click)="activate()" class="btn btn-success">Activer</button>
+    </div>
+  </div>
+
   <h4>Commentaires</h4>
   <div class="row">
     <div class="col-12 d-flex flex-column-reverse" *ngIf="taskDate.comments.length > 0">

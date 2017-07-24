@@ -27,20 +27,3 @@
     </div>
   </div>
 </div>
-
-<div *ngIf="state == states.DETAIL && task">
-  <task-detail class="mt-2" [taskDate]="task" [date]="date"></task-detail>
-  <div class="btn-group" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-dangers dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Modifier
-    </button>
-    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-      <a class="dropdown-item" (click)="modify(true)">Uniquement pour cette date</a>
-      <a class="dropdown-item" (click)="modify(false)">A partir de cette date</a>
-    </div>
-  </div>
-</div>
-
-<div *ngIf="state == states.UPDATE && task">
-    <add-task class="mt-2" [taskDate]="task" [date]="date" [onlyAtDate]=onlyAtDate [taskToAdd]=false></add-task>
-</div>

@@ -1,0 +1,26 @@
+<h2>Modification</h2>
+<hr/>
+<div *ngIf="state == 1">
+  <form [formGroup]="myForm" novalidate (ngSubmit)="chooseTypeModif(myForm.value, myForm.valid)">
+    <div class="row">
+      <div class="col-12">
+        <p>Vous avez le choix entre modifier la tâche uniquement pour cette date ou à partir de cette date.</p>
+        <p>Si c'est une tâche périodique, les jours précédant cette date ne seront pas modifiés et les jours après oui, donc les commentaires et personne en charge concernant les prochaines dates ne seront plus pris en compte</p>
+          <label >Type de modification</label>
+          <select class="custom-select" formControlName="type">
+            <option value="0">Uniquement cette date</option>
+            <option value="1">A partir de cette date</option>
+          </select>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <button margin-top class="btn btn-success" [disabled]="!myForm.valid" type="submit">Continuer</button>
+      </div>
+    </div>
+  </form>
+</div>
+<div *ngIf="state == 2">
+  <form-task [date]="date" [taskToAdd]="taskToAdd" [taskDate]="taskDate" [onlyAtDate]="onlyAtDate"></form-task>
+  <button class="btn btn-danger" (click)="reset()">Annuler</button>
+</div>

@@ -11,50 +11,66 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var core_1 = require("@angular/core");
 var http_1 = require("@angular/http");
-require("rxjs/add/operator/map");
 var index_1 = require("./index");
+require("rxjs/add/operator/map");
 var TaskService = (function () {
     function TaskService(http, authenticationService) {
         this.http = http;
         this.authenticationService = authenticationService;
     }
+    // Méthode permettant de récupérer les tâches d'un utilisateur selon une date et un secteur
+    TaskService.prototype.getTasks = function (date) {
+        var sector = localStorage["sector"];
+        return this.http.get(this.authenticationService.URL + 'api/tasks/' + date + '/' + sector + '/', this.authenticationService.options)
+            .map(function (response) { return response.json(); });
+    };
+    // Méthode permettant de récupérer une TaskDate/Apparition selon son ID
     TaskService.prototype.getTaskDate = function (taskDate_id) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        // get users from api
-        return this.http.get('http://localhost:8000/api/taskdate/' + taskDate_id + '/', options)
+        return this.http.get(this.authenticationService.URL + 'api/taskdate/' + taskDate_id + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de récupérer les types de tâches selon son secteur de travail
     TaskService.prototype.getTaskTypes = function () {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        return this.http.get('http://localhost:8000/api/tasktypes/' + localStorage["sector"] + '/', options)
+        var sector = localStorage['sector'];
+        return this.http.get(this.authenticationService.URL + 'api/tasktypes/' + sector + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de récupérer les informations d'un type de tâche selon son ID
     TaskService.prototype.getTaskType = function (pk) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token });
-        var options = new http_1.RequestOptions({ headers: headers });
-        return this.http.get('http://localhost:8000/api/tasktype/' + pk + '/', options)
+        return this.http.get(this.authenticationService.URL + 'api/tasktype/' + pk + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant d'ajouter un commentaire à une TaskDate/Apparition
     TaskService.prototype.addComment = function (data) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token, 'Content-Type': 'application/json' });
-        var options = new http_1.RequestOptions({ headers: headers });
-        return this.http.post('http://localhost:8000/api/addcomment/', data, options)
+        return this.http.post(this.authenticationService.URL + 'api/addcomment/', data, this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant d'ajouter l'utilisateur comme "preneur" d'une TaskDate
     TaskService.prototype.addTaker = function (data) {
-        var headers = new http_1.Headers({ 'Authorization': 'JWT ' + this.authenticationService.token, 'Content-Type': 'application/json' });
-        var options = new http_1.RequestOptions({ headers: headers });
-        return this.http.post('http://localhost:8000/api/addtaker/', data, options)
+        return this.http.post(this.authenticationService.URL + 'api/addtaker/', data, this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant d'arrêter une tâche
+    TaskService.prototype.stopTaskDate = function (data) {
+        return this.http.post(this.authenticationService.URL + 'api/stoptask/', data, this.authenticationService.options)
+            .map(function (response) { return response.json(); });
+    };
+    // Méthode permettant d'ajouter une tâche
+    TaskService.prototype.addTask = function (data) {
+        return this.http.post(this.authenticationService.URL + 'api/createtask/', data, this.authenticationService.options)
+            .map(function (response) { return response.json(); });
+    };
+    // Méthode permettant de mettre à jour une tâche
+    TaskService.prototype.updateTask = function (data) {
+        return this.http.post(this.authenticationService.URL + 'api/updatetask/', data, this.authenticationService.options)
+            .map(function (response) { return response.json(); });
+    };
+    TaskService = __decorate([
+        core_1.Injectable(),
+        __metadata("design:paramtypes", [http_1.Http,
+            index_1.AuthenticationService])
+    ], TaskService);
     return TaskService;
 }());
-TaskService = __decorate([
-    core_1.Injectable(),
-    __metadata("design:paramtypes", [http_1.Http,
-        index_1.AuthenticationService])
-], TaskService);
 exports.TaskService = TaskService;
 //# sourceMappingURL=task.service.js.map

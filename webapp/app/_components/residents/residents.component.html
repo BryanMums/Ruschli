@@ -1,7 +1,8 @@
 <div class="col-12 col-md-6 offset-md-3">
     <h2>Résidents</h2>
     <hr/>
-    <select *ngIf="tabSort != []" id="sort" class="custom-select" style="width:100%" [ngModel]="selectedSort" (ngModelChange)="onSort($event)">
+    <label>Trier par</label>
+    <select *ngIf="tabSort != []" class="custom-select" [(ngModel)]="selectedSort" (ngModelChange)="onSort($event)">
       <option *ngFor="let sort of tabSort; let i = index" [ngValue]=i>{{sort[0]}}</option>
     </select>
     <h5 class="mt-2">Liste</h5>

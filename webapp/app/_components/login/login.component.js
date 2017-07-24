@@ -54,15 +54,15 @@ var LoginComponent = (function () {
             }
         });
     };
+    LoginComponent = __decorate([
+        core_1.Component({
+            moduleId: module.id,
+            templateUrl: 'login.component.html'
+        }),
+        __metadata("design:paramtypes", [router_1.Router,
+            index_1.AuthenticationService])
+    ], LoginComponent);
     return LoginComponent;
 }());
-LoginComponent = __decorate([
-    core_1.Component({
-        moduleId: module.id,
-        templateUrl: 'login.component.html'
-    }),
-    __metadata("design:paramtypes", [router_1.Router,
-        index_1.AuthenticationService])
-], LoginComponent);
 exports.LoginComponent = LoginComponent;
 //# sourceMappingURL=login.component.js.map

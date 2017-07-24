@@ -1,9 +1,9 @@
-import { Component, OnInit, Input } from '@angular/core';
-import { Router, ActivatedRoute, Params } from '@angular/router';
-import 'rxjs/add/operator/switchMap';
-import { Resident, TaskDate } from '../../_models/index';
-import { ResidentService } from '../../_services/index';
-import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
+import { Component, OnInit, Input } from '@angular/core'
+import { Router, ActivatedRoute, Params } from '@angular/router'
+import 'rxjs/add/operator/switchMap'
+import { Resident, TaskDate } from '../../_models/index'
+import { ResidentService } from '../../_services/index'
+import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker'
 
 @Component({
     selector: 'resident',
@@ -12,9 +12,10 @@ import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker';
 })
 
 export class ResidentComponent implements OnInit {
-    @Input() resident: Resident;
-    tasks: TaskDate[] = [];
-    private selDate: IMyDate = {year: 2017, month: 6, day: 6};
+    @Input() resident: Resident
+    tasks: TaskDate[] = []
+    public date:any = null
+    private selDate: IMyDate = {year: 2017, month: 6, day: 6}
     private myDatePickerOptions: IMyDpOptions = {
       dateFormat: 'yyyy-mm-dd',
       dayLabels: {su: 'Dim', mo: 'Lun', tu: 'Mar', we: 'Mer', th: 'Jeu', fr: 'Ven', sa: 'Sam'},
@@ -33,29 +34,32 @@ export class ResidentComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-        let date = new Date();
-        this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
-        let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
-        // On récupère le résident selon l'id
-        this.route.params
-        .switchMap((params: Params) => this.residentService.getResident(+params['id']))
-        .subscribe((resident: Resident) => {
-          this.resident = resident
-          // On récupère les tâches le concernant selon la date.
-          this.residentService.getTaskResident(this.resident.pk, dateStr)
-              .subscribe(tasks => {
-                  this.tasks = tasks;
-              });
-        })
+      let date = new Date()
+      this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
+      let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
+      this.date = dateStr
+
+      // On récupère le résident selon l'id
+      this.route.params
+      .switchMap((params: Params) => this.residentService.getResident(+params['id']))
+      .subscribe((resident: Resident) => {
+        this.resident = resident
+        // On récupère les tâches le concernant selon la date.
+        this.updateList()
+      })
     }
 
-    onDateChanged(event: IMyDateModel) {
-        // event properties are: event.date, event.jsdate, event.formatted and event.epoc
-        let date = event
-        console.log(date.formatted)
-        this.residentService.getTaskResident(this.resident.pk, date.formatted)
+    // Méthode appelée lorsqu'on change de date dans le date picker
+    onDateChanged(date: IMyDateModel) {
+        this.date = date.formatted
+        this.updateList()
+    }
+
+    // Permet de mettre à jour la liste des tâches concernant le résident
+    updateList(){
+      this.residentService.getTaskResident(this.resident.pk, this.date)
           .subscribe(tasks => {
-            this.tasks = tasks;
-          })
+              this.tasks = tasks
+          });
     }
 }
