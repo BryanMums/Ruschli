@@ -11,11 +11,13 @@
       <hr/>
       <p><b>Heure</b> : {{taskDate.time.split(':')[0]+'h'+taskDate.time.split(':')[1]}}</p>
     </div>
-    <div *ngIf="taskDate.task.resident" style="padding:5px">
-        <ion-badge margin-right *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</ion-badge>
+    <div *ngIf="taskDate.task.resident.length > 0" style="padding:5px">
+      <ion-label stacked color="primary">Résident(s)</ion-label>
+        <ion-badge style="margin-bottom: 2px" margin-right *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</ion-badge>
     </div>
-    <div *ngIf="taskDate.task.room" style="padding:5px">
-        <ion-badge margin-right color="danger" *ngFor="let room of taskDate.task.room">{{room.title}}</ion-badge>
+    <div *ngIf="taskDate.task.room.length > 0" style="padding:5px">
+      <ion-label stacked color="primary">Salle(s)</ion-label>
+        <ion-badge margin-right color="primary" *ngFor="let room of taskDate.task.room">{{room.title}}</ion-badge>
     </div>
     <hr/>
     </div>

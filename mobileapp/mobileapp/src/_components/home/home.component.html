@@ -8,6 +8,9 @@
 </ion-header>
 
 <ion-content id="ionContent" class="has-header has-subheader">
+  <ion-refresher (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
   <ion-grid>
     <ion-row>
       <ion-col>

@@ -3,6 +3,9 @@
     <ion-col>
       <form *ngIf="taskDate && taskType" [formGroup]="myForm" novalidate (ngSubmit)="save(myForm.value, myForm.valid)">
       <ion-list>
+        <ion-list-header>
+          Informations basiques
+        </ion-list-header>
         <ion-item>
           <ion-label color="primary">Titre</ion-label>
           <ion-input [(ngModel)]="taskDate.task.title" [disabled]="!taskType.change_title" placeholder="Votre titre" formControlName="title"></ion-input>
@@ -17,7 +20,7 @@
         </ion-item>
         <ion-item>
           <ion-label color="primary">Heure</ion-label>
-          <ion-datetime [(ngModel)]="taskDate.time" [disabled]="!change_time" displayFormat="HH:mm" formControlName="time" ></ion-datetime>
+          <ion-datetime [(ngModel)]="taskDate.time" [disabled]="!taskType.change_time" displayFormat="HH:mm" formControlName="time" ></ion-datetime>
         </ion-item>
         <ion-item>
           <ion-label stacked color="primary">Résident(s)</ion-label>

@@ -18,6 +18,7 @@ var AddTaskComponent = (function () {
         this.state = 1; // Etat de base à 1 --> Choix du type de tâche, 2 --> Formulaire
         this.taskType = null; // Le type de tâche qui sera sélectionné
         this.taskToAdd = true; // Permet de spécifier au formulaire que l'on veut ajouter et non modifier.
+        this.isASectorSelected = true;
     }
     AddTaskComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -25,6 +26,8 @@ var AddTaskComponent = (function () {
         this.taskService.getTaskTypes()
             .subscribe(function (types) {
             _this.taskTypes = types;
+        }, function (err) {
+            _this.isASectorSelected = false;
         });
     };
     // Méthode appelée lors du choix du type de tâche

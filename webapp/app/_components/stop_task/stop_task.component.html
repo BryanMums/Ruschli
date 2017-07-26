@@ -1,0 +1,27 @@
+<div class="col-12 col-md-8 offset-md-2" *ngIf="taskDate">
+  <h2>Arrêt de la tâche</h2>
+  <div *ngIf="taskDate.eventType == 0 && taskDate.parent == null">
+    <p>Vous allez supprimer cette tâche non-périodique, elle ne sera plus récupérable ensuite, êtes-vous sûr ?</p>
+    <button (click)="stop()">Oui je suis sûr</button>
+  </div>
+  <div *ngIf="taskDate.eventType == 1 || taskDate.parent != null">
+    <form>
+      <div>
+          <label>Type d'arrêt</label><br/>
+          <select class="custom-select" [(ngModel)]="onlyAtDate" name="type">
+            <option [ngValue]="true">Désactiver uniquement pour cette date</option>
+            <option [ngValue]="false">Arrêter la tâche périodique</option>
+          </select>
+        </div>
+        <div *ngIf="onlyAtDate == false">
+          <label>Date comprise</label><br/>
+          <select class="custom-select" [(ngModel)]="included_date" name="included_date">
+            <option [ngValue]="true">A partir de cette date</option>
+            <option [ngValue]="false">Après cette date</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" (click)="stop()">Oui je suis sûr</button>
+    </form>
+  </div>
+  <button class="btn btn-danger" (click)="reset()">Annuler</button>
+</div>

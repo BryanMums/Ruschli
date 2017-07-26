@@ -11,7 +11,7 @@ export class TaskDate {
     end_date: Date
     intervalMonth: number
     intervalWeek: number
-    monthlytype: number
+    monthlyType: number
     periodicType: number
     taker: any
     task: any

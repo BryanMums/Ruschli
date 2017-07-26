@@ -61,9 +61,11 @@
         <!--NON PERIODIC-->
         <div *ngIf="taskDate.eventType == 0">
             <div class="panel-body">
-              <div class="col-12 col-md-6">
-                  <label>Date</label>
-                  <my-date-picker formControlName="start_date" [options]="myDatePickerOptions" [selDate]="start_date"></my-date-picker>
+              <div class="row">
+                <div class="col-12 col-md-6">
+                    <label>Date</label>
+                    <my-date-picker formControlName="start_date" [options]="myDatePickerOptions" [selDate]="start_date"></my-date-picker>
+                </div>
               </div>
             </div>
         </div>
@@ -140,7 +142,7 @@
                             <div>
                                 <label>Quelle semaine ? (première à cinquième)</label><br/>
                                 <select formControlName="weekNumber" [(ngModel)]="taskDate.weekNumber" class="btn btn-default" style="margin-left:0px;">
-                                    <option *ngFor="let week of weekNumberOptions" value="week.id">{{week.name}}</option>
+                                    <option *ngFor="let week of weekNumberOptions" [ngValue]="week.id">{{week.name}}</option>
                                 </select>
 
                             </div>

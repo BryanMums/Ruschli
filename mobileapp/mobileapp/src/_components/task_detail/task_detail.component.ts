@@ -15,8 +15,33 @@ import { StopTaskComponent } from '../stop_task/index'
 export class TaskDetailComponent implements OnInit {
     @Input() date: any
     @Input() taskDate: TaskDate
-    canTakeInCharge = true
+
+    can_update = false
+    can_take = false
+    can_comment = false
+
+    repetition: String = ""
+    parent: TaskDate = null
     public myForm: FormGroup
+
+    days: string  [] = [
+        'Lundi. ',
+        'Mardi. ' ,
+        'Mercredi. ',
+        'Jeudi. ' ,
+        'Vendredi. ',
+        'Samedi. ' ,
+        'Dimanche. '
+    ]
+
+    // Options pour le choix de quelle semaine
+    weekNumber: string[] = [
+        'Premier',
+        'Deuxième',
+        'Troisième',
+        'Quatrième',
+        'Cinquième'
+    ]
 
     constructor(
       private taskService: TaskService,
@@ -34,10 +59,50 @@ export class TaskDetailComponent implements OnInit {
       // On récupère la tâche et la date
       let pk = this.navParams.get("taskDate")
       this.date = this.navParams.get("date")
-      this.taskService.getTaskDate(pk)
+      this.taskService.getTaskDate_date(pk, this.date)
       .subscribe((taskDate: TaskDate) => {
         this.taskDate = taskDate
-        })
+        if(this.taskDate.parent != null){
+          this.taskService.getTaskDate(this.taskDate.parent)
+            .subscribe((parent: TaskDate) => {
+              this.parent = parent
+              this.initPeriodicity()
+              this.taskService.getPermissions(taskDate.pk)
+                .subscribe((data: any) => {
+                  this.can_take = data.can_take
+                  this.can_update = data.can_update
+                  this.can_comment = data.can_comment
+                })
+            },
+          err => {
+            this.toastCtrl.create({
+              message: 'Une erreur s\'est produite !',
+              duration: 3000,
+              position: 'bottom',
+              cssClass: 'error'
+            }).present()
+            this.navCtrl.pop()
+          })
+        }else{
+          this.initPeriodicity()
+          this.taskService.getPermissions(taskDate.pk)
+            .subscribe((data: any) => {
+              this.can_take = data.can_take
+              this.can_update = data.can_update
+              this.can_comment = data.can_comment
+            })
+        }
+
+      },
+    err => {
+      this.toastCtrl.create({
+        message: 'Une erreur s\'est produite !',
+        duration: 3000,
+        position: 'bottom',
+        cssClass: 'error'
+      }).present()
+      this.navCtrl.pop()
+    })
     }
 
     // Méthode permettant d'ajouter un commentaire
@@ -118,4 +183,75 @@ export class TaskDetailComponent implements OnInit {
       this.navCtrl.push(StopTaskComponent, {pk: this.taskDate.pk, date: this.date})
     }
 
+    // Méthode appelée pour permettre de réactiver la tâche
+    reactivate(){
+      this.taskService.activateTaskDate(this.taskDate.pk, this.date)
+      .subscribe(
+        response => {
+          this.toastCtrl.create({
+            message: 'La tâche a bien été réactivée !',
+            duration: 3000,
+            position: 'bottom',
+            cssClass: 'success'
+          }).present();
+          this.navCtrl.pop()
+      },
+        err => {
+          this.toastCtrl.create({
+            message: 'La tâche n\'a pas pu être réactivée !',
+            duration: 3000,
+            position: 'bottom',
+            cssClass: 'error'
+          }).present();
+        })
+    }
+
+
+      translatePeriodicity(taskDate){
+        if(taskDate.eventType == 0){
+          this.repetition += "Tâche non périodique. "
+        }else{
+          this.repetition += "Tâche périodique "
+          if(taskDate.periodicType == 0){
+            this.repetition += "quotidienne. "
+          }else if(taskDate.periodicType == 1){
+            this.repetition += "hebdomadaire. "
+            let that = this
+            taskDate.daysOfWeek.forEach(function(day){
+              that.repetition += that.days[day]
+            })
+            this.repetition += "Tous les "+(taskDate.intervalWeek > 1 ? taskDate.intervalWeek : '') + " semaines."
+          }else if(taskDate.periodicType == 2){
+            this.repetition += "mensuelle. "
+            if(taskDate.monthlyType == 0){
+              this.repetition += "Tous les "+taskDate.dayNumber+" du mois. "
+            }else{
+              let that = this
+              taskDate.daysOfWeek.forEach(function(day){
+                that.repetition += that.days[day]
+              })
+              this.repetition += that.weekNumber[taskDate.weekNumber]+ " du mois. "
+            }
+            this.repetition += "Tous les "+(taskDate.intervalMonth > 1 ? taskDate.intervalMonth : '') + " mois."
+          }else{
+            this.repetition += "annuelle. "
+          }
+        }
+
+        if(taskDate.eventType == 1){
+          this.repetition += "Date de début : "+taskDate.start_date+". "
+          if(taskDate.end_date){
+            this.repetition += "Date de fin : "+taskDate.end_date+ ". "
+          }
+        }
+      }
+
+      initPeriodicity(){
+        // Si c'est une apparition exception, il faudra prendre celle de son parent
+        if(this.taskDate.eventType == 0 && this.parent != null){
+          this.translatePeriodicity(this.parent)
+        }else{
+          this.translatePeriodicity(this.taskDate)
+        }
+      }
 }

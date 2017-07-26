@@ -5,10 +5,13 @@
     <div class="col-12">
       <h5>Etape 1 | Type de tâche</h5>
       <p>Veuillez choisir le type de tâche :</p>
-      <select class="form-control" [ngModel]="selectedType" (ngModelChange)="chooseType($event)">
+      <select class="custom-select" [ngModel]="selectedType" (ngModelChange)="chooseType($event)">
         <option selected="selected" disabled="disabled" [ngValue]=-1>Choisir un type</option>
         <option *ngFor="let type of taskTypes" [ngValue]="type.pk">{{type.name}}</option>
       </select>
+      <p *ngIf="!isASectorSelected" style="color:#c0392b">
+        Veuillez choisir un secteur dans votre profil pour pouvoir ajouter une tâche !
+      </p>
     </div>
   </div>
 </div>

@@ -14,6 +14,7 @@ var index_10 = require("./_guards/index");
 var appRoutes = [
     { path: 'profile', component: index_1.ProfileComponent },
     { path: '', component: index_2.HomeComponent, canActivate: [index_10.AuthGuard] },
+    { path: 'home/:date', component: index_2.HomeComponent, canActivate: [index_10.AuthGuard] },
     { path: 'residents', component: index_3.ResidentsComponent, canActivate: [index_10.AuthGuard] },
     { path: 'resident/:id', component: index_4.ResidentComponent, canActivate: [index_10.AuthGuard] },
     { path: 'task/:id/:date', component: index_5.TaskDetailComponent, canActivate: [index_10.AuthGuard] },

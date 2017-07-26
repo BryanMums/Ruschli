@@ -31,7 +31,7 @@ export class StopTaskComponent implements OnInit{
   ngOnInit(){
       let pk = this.navParams.get("pk")
       this.date = this.navParams.get("date")
-      this.taskService.getTaskDate(pk)
+      this.taskService.getTaskDate_date(pk, this.date)
         .subscribe((taskDate: any) => {
           this.taskDate = taskDate
           })

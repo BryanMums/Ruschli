@@ -24,33 +24,33 @@
     </ion-row>
     <ion-row *ngIf="taskDate.task.description">
       <ion-col>
-        <ion-label stacked color="primary">Description</ion-label>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Description</ion-label>
         <p [outerHTML] ="taskDate.task.description | replaceLineBreaks" ></p>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="taskDate.task.resident.length != 0">
       <ion-col>
-        <ion-label stacked color="primary">Résident(s)</ion-label>
-        <ion-badge margin-right *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</ion-badge>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Résident(s)</ion-label>
+          <ion-badge style="margin-right:4px" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</ion-badge>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="taskDate.task.room.length != 0">
       <ion-col>
-        <ion-label stacked color="primary">Chambre(s)</ion-label>
-        <ion-badge margin-right color="dark" *ngFor="let room of taskDate.task.room">{{room.title}}</ion-badge>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Chambre(s)</ion-label>
+        <ion-badge margin-right color="primary" *ngFor="let room of taskDate.task.room">{{room.title}}</ion-badge>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="taskDate.time">
       <ion-col>
-        <ion-label stacked color="primary">Heure</ion-label>
-        <span>{{taskDate.time}}</span>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Heure</ion-label>
+        <span>{{taskDate.time.split(':')[0]+'h'+taskDate.time.split(':')[1]}}</span>
       </ion-col>
     </ion-row>
     <ion-row *ngIf="taskDate.task.need_someone">
       <ion-col>
-        <ion-label stacked color="primary">Qui s'en charge</ion-label>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Qui s'en charge</ion-label>
         <ion-badge *ngIf="taskDate.taker" color="secondary" >{{taskDate.taker.username}}</ion-badge>
-        <span *ngIf="!taskDate.taker">Il faut une personne ! </span><button small ion-button *ngIf="!taskDate.taker" (click)="take()" color="primary"><ion-icon name="hand"></ion-icon></button>
+        <span style="vertical-align: middle;margin-top: 10px;display: inline-block;"*ngIf="!taskDate.taker">Il faut une personne !</span><br/><br/><button small ion-button full *ngIf="!taskDate.taker && can_take" (click)="take()" color="secondary"><ion-icon name="hand"></ion-icon>&nbsp; Je m'en occupe !</button>
       </ion-col>
     </ion-row>
     <!-- Répétition -->
@@ -62,28 +62,8 @@
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col *ngIf="taskDate.eventType == 0 && !taskDate.parent">
-        <span>Tâche unique pour le {{taskDate.start_date | amDateFormat:'LL'}}</span>
-      </ion-col>
-      <ion-col *ngIf="taskDate.eventType == 0 && taskDate.parent">
-        <span>Exception</span>
-      </ion-col>
-      <ion-col *ngIf="taskDate.eventType == 1">
-        <div *ngIf="taskDate.periodicType == 0">
-          Tâche quotidienne, à partir du {{taskDate.start_date | amDateFormat:'LL'}}
-          <span *ngIf="taskDate.end_date"> jusqu'au {{taskDate.end_date | amDateFormat:'LL'}}</span>.
-        </div>
-        <div *ngIf="taskDate.periodicType == 1">
-          Tache hebdomadaire, à partir du {{taskDate.start_date | amDateFormat:'LL'}}
-          <span *ngIf="taskDate.end_date"> jusqu'au {{taskDate.end_date | amDateFormat:'LL'}}</span>.
-
-        </div>
-        <div *ngIf="taskDate.periodicType == 2">
-
-        </div>
-        <div *ngIf="taskDate.periodicType == 3">
-
-        </div>
+      <ion-col>
+        {{repetition}}
       </ion-col>
     </ion-row>
     <!-- Destinataires -->
@@ -96,22 +76,22 @@
     </ion-row>
     <ion-row>
       <ion-col *ngIf="taskDate.task.receiver_user.length != 0">
-        <ion-label stacked color="primary">Employé(s)</ion-label>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Employé(s)</ion-label>
         <ion-badge margin-right color="danger" *ngFor="let user of taskDate.task.receiver_user">{{user.username}}</ion-badge>
       </ion-col>
       <ion-col *ngIf="taskDate.task.copyreceiver_user.length != 0">
-        <ion-label stacked color="primary">Employé(s) en copie</ion-label>
-        <ion-badge margin-right color="light" *ngFor="let user of taskDate.task.copyreceiver_user">{{user.username}}</ion-badge>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Employé(s) en copie</ion-label>
+        <ion-badge margin-right color="danger" *ngFor="let user of taskDate.task.copyreceiver_user">{{user.username}}</ion-badge>
       </ion-col>
     </ion-row>
     <ion-row>
       <ion-col *ngIf="taskDate.task.receiver_group.length != 0">
-        <ion-label stacked color="primary">Secteur(s)</ion-label>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Secteur(s)</ion-label>
         <ion-badge margin-right color="danger" *ngFor="let sector of taskDate.task.receiver_group">{{sector.title}}</ion-badge>
       </ion-col>
       <ion-col *ngIf="taskDate.task.copyreceiver_group.length != 0">
-        <ion-label stacked color="primary">Secteur(s) en copie</ion-label>
-        <ion-badge margin-right color="light" *ngFor="let sector of taskDate.task.copyreceiver_group">{{sector.title}}</ion-badge>
+        <ion-label style="margin-bottom:8px;" stacked color="primary">Secteur(s) en copie</ion-label>
+        <ion-badge margin-right color="danger" *ngFor="let sector of taskDate.task.copyreceiver_group">{{sector.title}}</ion-badge>
       </ion-col>
     </ion-row>
     <!-- Commentaires -->
@@ -141,7 +121,7 @@
       </ion-col>
     </ion-row>
     <ion-row>
-      <ion-col>
+      <ion-col *ngIf="can_comment">
         <form *ngIf="taskDate" [formGroup]="myForm" novalidate (ngSubmit)="addComment(myForm.value, myForm.valid)">
           <ion-item>
             <ion-textarea formControlName="text" rows="4" placeholder="Entrer un commentaire"></ion-textarea>
@@ -152,9 +132,9 @@
     </ion-row>
   </ion-grid>
 </div>
-<ion-fab *ngIf="taskDate" bottom right>
+<ion-fab *ngIf="taskDate && can_update" bottom right>
  <button *ngIf="taskDate.active" ion-fab mini color="secondary" (click)="openModif()"><ion-icon name="color-wand"></ion-icon></button>
  <button *ngIf="taskDate.active" ion-fab mini color="danger" (click)="openStop()"><ion-icon name="trash"></ion-icon></button>
-  <button *ngIf="!taskDate.active" ion-fab mini color="secondary" (click)="activate()"><ion-icon name="power"></ion-icon></button>
+  <button *ngIf="!taskDate.active" ion-fab mini color="secondary" (click)="reactivate()"><ion-icon name="power"></ion-icon></button>
 </ion-fab>
 </ion-content>

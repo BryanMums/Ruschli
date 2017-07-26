@@ -29,6 +29,17 @@ var TaskService = (function () {
         return this.http.get(this.authenticationService.URL + 'api/taskdate/' + taskDate_id + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
+    // Méthode permettant de récupérer la bonne TaskDate/apparition selon son ID et une date
+    TaskService.prototype.getTaskDate_date = function (taskDate_id, date) {
+        return this.http.get(this.authenticationService.URL + 'api/get_taskdate/' + taskDate_id + '/' + date + '/', this.authenticationService.options)
+            .map(function (response) { return response.json(); });
+    };
+    // Méthode permettant de récupérer les permissions concernant une apparition et le secteur
+    TaskService.prototype.getPermissions = function (taskDate_id) {
+        var sector = localStorage['sector'];
+        return this.http.get(this.authenticationService.URL + 'api/get_permissions/' + taskDate_id + '/' + sector + '/', this.authenticationService.options)
+            .map(function (response) { return response.json(); });
+    };
     // Méthode permettant de récupérer les types de tâches selon son secteur de travail
     TaskService.prototype.getTaskTypes = function () {
         var sector = localStorage['sector'];
@@ -53,6 +64,11 @@ var TaskService = (function () {
     // Méthode permettant d'arrêter une tâche
     TaskService.prototype.stopTaskDate = function (data) {
         return this.http.post(this.authenticationService.URL + 'api/stoptask/', data, this.authenticationService.options)
+            .map(function (response) { return response.json(); });
+    };
+    // Méthode permettant de réactiver une apparition (Une tâche à une date précise dans une apparition périodique)
+    TaskService.prototype.activateTaskDate = function (pk, date) {
+        return this.http.get(this.authenticationService.URL + 'api/activate_taskdate/' + pk + '/' + date + '/', this.authenticationService.options)
             .map(function (response) { return response.json(); });
     };
     // Méthode permettant d'ajouter une tâche

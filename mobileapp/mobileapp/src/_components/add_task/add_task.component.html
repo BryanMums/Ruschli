@@ -29,7 +29,6 @@
 
   <!-- Début : Formulaire de la tâche -->
   <div *ngIf="state == 2">
-    <h5>Informations de la tâche</h5>
     <form-task [taskToAdd]="taskToAdd" [taskType]="taskType"></form-task>
     <ion-grid><ion-row><ion-col>
       <button ion-button block outline color="danger" (click)="reset()">Annuler</button>

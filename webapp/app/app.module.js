@@ -15,22 +15,21 @@ var app_component_1 = require("./app.component");
 var app_routing_1 = require("./app.routing");
 var index_1 = require("./_guards/index");
 var index_2 = require("./_services/index");
-var index_3 = require("./_components/login/index");
-var index_4 = require("./_components/profile/index");
-var index_5 = require("./_components/home/index");
-var index_6 = require("./_components/residents/index");
-var index_7 = require("./_components/resident/index");
-var index_8 = require("./_components/task_card/index");
-var index_9 = require("./_components/task_detail/index");
-var index_10 = require("./_components/choose_sector/index");
-var index_11 = require("./_components/add_task/index");
-var index_12 = require("./_components/update_task/index");
-var index_13 = require("./_components/stop_task/index");
-var index_14 = require("./_components/form_task/index");
+var index_3 = require("./_components/profile/index");
+var index_4 = require("./_components/home/index");
+var index_5 = require("./_components/residents/index");
+var index_6 = require("./_components/resident/index");
+var index_7 = require("./_components/task_card/index");
+var index_8 = require("./_components/task_detail/index");
+var index_9 = require("./_components/choose_sector/index");
+var index_10 = require("./_components/add_task/index");
+var index_11 = require("./_components/update_task/index");
+var index_12 = require("./_components/stop_task/index");
+var index_13 = require("./_components/form_task/index");
 var mydatepicker_1 = require("mydatepicker");
 var angular_2_dropdown_multiselect_1 = require("angular-2-dropdown-multiselect");
 var angular2_toaster_1 = require("angular2-toaster");
-var index_15 = require("./_utils/index");
+var index_14 = require("./_utils/index");
 var angular2_moment_1 = require("angular2-moment");
 var AppModule = (function () {
     function AppModule() {
@@ -51,20 +50,21 @@ var AppModule = (function () {
             ],
             declarations: [
                 app_component_1.AppComponent,
-                index_3.LoginComponent,
-                index_4.ProfileComponent,
-                index_5.HomeComponent,
-                index_6.ResidentsComponent,
-                index_7.ResidentComponent,
-                index_8.TaskCardComponent,
-                index_9.TaskDetailComponent,
-                index_10.ChooseSectorComponent,
-                index_11.AddTaskComponent,
-                index_12.UpdateTaskComponent,
-                index_13.StopTaskComponent,
-                index_14.FormTaskComponent,
-                index_15.KeysPipe,
-                index_15.ValuesPipe
+                index_3.ProfileComponent,
+                index_4.HomeComponent,
+                index_5.ResidentsComponent,
+                index_6.ResidentComponent,
+                index_7.TaskCardComponent,
+                index_8.TaskDetailComponent,
+                index_9.ChooseSectorComponent,
+                index_10.AddTaskComponent,
+                index_11.UpdateTaskComponent,
+                index_12.StopTaskComponent,
+                index_13.FormTaskComponent,
+                index_14.KeysPipe,
+                index_14.ValuesPipe,
+                index_14.ReplaceLineBreaks,
+                index_14.TruncatePipe
             ],
             providers: [
                 index_1.AuthGuard,

@@ -13,6 +13,7 @@ export class AddTaskComponent implements OnInit {
     private state = 1 // Etat de base à 1 --> Choix du type de tâche, 2 --> Formulaire
     private taskType: TaskType = null // Le type de tâche qui sera sélectionné
     private taskToAdd: Boolean = true // Permet de spécifier au formulaire que l'on veut ajouter et non modifier.
+    private isASectorSelected = true
 
     constructor(
       private taskService: TaskService
@@ -21,9 +22,13 @@ export class AddTaskComponent implements OnInit {
     ngOnInit() {
       // On va récupérer tous les types de tâche
       this.taskService.getTaskTypes()
-          .subscribe(types  => {
+          .subscribe(
+            types  => {
               this.taskTypes = types
-          })
+            },
+            err => {
+              this.isASectorSelected = false
+            })
     }
 
     // Méthode appelée lors du choix du type de tâche

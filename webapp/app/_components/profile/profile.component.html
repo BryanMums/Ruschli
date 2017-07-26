@@ -1,4 +1,4 @@
-<div *ngIf="!authenticationService.authenticated()" class="col-md-6 col-md-offset-3">
+<div *ngIf="!authenticationService.authenticated()" class="col-12 col-md-8 offset-md-2">
     <h2>Connexion</h2>
     <p>
       Si vous n'avez pas de compte ou que vous ne vous souvenez plus de votre mot de passe, contactez l'adminstrateur
@@ -18,7 +18,7 @@
         <div *ngIf="error" class="alert alert-danger">{{error}}</div>
     </form>
 </div>
-<div *ngIf="authenticationService.authenticated()" class="col-md-6 col-md-offset-3">
+<div *ngIf="authenticationService.authenticated()" class="col-12 col-md-8 offset-md-2">
   <h2>Vous êtes connecté !</h2>
   <choose-sector></choose-sector>
   <button class="btn btn-danger" (click)="logout()">Déconnexion</button>

@@ -10,7 +10,6 @@ import { routing }        from './app.routing';
 import { AuthGuard } from './_guards/index';
 import { AuthenticationService, UserService, ResidentService, TaskService, FormService, RoomService, SectorService } from './_services/index';
 
-import { LoginComponent } from './_components/login/index';
 import { ProfileComponent } from './_components/profile/index';
 import { HomeComponent } from './_components/home/index';
 import { ResidentsComponent } from './_components/residents/index';
@@ -26,7 +25,7 @@ import { FormTaskComponent } from './_components/form_task/index';
 import { MyDatePickerModule } from 'mydatepicker';
 import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
 import { ToasterModule, ToasterService } from 'angular2-toaster';
-import { KeysPipe, ValuesPipe } from './_utils/index'
+import { KeysPipe, ValuesPipe, ReplaceLineBreaks, TruncatePipe } from './_utils/index'
 import { MomentModule } from 'angular2-moment';
 
 @NgModule({
@@ -44,7 +43,6 @@ import { MomentModule } from 'angular2-moment';
     ],
     declarations: [
         AppComponent,
-        LoginComponent,
         ProfileComponent,
         HomeComponent,
         ResidentsComponent,
@@ -57,7 +55,9 @@ import { MomentModule } from 'angular2-moment';
         StopTaskComponent,
         FormTaskComponent,
         KeysPipe,
-        ValuesPipe
+        ValuesPipe,
+        ReplaceLineBreaks,
+        TruncatePipe
     ],
     providers: [
         AuthGuard,

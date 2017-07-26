@@ -22,7 +22,20 @@ export class TaskService {
     // Méthode permettant de récupérer une TaskDate/Apparition selon son ID
     getTaskDate(taskDate_id: number): Observable<TaskDate>{
       return this.http.get(this.authenticationService.URL + 'api/taskdate/'+taskDate_id+'/', this.authenticationService.options)
-          .map((response: Response) => response.json());
+          .map((response: Response) => response.json())
+    }
+
+    // Méthode permettant de récupérer la bonne TaskDate/apparition selon son ID et une date
+    getTaskDate_date(taskDate_id:number, date:any): Observable<TaskDate>{
+      return this.http.get(this.authenticationService.URL + 'api/get_taskdate/' + taskDate_id + '/' + date + '/', this.authenticationService.options)
+        .map((response: Response) => response.json())
+    }
+
+    // Méthode permettant de récupérer les permissions concernant une apparition et le secteur
+    getPermissions(taskDate_id:number): Observable<any>{
+      let sector = localStorage['sector']
+      return this.http.get(this.authenticationService.URL + 'api/get_permissions/' + taskDate_id + '/' + sector + '/', this.authenticationService.options)
+        .map((response: Response) => response.json())
     }
 
     // Méthode permettant de récupérer les types de tâches selon son secteur de travail
@@ -54,6 +67,12 @@ export class TaskService {
     stopTaskDate(data:any): Observable<any>{
       return this.http.post(this.authenticationService.URL + 'api/stoptask/', data, this.authenticationService.options)
         .map((response: Response) => response.json());
+    }
+
+    // Méthode permettant de réactiver une apparition (Une tâche à une date précise dans une apparition périodique)
+    activateTaskDate(pk: number, date:any): Observable<Boolean>{
+      return this.http.get(this.authenticationService.URL + 'api/activate_taskdate/' + pk + '/' + date + '/',this.authenticationService.options)
+        .map((response: Response) => response.json())
     }
 
     // Méthode permettant d'ajouter une tâche

@@ -1,8 +1,8 @@
 <div *ngIf="user">
-  <p>Dans quel secteur travaillez-vous aujourdĥui ?</p>
+  <p>Dans quel secteur travaillez-vous aujourdĥui {{user.username}}?</p>
   <div class="form-group">
     <label>Secteur</label>
-    <select class="form-control" [(ngModel)]="selectedSector" (ngModelChange)="change($event)">
+    <select class="custom-select" [(ngModel)]="selectedSector" (ngModelChange)="change($event)">
         <option value="0" disabled="disabled">Veuillez choisir un secteur</option>
         <option *ngFor="let sector of user.sectors" [ngValue]="sector.pk">{{sector.title}}</option>
     </select>

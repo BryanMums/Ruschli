@@ -2,7 +2,7 @@
 import { User, TaskDate } from '../../_models/index'
 import { UserService, TaskService } from '../../_services/index'
 import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker'
-import { Router } from '@angular/router'
+import { Router, ActivatedRoute } from '@angular/router'
 
 @Component({
     moduleId: module.id,
@@ -28,15 +28,26 @@ export class HomeComponent implements OnInit {
 
     constructor(
       private taskService: TaskService,
+      private route: ActivatedRoute,
       private router: Router
     ) { }
 
     ngOnInit() {
-      // On va prendre la date d'aujourd'hui et la formatter pour le date picker et l'appel API
-      let date = new Date();
-      this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
-      let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
-      this.date = dateStr
+
+      this.route.params.subscribe(params => {
+        if(params['date']){
+          // On va récupérer la date sous le format Année-mois-jour (yyyy-mm-dd)
+          this.date = params['date']
+          let dateArray = this.date.split('-')
+          this.selDate = {year:parseInt(dateArray[0]), day:parseInt(dateArray[2]), month:parseInt(dateArray[1])}
+        }else{
+          // On va prendre la date d'aujourd'hui et la formatter pour le date picker et l'appel API
+          let date = new Date();
+          this.selDate = {year:date.getUTCFullYear(), day:date.getDate(), month:date.getMonth()+1}
+          let dateStr = date.getUTCFullYear()+"-"+("0" + (date.getMonth()+1)).slice(-2)+"-"+("0" + date.getDate()).slice(-2)
+          this.date = dateStr
+        }
+     })
 
       // On met à jour à la liste des tâches selon la date
       this.updateList()

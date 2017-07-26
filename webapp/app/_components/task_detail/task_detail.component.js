@@ -23,7 +23,28 @@ var TaskDetailComponent = (function () {
         this.router = router;
         this._fb = _fb;
         this.toasterService = toasterService;
-        this.canTakeInCharge = true;
+        this.can_take = false;
+        this.can_update = false;
+        this.can_comment = false;
+        this.repetition = "";
+        this.parent = null;
+        this.days = [
+            'Lundi. ',
+            'Mardi. ',
+            'Mercredi. ',
+            'Jeudi. ',
+            'Vendredi. ',
+            'Samedi. ',
+            'Dimanche. '
+        ];
+        // Options pour le choix de quelle semaine
+        this.weekNumber = [
+            'Premier',
+            'Deuxième',
+            'Troisième',
+            'Quatrième',
+            'Cinquième'
+        ];
     }
     TaskDetailComponent.prototype.ngOnInit = function () {
         var _this = this;
@@ -34,10 +55,32 @@ var TaskDetailComponent = (function () {
         // On récupère la tâche et la date
         this.route.params.subscribe(function (params) {
             _this.date = params['date'];
-            console.log(params['id']);
-            _this.taskService.getTaskDate(+params['id'])
+            _this.taskService.getTaskDate_date(+params['id'], _this.date)
                 .subscribe(function (taskDate) {
                 _this.taskDate = taskDate;
+                if (_this.taskDate.parent != null) {
+                    _this.taskService.getTaskDate(_this.taskDate.parent)
+                        .subscribe(function (parent) {
+                        _this.parent = parent;
+                        _this.initPeriodicity();
+                        _this.taskService.getPermissions(taskDate.pk)
+                            .subscribe(function (data) {
+                            _this.can_take = data.can_take;
+                            _this.can_update = data.can_update;
+                            _this.can_comment = data.can_comment;
+                        });
+                    });
+                }
+                else {
+                    _this.initPeriodicity();
+                    _this.taskService.getPermissions(taskDate.pk)
+                        .subscribe(function (data) {
+                        console.log(data);
+                        _this.can_take = data.can_take;
+                        _this.can_update = data.can_update;
+                        _this.can_comment = data.can_comment;
+                    });
+                }
             });
         });
     };
@@ -88,6 +131,8 @@ var TaskDetailComponent = (function () {
             else {
                 _this.toasterService.pop('error', 'S\'occuper de la tâche', 'Une erreur s\'est produite, veuillez recharger la page');
             }
+        }, function (err) {
+            _this.toasterService.pop('error', 'S\'occuper de la tâche', 'Une erreur s\'est produite, veuillez recharger la page');
         });
     };
     // Méthode appelée pour permettre la modification
@@ -99,6 +144,67 @@ var TaskDetailComponent = (function () {
     TaskDetailComponent.prototype.openStop = function () {
         // On affiche la page d'arrêt d'une tâche
         this.router.navigate(['/stop-task', this.taskDate.pk, this.date]);
+    };
+    // Méthode appelée pour permettre de réactiver la tâche
+    TaskDetailComponent.prototype.reactivate = function () {
+        var _this = this;
+        this.taskService.activateTaskDate(this.taskDate.pk, this.date)
+            .subscribe(function (response) {
+            _this.toasterService.pop('success', 'Activation de la tâche', 'La tâche a bien été réactivée !');
+        }, function (err) {
+            _this.toasterService.pop('error', 'activation de la tâche', 'Une erreur s\'est produite !');
+        });
+    };
+    TaskDetailComponent.prototype.translatePeriodicity = function (taskDate) {
+        if (taskDate.eventType == 0) {
+            this.repetition += "Tâche non périodique. ";
+        }
+        else {
+            this.repetition += "Tâche périodique ";
+            if (taskDate.periodicType == 0) {
+                this.repetition += "quotidienne. ";
+            }
+            else if (taskDate.periodicType == 1) {
+                this.repetition += "hebdomadaire. ";
+                var that_1 = this;
+                taskDate.daysOfWeek.forEach(function (day) {
+                    that_1.repetition += that_1.days[day];
+                });
+                this.repetition += "Tous les " + (taskDate.intervalWeek > 1 ? taskDate.intervalWeek : '') + " semaines.";
+            }
+            else if (taskDate.periodicType == 2) {
+                this.repetition += "mensuelle. ";
+                if (taskDate.monthlyType == 0) {
+                    this.repetition += "Tous les " + taskDate.dayNumber + " du mois. ";
+                }
+                else {
+                    var that_2 = this;
+                    taskDate.daysOfWeek.forEach(function (day) {
+                        that_2.repetition += that_2.days[day];
+                    });
+                    this.repetition += that_2.weekNumber[taskDate.weekNumber] + " du mois. ";
+                }
+                this.repetition += "Tous les " + (taskDate.intervalMonth > 1 ? taskDate.intervalMonth : '') + " mois.";
+            }
+            else {
+                this.repetition += "annuelle. ";
+            }
+        }
+        if (taskDate.eventType == 1) {
+            this.repetition += "Date de début : " + taskDate.start_date + ". ";
+            if (taskDate.end_date) {
+                this.repetition += "Date de fin : " + taskDate.end_date + ". ";
+            }
+        }
+    };
+    TaskDetailComponent.prototype.initPeriodicity = function () {
+        // Si c'est une apparition exception, il faudra prendre celle de son parent
+        if (this.taskDate.eventType == 0 && this.parent != null) {
+            this.translatePeriodicity(this.parent);
+        }
+        else {
+            this.translatePeriodicity(this.taskDate);
+        }
     };
     __decorate([
         core_1.Input(),

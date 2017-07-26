@@ -20,16 +20,25 @@ export class AddTaskComponent implements OnInit {
     ) { }
 
     ngOnInit() {
-      // On va récupérer tous les types de tâche
-      this.taskService.getTaskTypes()
-          .subscribe(types  => {
-              this.taskTypes = types
-          })
-
       // Evénement qui va se produire à la fin de l'ajout
       this.events.subscribe('add', () => {
         this.reset()
         })
+    }
+
+    // Méthode appelée lorsqu'on vient sur la page, important !
+    ionViewWillEnter() {
+      if(this.state == 1){
+        // On va récupérer tous les types de tâche
+        this.taskService.getTaskTypes()
+            .subscribe(
+            types  => {
+                this.taskTypes = types
+            },
+            err => {
+
+            })
+      }
     }
 
     // Méthode appelée lors du choix du type de tâche

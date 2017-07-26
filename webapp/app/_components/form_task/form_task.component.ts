@@ -5,6 +5,7 @@ import { IMyDpOptions, IMyDateModel, IMyDate } from 'mydatepicker'
 import { FormGroup, FormBuilder, Validators, FormControl } from '@angular/forms'
 import { IMultiSelectOption, IMultiSelectSettings, IMultiSelectTexts } from 'angular-2-dropdown-multiselect'
 import { ToasterService } from 'angular2-toaster'
+import { Router, ActivatedRoute, Params } from '@angular/router'
 
 @Component({
     selector: 'form-task',
@@ -125,7 +126,9 @@ export class FormTaskComponent implements OnInit {
       private userService: UserService,
       private sectorService: SectorService,
       private _fb: FormBuilder,
-      private toasterService: ToasterService
+      private toasterService: ToasterService,
+      private route: ActivatedRoute,
+      private router: Router,
     ) { }
 
     ngOnInit() {
@@ -263,7 +266,7 @@ export class FormTaskComponent implements OnInit {
         data['eventType'] = this.taskDate.eventType
         data['start_date'] = (model.start_date as any).formatted
         // Si c'est périodique
-        if(model.eventType == 1){
+        if(this.taskDate.eventType == 1){
             if(model.end_date == null){
                 data["end_date"] = null
             }else{
@@ -276,12 +279,12 @@ export class FormTaskComponent implements OnInit {
             data['periodicType'] = this.taskDate.periodicType
             // Si c'est quotidien ou annuel, on ne fait rien de plus
             // Si c'est hebdomadaire
-            if(model.periodicType == 1){
+            if(this.taskDate.periodicType == 1){
                 data['daysOfWeek'] = model.daysOfWeek
                 data['intervalWeek'] = model.intervalWeek
             }
             // Si c'est mensuel
-            else if(model.periodicType == 2){
+            else if(this.taskDate.periodicType == 2){
                 data['monthlyType'] = this.taskDate.monthlyType
                 data['intervalMonth'] = model.intervalMonth
                 // Si c'est daydate
@@ -313,6 +316,7 @@ export class FormTaskComponent implements OnInit {
               response => {
                 if((response as any).pk != null){}
                 this.toasterService.pop('success', 'Ajout réussi', 'La nouvelle tâche a bien été créée')
+                this.router.navigate(['/task-add'])
             },
               err => {
                 this.toasterService.pop('error', 'Ajout a échoué', 'Une erreur s\'est produite !')
@@ -332,6 +336,7 @@ export class FormTaskComponent implements OnInit {
               .subscribe(
                 response => {
                   this.toasterService.pop('success', 'Modification réussie', 'La tâche a bien été modifiée')
+                  this.router.navigate(['/home', this.date])
               },
                 err => {
                   this.toasterService.pop('error', 'Modification échouée', 'La tâche n\'a pas pu être modifiée')
@@ -350,7 +355,7 @@ export class FormTaskComponent implements OnInit {
       this.taskDate.periodicType = id
     }
 
-    // Méthide permettant de changer le type de périodicité mensuelle
+    // Méthode permettant de changer le type de périodicité mensuelle
     setMonthlyType(id: number){
       this.taskDate.monthlyType = id
     }

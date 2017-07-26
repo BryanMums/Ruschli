@@ -21,9 +21,20 @@ urlpatterns = (
     url(r'^api/', include(router.urls)),
 )
 
+
 # Route permettant de récupérer les informations de l'utilisateur connecté
 urlpatterns += (
     url(r'^api/get_connected_user/$', views.get_connected_user, name='get_connected_user'),
+)
+
+# Route permettant de récupérer la bonne apparition selon un ID et une date
+urlpatterns += (
+    url(r'^api/get_taskdate/(?P<pk>\S+)/(?P<date_url>\d{4}-\d{2}-\d{2})/$', views.get_taskDate_date, name='get_taskDate_date'),
+)
+
+# Route permettant de récupérer les permissions d'une apparition/tâche
+urlpatterns += (
+    url(r'^api/get_permissions/(?P<pk>\S+)/(?P<group_id>\S+)/$', views.get_permissions, name='get_permissions'),
 )
 
 # Route permettant de récupérer la liste des tâches pour un utilisateur/secteur ou résident
@@ -65,4 +76,9 @@ urlpatterns += (
 # Route permettant de modifier une tâche et apparition
 urlpatterns += (
     url(r'^api/updatetask/', views.update_task, name='update_task'),
+)
+
+# Route permettant de réactiver une un jour d'une apparition périodique
+urlpatterns += (
+    url(r'^api/activate_taskdate/(?P<pk>\S+)/(?P<date_url>\d{4}-\d{2}-\d{2})/$', views.activate_taskdate, name='activate_taskdate'),
 )

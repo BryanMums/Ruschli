@@ -60,6 +60,17 @@ export class HomeComponent implements OnInit {
         this.updateList()
     }
 
+    // Méthode appelée lors d'un refresh avec scroll
+    doRefresh(refresher) {
+      console.log('Begin async operation', refresher);
+      this.updateList()
+      setTimeout(() => {
+        console.log('Async operation has ended');
+        refresher.complete();
+      }, 500);
+    }
+
+
     // Méthode appelée permettant de mettre à jour la liste des tâches
     updateList(){
         this.taskService.getTasks(this.date)

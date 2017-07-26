@@ -1,22 +1,26 @@
-<div class="d-flex flex-column task_card">
-    <div style="border-bottom:1px solid whitesmoke;background:#2c3e50;color:whitesmoke;padding-left:5px;">
-      <div class="d-flex justify-content-end">
-        <small class="mr-auto" [style.display]="taskDate.eventType == 0 ? 'block' : 'none'">Non périodique</small>
-        <small class="mr-auto" [style.display]="taskDate.eventType == 1 ? 'block' : 'none'">Périodique</small>
-        <small class="pr-2" *ngIf="taskDate.time">{{taskDate.time}}</small>
-      </div>
+<div class="card cardTask" [class.cardNotActive]="!taskDate.active">
+    <!--Card content-->
+    <div class="card-block">
+        <!--Title-->
+        <h4 class="card-title">{{taskDate.task.title}}</h4>
+        <div *ngIf="taskDate.active">
+          <!--Text-->
+          <p class="card-text" *ngIf="taskDate.task.description">
+            {{taskDate.task.description | truncate : 30}}
+          </p>
+          <hr/>
+          <div *ngIf="taskDate.time">
+            <p><b>Heure</b> : {{taskDate.time.split(':')[0]+'h'+taskDate.time.split(':')[1]}}</p>
+          </div>
+          <div *ngIf="taskDate.task.resident.length > 0" >
+            <label style="display:block;margin-bottom:2px;" color="#488aff">Résident(s)</label>
+            <span class="badge badge-primary mr-1" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</span>
+          </div>
+          <div *ngIf="taskDate.task.room.length > 0">
+              <label color="#488aff">Salle(s)</label><br/>
+              <span class="badge badge-primary mr-1" *ngFor="let room of taskDate.task.room">{{room.title}}</span>
+          </div>
+        </div>
     </div>
-    <div style="background:white;padding:5px;">
-      <h5 style="margin-bottom:0px;">{{taskDate.task.title}}</h5>
-    </div>
-    <div class="col-12"  style="overflow-x:scroll;background:white;">
-      <div *ngIf="taskDate.task.resident" class="small row flex-row flex-nowrap"  style="padding:5px">
-          <span class="badge badge-primary mr-1" *ngFor="let resident of taskDate.task.resident">{{resident.firstname}} {{resident.lastname}}</span>
-      </div>
-    </div>
-    <div class="col-12"  style="overflow-x:scroll;background:white;">
-      <div *ngIf="taskDate.task.room" class="small row flex-row flex-nowrap" style="padding:5px">
-          <span class="badge badge-default mr-1" *ngFor="let room of taskDate.task.room">{{room.title}}</span>
-      </div>
-    </div>
+    <!--/.Card content-->
 </div>

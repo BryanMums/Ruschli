@@ -97,8 +97,7 @@ def get_tasks_for_a_day(request, date_url, group_id):
     try:
         date = datetime.strptime(date_url, '%Y-%m-%d')
         if(group_id == 0 or group_id == '0'):
-            group = {}
-            group["id"] = 0
+            group = None
         else:
             group = Group.objects.get(pk=group_id)
 
@@ -151,5 +150,65 @@ def get_tasktypes_sector(request, sector_id):
         content = {'Erreur': 'Le secteur donné n\'existe pas !'}
         return Response(content, status=status.HTTP_400_BAD_REQUEST)
 
-#TODO : Récupérer tâches selon ID et date.
-#TODO : Permissions
+
+@api_view(['GET'])
+def get_taskDate_date(request, pk, date_url):
+    '''
+    Vue permettant de récupérer la bonne TaskDate (Apparition) selon un ID et une date.
+    '''
+    try:
+        date = datetime.strptime(date_url, '%Y-%m-%d')
+        data = TaskManager().get_taskDate_date(pk, date)
+        if data:
+            serializer = TaskDateSerializer(data, many=False, context={'request': request})
+            return Response(serializer.data)
+        else:
+            raise
+
+    except Exception as e:
+        print(e)
+        content = {'Erreur': 'l\'ID et la date ne correspondent pas !'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+def get_permissions(request, pk, group_id):
+    '''
+    Vue permettant de récupérer les permissions concernant une apparition et sa tâche
+    par rapport à un utilisateur et son secteur.
+    '''
+    try:
+        taskDate = TaskDate.objects.get(pk=pk)
+        if group_id == '0':
+            group = None
+            print("mdr")
+        else:
+            group = Group.objects.get(pk=group_id)
+        data = {}
+        data["can_take"] = taskDate.can_take(request.user, group)
+        data["can_update"] = taskDate.can_modify(request.user)
+        data["can_comment"] = taskDate.can_comment(request.user, group)
+        return Response(data, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        print(e)
+        content = {'Erreur': 'Problème au niveau de la tâche ou du secteur !'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+def activate_taskdate(request, pk, date_url):
+    '''
+    Vue permettant de réactiver un jour d'une tâche périodique
+    '''
+    try:
+        date = datetime.strptime(date_url, '%Y-%m-%d')
+        if TaskManager.activate_taskdate(request.user, pk, date):
+            content = {'Succès': 'La tâche a bien été réactivée pour le '+date_url}
+            return Response(content, status=status.HTTP_200_OK)
+        else:
+            raise
+
+    except Exception as e:
+        print(e)
+        content = {'Erreur': 'la tâche à cette date ne peux pas être activée !'}
+        return Response(content, status=status.HTTP_400_BAD_REQUEST)

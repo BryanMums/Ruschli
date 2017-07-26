@@ -13,8 +13,9 @@ var core_1 = require("@angular/core");
 var index_1 = require("../../_services/index");
 var router_1 = require("@angular/router");
 var HomeComponent = (function () {
-    function HomeComponent(taskService, router) {
+    function HomeComponent(taskService, route, router) {
         this.taskService = taskService;
+        this.route = route;
         this.router = router;
         this.tasks = []; // La liste des tâches
         this.date = null; // La date qui sera sélectionnée utilisée pour les appels à l'API
@@ -31,11 +32,22 @@ var HomeComponent = (function () {
         };
     }
     HomeComponent.prototype.ngOnInit = function () {
-        // On va prendre la date d'aujourd'hui et la formatter pour le date picker et l'appel API
-        var date = new Date();
-        this.selDate = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
-        var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
-        this.date = dateStr;
+        var _this = this;
+        this.route.params.subscribe(function (params) {
+            if (params['date']) {
+                // On va récupérer la date sous le format Année-mois-jour (yyyy-mm-dd)
+                _this.date = params['date'];
+                var dateArray = _this.date.split('-');
+                _this.selDate = { year: parseInt(dateArray[0]), day: parseInt(dateArray[2]), month: parseInt(dateArray[1]) };
+            }
+            else {
+                // On va prendre la date d'aujourd'hui et la formatter pour le date picker et l'appel API
+                var date = new Date();
+                _this.selDate = { year: date.getUTCFullYear(), day: date.getDate(), month: date.getMonth() + 1 };
+                var dateStr = date.getUTCFullYear() + "-" + ("0" + (date.getMonth() + 1)).slice(-2) + "-" + ("0" + date.getDate()).slice(-2);
+                _this.date = dateStr;
+            }
+        });
         // On met à jour à la liste des tâches selon la date
         this.updateList();
     };
@@ -65,6 +77,7 @@ var HomeComponent = (function () {
             templateUrl: 'home.component.html'
         }),
         __metadata("design:paramtypes", [index_1.TaskService,
+            router_1.ActivatedRoute,
             router_1.Router])
     ], HomeComponent);
     return HomeComponent;

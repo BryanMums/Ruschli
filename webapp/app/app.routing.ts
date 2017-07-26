@@ -16,6 +16,7 @@ import { AuthGuard } from './_guards/index';
 const appRoutes: Routes = [
     { path: 'profile', component: ProfileComponent },
     { path: '', component: HomeComponent, canActivate: [AuthGuard] },
+    { path: 'home/:date', component: HomeComponent, canActivate: [AuthGuard] },
     { path: 'residents', component: ResidentsComponent, canActivate: [AuthGuard]},
     { path: 'resident/:id', component: ResidentComponent, canActivate: [AuthGuard]},
     { path: 'task/:id/:date', component: TaskDetailComponent, canActivate: [AuthGuard]},

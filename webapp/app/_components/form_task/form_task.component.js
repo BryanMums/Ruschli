@@ -14,8 +14,9 @@ var index_1 = require("../../_models/index");
 var index_2 = require("../../_services/index");
 var forms_1 = require("@angular/forms");
 var angular2_toaster_1 = require("angular2-toaster");
+var router_1 = require("@angular/router");
 var FormTaskComponent = (function () {
-    function FormTaskComponent(taskService, residentService, roomService, userService, sectorService, _fb, toasterService) {
+    function FormTaskComponent(taskService, residentService, roomService, userService, sectorService, _fb, toasterService, route, router) {
         this.taskService = taskService;
         this.residentService = residentService;
         this.roomService = roomService;
@@ -23,6 +24,8 @@ var FormTaskComponent = (function () {
         this.sectorService = sectorService;
         this._fb = _fb;
         this.toasterService = toasterService;
+        this.route = route;
+        this.router = router;
         // Variables pouvant être données dans le cas d'une création ou modification
         this.taskType = null;
         this.date = null;
@@ -247,7 +250,7 @@ var FormTaskComponent = (function () {
             data['eventType'] = this.taskDate.eventType;
             data['start_date'] = model.start_date.formatted;
             // Si c'est périodique
-            if (model.eventType == 1) {
+            if (this.taskDate.eventType == 1) {
                 if (model.end_date == null) {
                     data["end_date"] = null;
                 }
@@ -262,11 +265,11 @@ var FormTaskComponent = (function () {
                 data['periodicType'] = this.taskDate.periodicType;
                 // Si c'est quotidien ou annuel, on ne fait rien de plus
                 // Si c'est hebdomadaire
-                if (model.periodicType == 1) {
+                if (this.taskDate.periodicType == 1) {
                     data['daysOfWeek'] = model.daysOfWeek;
                     data['intervalWeek'] = model.intervalWeek;
                 }
-                else if (model.periodicType == 2) {
+                else if (this.taskDate.periodicType == 2) {
                     data['monthlyType'] = this.taskDate.monthlyType;
                     data['intervalMonth'] = model.intervalMonth;
                     // Si c'est daydate
@@ -294,6 +297,7 @@ var FormTaskComponent = (function () {
                     .subscribe(function (response) {
                     if (response.pk != null) { }
                     _this.toasterService.pop('success', 'Ajout réussi', 'La nouvelle tâche a bien été créée');
+                    _this.router.navigate(['/task-add']);
                 }, function (err) {
                     _this.toasterService.pop('error', 'Ajout a échoué', 'Une erreur s\'est produite !');
                 });
@@ -311,6 +315,7 @@ var FormTaskComponent = (function () {
                 this.taskService.updateTask(post)
                     .subscribe(function (response) {
                     _this.toasterService.pop('success', 'Modification réussie', 'La tâche a bien été modifiée');
+                    _this.router.navigate(['/home', _this.date]);
                 }, function (err) {
                     _this.toasterService.pop('error', 'Modification échouée', 'La tâche n\'a pas pu être modifiée');
                 });
@@ -325,7 +330,7 @@ var FormTaskComponent = (function () {
     FormTaskComponent.prototype.setPeriodicType = function (id) {
         this.taskDate.periodicType = id;
     };
-    // Méthide permettant de changer le type de périodicité mensuelle
+    // Méthode permettant de changer le type de périodicité mensuelle
     FormTaskComponent.prototype.setMonthlyType = function (id) {
         this.taskDate.monthlyType = id;
     };
@@ -361,7 +366,9 @@ var FormTaskComponent = (function () {
             index_2.UserService,
             index_2.SectorService,
             forms_1.FormBuilder,
-            angular2_toaster_1.ToasterService])
+            angular2_toaster_1.ToasterService,
+            router_1.ActivatedRoute,
+            router_1.Router])
     ], FormTaskComponent);
     return FormTaskComponent;
 }());

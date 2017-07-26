@@ -16,10 +16,35 @@
   margin-bottom:10px;
   box-shadow: 0 2px 5px 0 rgba(0,0,0,.16), 0 2px 10px 0 rgba(0,0,0,.12);
 }
-.task_card:hover{
+.cardTask:hover{
   cursor:pointer;
   box-shadow: 0 4px 5px 0 rgba(0,0,0,.16), 0 4px 10px 0 rgba(0,0,0,.12);
 }
 html, body {
    height: 100%;
+}
+
+.cardTask{
+  border-top:3px solid #488aff;
+  margin-bottom:10px;
+}
+
+.cardNotActive{
+  opacity: 0.5;
+  border-top:3px solid #f53d3d;
+}
+
+.card-title{
+  color: #488aff;
+}
+
+.selection{
+  text-align: center;
+  font-weight: bold;
+  color: #488aff !important;
+}
+
+.selector{
+  width: 100% !important;
+  height: 100% !important;
 }
