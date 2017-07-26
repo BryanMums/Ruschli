@@ -1,3 +1,8 @@
 django
 djangorestframework
 pygments
+django-extensions
+django-cors-headers
+django-crispy-forms
+psycopg2
+djangorestframework-jwt
