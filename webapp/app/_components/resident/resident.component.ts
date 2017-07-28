@@ -55,6 +55,12 @@ export class ResidentComponent implements OnInit {
         this.updateList()
     }
 
+    // Méthode appelée lorsque l'on clique sur la tâche
+    onClickTask(pk: number){
+      // On va aller sur la page de la tâche en spécifiant la date également
+      this.router.navigate(['/task', pk, this.date])
+    }
+
     // Permet de mettre à jour la liste des tâches concernant le résident
     updateList(){
       this.residentService.getTaskResident(this.resident.pk, this.date)

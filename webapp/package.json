@@ -1,9 +1,9 @@
 {
-  "name": "angular2-jwt-authentication-example",
+  "name": "RuschliAppWeb",
   "version": "1.0.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cornflourblue/angular2-jwt-authentication-example.git"
+    "url": ""
   },
   "scripts": {
     "start": "concurrently \"npm run tsc:w\" \"npm run lite\" ",

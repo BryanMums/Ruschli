@@ -101,7 +101,7 @@ def get_tasks_for_a_day(request, date_url, group_id):
         else:
             group = Group.objects.get(pk=group_id)
 
-        data = request.user.get_tasks_for_a_day(date, group, None)
+        data = TaskManager.get_tasks_for_a_day(request.user, date, group, None)
         serializer = TaskDateSerializer(data, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -118,7 +118,7 @@ def get_tasks_for_a_day_resident(request, date_url, resident_id):
     try:
         date = datetime.strptime(date_url, '%Y-%m-%d')
         resident = Resident.objects.get(pk=resident_id)
-        data = request.user.get_tasks_for_a_day(date, None, resident)
+        data = TaskManager.get_tasks_for_a_day(request.user, date, None, resident)
         serializer = TaskDateSerializer(data, many=True, context={'request': request})
         return Response(serializer.data)
     except Exception as e:

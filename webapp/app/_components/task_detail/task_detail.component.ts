@@ -79,7 +79,6 @@ export class TaskDetailComponent implements OnInit {
            this.initPeriodicity()
            this.taskService.getPermissions(taskDate.pk)
              .subscribe((data:any) => {
-               console.log(data)
                this.can_take = data.can_take
                this.can_update = data.can_update
                this.can_comment = data.can_comment
@@ -97,7 +96,6 @@ export class TaskDetailComponent implements OnInit {
         data["text"] = model.text
         data["date"] = this.date
         data["taskdate"] = this.taskDate.pk
-        console.log(data)
         // On envoie à l'API le commentaire
         this.taskService.addComment(data)
           .subscribe(taskDate => {
@@ -157,6 +155,7 @@ export class TaskDetailComponent implements OnInit {
       .subscribe(
         response => {
           this.toasterService.pop('success', 'Activation de la tâche', 'La tâche a bien été réactivée !')
+          this.router.navigate(['/home', this.date])
       },
         err => {
           this.toasterService.pop('error', 'activation de la tâche', 'Une erreur s\'est produite !')

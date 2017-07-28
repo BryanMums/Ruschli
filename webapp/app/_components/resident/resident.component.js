@@ -53,6 +53,11 @@ var ResidentComponent = (function () {
         this.date = date.formatted;
         this.updateList();
     };
+    // Méthode appelée lorsque l'on clique sur la tâche
+    ResidentComponent.prototype.onClickTask = function (pk) {
+        // On va aller sur la page de la tâche en spécifiant la date également
+        this.router.navigate(['/task', pk, this.date]);
+    };
     // Permet de mettre à jour la liste des tâches concernant le résident
     ResidentComponent.prototype.updateList = function () {
         var _this = this;

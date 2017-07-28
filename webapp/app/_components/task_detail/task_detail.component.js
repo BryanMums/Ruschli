@@ -75,7 +75,6 @@ var TaskDetailComponent = (function () {
                     _this.initPeriodicity();
                     _this.taskService.getPermissions(taskDate.pk)
                         .subscribe(function (data) {
-                        console.log(data);
                         _this.can_take = data.can_take;
                         _this.can_update = data.can_update;
                         _this.can_comment = data.can_comment;
@@ -93,7 +92,6 @@ var TaskDetailComponent = (function () {
             data["text"] = model.text;
             data["date"] = this.date;
             data["taskdate"] = this.taskDate.pk;
-            console.log(data);
             // On envoie à l'API le commentaire
             this.taskService.addComment(data)
                 .subscribe(function (taskDate) {
@@ -151,6 +149,7 @@ var TaskDetailComponent = (function () {
         this.taskService.activateTaskDate(this.taskDate.pk, this.date)
             .subscribe(function (response) {
             _this.toasterService.pop('success', 'Activation de la tâche', 'La tâche a bien été réactivée !');
+            _this.router.navigate(['/home', _this.date]);
         }, function (err) {
             _this.toasterService.pop('error', 'activation de la tâche', 'Une erreur s\'est produite !');
         });

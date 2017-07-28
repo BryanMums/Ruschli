@@ -123,6 +123,22 @@ var FormTaskComponent = (function () {
         var _this = this;
         // Dans le cas de la modification d'une tâche
         if (!this.taskToAdd && this.taskDate != null) {
+            // Si on est sur une tâche exception et qu'on veut modifier à partir de la date
+            // Il va falloir mettre les informations de la tâche parente pour la périodicité
+            if (!this.onlyAtDate && this.taskDate.parent != null) {
+                this.taskService.getTaskDate(this.taskDate.parent)
+                    .subscribe(function (taskDate) {
+                    _this.taskDate.eventType = taskDate.eventType;
+                    _this.taskDate.periodicType = taskDate.periodicType;
+                    _this.taskDate.monthlyType = taskDate.monthlyType;
+                    _this.taskDate.end_date = taskDate.end_date;
+                    _this.taskDate.weekNumber = taskDate.weekNumber;
+                    _this.taskDate.daysOfWeek = taskDate.daysOfWeek;
+                    _this.taskDate.intervalWeek = taskDate.intervalWeek;
+                    _this.taskDate.intervalMonth = taskDate.intervalMonth;
+                    _this.taskDate.dayNumber = taskDate.dayNumber;
+                });
+            }
             // On récupère la date de début comme étant la date à laquelle il veut modifier
             this.start_date = { year: parseInt(this.date.substr(0, 4)), day: parseInt(this.date.substr(8, 2)), month: parseInt(this.date.substr(5, 2)) };
             // On récupère les informations du type de la tâche qu'on veut modifier
@@ -297,7 +313,7 @@ var FormTaskComponent = (function () {
                     .subscribe(function (response) {
                     if (response.pk != null) { }
                     _this.toasterService.pop('success', 'Ajout réussi', 'La nouvelle tâche a bien été créée');
-                    _this.router.navigate(['/task-add']);
+                    _this.router.navigate(['/home']);
                 }, function (err) {
                     _this.toasterService.pop('error', 'Ajout a échoué', 'Une erreur s\'est produite !');
                 });

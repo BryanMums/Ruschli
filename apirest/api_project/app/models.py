@@ -364,6 +364,70 @@ class TaskManager(models.Manager):
 
 
     @staticmethod
+    def check_periodicity_values(values):
+        '''
+        Méthode permettant de vérifier si les valeurs concernant la périodicité
+        sont bien fournies.
+        '''
+        try:
+            # Si la date de fin est plus petite que la date de début, cela ne joue pas !
+            if values.get("start_date") is None:
+                raise
+
+            if values.get("end_date") is not None:
+                if values.get("end_date") < values.get("start_date"):
+                    raise
+
+            # Dans le cas d'un ajout d'une tâche non périodique
+            if values.get("eventType") == 0 :
+                # On n'a pas besoin de mettre d'autres valeurs
+                pass
+            # Dans le cas d'un ajout d'une tâche périodique
+            elif values.get("eventType") == 1 :
+                # Dans le cas : Quotidien
+                if values.get("periodicType") == 0:
+                    # Rien de spécifique
+                    pass
+                # Dans le cas : Hebdomadaire
+                elif values.get("periodicType") == 1:
+                    if values.get("daysOfWeek") is None or values.get("intervalWeek") is None:
+                        raise
+                # Dans le cas : Mensuel
+                elif values.get("periodicType") == 2:
+                    # Répétition selon un jour
+                    if values.get("monthlyType") == 0:
+                        if values.get("dayNumber") is None or values.get("intervalMonth") is None:
+                            raise
+
+                    # Répépition selon le combien-t-ième jour
+                    elif values.get("monthlyType") == 1:
+                        if values.get("weekNumber") is None or values.get("daysOfWeek") is None or values.get("intervalMonth") is None:
+                            raise
+                    else:
+                        raise
+
+                # Dans le cas : Annuel
+                elif values.get("periodicType") == 3:
+                    # Rien de spécifique
+                    pass
+                # Pour une mauvaise valeur pour le type de périodicité (periodicType)
+                else:
+                    raise
+
+            # Pour une mauvaise valeur dans eventType
+            else :
+                raise
+
+            return True
+
+        # Si une erreur s'est produite
+        except Exception as e:
+            print(e)
+            return False
+
+
+
+    @staticmethod
     def copy_task_if_necessary(task):
         '''
         Méthode permettant de copier une tâche si cela est nécessaire.
@@ -372,7 +436,6 @@ class TaskManager(models.Manager):
         est liée.
         '''
         if TaskDate.objects.filter(task=task).count() > 1 :
-            print("On crée !")
             ancient = Task.objects.get(pk=task.pk)
             modifiedTask = task
             modifiedTask.pk = None
@@ -390,6 +453,8 @@ class TaskManager(models.Manager):
     def is_taskDate_at_date(taskdate, date):
         '''
         Méthode permettant de savoir si une apparition apparaît à une date donnée.
+
+        Calcul des différents cas de périodicité.
         '''
         # Les informations que l'on aura besoin de base
         eventType = taskdate.eventType
@@ -397,13 +462,13 @@ class TaskManager(models.Manager):
         end_date = taskdate.end_date
 
         # Variable permettant de savoir si on devra garder la TaskDate
-        isToAdd = False
+        possible = False
 
         # On va d'abord gérer le cas des tâches non périodique
         if eventType == 0 :
             # Dans ce cas-là, on doit juste regarder si la date est la même
             if start_date == date.date() :
-                isToAdd = True
+                possible = True
 
         # Puis gérer les cas des tâches périodiques
         elif eventType == 1 :
@@ -411,7 +476,7 @@ class TaskManager(models.Manager):
             # Quotidien
             if periodicType == 0 :
                 # Pas besoin de tester + car on est déjà sûr d'être dans la plage de date.
-                isToAdd = True
+                possible = True
 
             # Hebdomadaire
             elif periodicType == 1 :
@@ -419,14 +484,17 @@ class TaskManager(models.Manager):
                 # Se répète chaque semaine
                     if taskdate.intervalWeek == 1 | taskdate.intervalWeek is None:
                         # on doit juste regarder si on est le bon jour de la semaine
-                        isToAdd = True
+                        possible = True
                     # Se répète chaque x semaines
                     else :
                         newdate = start_date
+
                         while newdate <= date.date():
                             enddate = newdate + datetime2.timedelta(days=6)
+                            # Si notre date se trouve dans la plage de date.
                             if date.date() >= newdate and date.date() <= enddate:
-                                isToAdd = True
+                                possible = True
+                                # On quitte la boucle
                                 break
                             newdate += datetime2.timedelta(days=7 * taskdate.intervalWeek)
 
@@ -436,12 +504,12 @@ class TaskManager(models.Manager):
                 if taskdate.monthlyType == 0 :
                     if date.date().day == taskdate.dayNumber:
                         if taskdate.intervalMonth == 1 :
-                            isToAdd = True
+                            possible = True
                         else:
                             new_date = start_date
                             while new_date <= date.date():
                                 if new_date.month == date.month and new_date.year == date.year:
-                                    isToAdd = True
+                                    possible = True
                                     break
                                 month = new_date.month - 1 + taskdate.intervalMonth
                                 year = int(new_date.year + month / 12 )
@@ -452,12 +520,11 @@ class TaskManager(models.Manager):
                 elif taskdate.monthlyType == 1 :
                     for day in taskdate.daysOfWeek.all() :
                         if date.weekday() == day.id :
-                            print(str(date.day))
                             if taskdate.weekNumber * 7 < date.day <= (taskdate.weekNumber + 1) * 7 :
                                 new_date = start_date
                                 while new_date <= date.date():
                                     if new_date.month == date.month and new_date.year == date.year:
-                                        isToAdd = True
+                                        possible = True
                                         break
                                     month = new_date.month - 1 + taskdate.intervalMonth
                                     year = int(new_date.year + month / 12 )
@@ -467,12 +534,22 @@ class TaskManager(models.Manager):
             # Annuel
             elif periodicType == 3 :
                 if date.day == start_date.day and date.month == start_date.month:
-                    isToAdd = True
+                    possible = True
 
-        return isToAdd
+        return possible
 
     @staticmethod
     def get_taskDate_date(pk, date):
+        '''
+        Méthode permettant de récupérer la bonne apparition selon l'ID et la date.
+
+        Il se peut que l'utilisateur ait sa liste de tâches et qu'il ne l'a pas
+        actualisé depuis quelques minutes. Dans cette liste se trouve une apparition
+        périodique (qui n'a pas d'exception à la date) mais il vient d'y avoir une
+        exception qui a été créée (Quelqu'un a commenté par exemple), du coup sa liste
+        est "faussé". Si l'utilisateur clique sur l'apparition périodique, il faudra y
+        retourner l'exception.
+        '''
         try :
             taskDate = TaskDate.objects.get(pk=pk)
 
@@ -535,7 +612,6 @@ class TaskManager(models.Manager):
         output = ""
         try :
             with transaction.atomic():
-                # TODO : être sûr d'avoir la bonne taskDate à la bonne date. et gérer les daysOfWeek
                 taskDate = TaskDate.objects.get(pk=post["taskdate"]) # L'apparition sur laquelle l'utilisateur veut modifier
                 date = post["date"] # La date à laquelle on veut modifier
                 if not taskDate.can_modify(user):
@@ -557,7 +633,11 @@ class TaskManager(models.Manager):
                 dict_values_taskDate = { k: values[k] for k in keys_of_taskDate if k in values }
                 dict_values_taskDate_exception = { k: dict_values_taskDate[k] for k in ['time', 'active', 'taker'] if k in dict_values_taskDate }
 
-                #TODO: Tester si les valeurs pour la périodicité sont corrects.
+                # Tester si les valeurs pour la périodicité sont bien données
+                if not onlyAtTheDate:
+                    if not TaskManager().check_periodicity_values(values):
+                        output += "Les valeurs concernant la périodicité ne sont pas justes."
+                        raise
 
                 # Dans le cas d'une tâche non-périodique et qui n'est pas une exception.
                 if taskDate.eventType == 0 and taskDate.parent == None:
@@ -575,6 +655,7 @@ class TaskManager(models.Manager):
 
                         # On modifie la taskDate
                         TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                        taskDate.daysOfWeek.set(values.get('daysOfWeek'))
 
                         # On récupère la taskDate qu'on a modifié pour la retourner
                         return TaskDate.objects.get(pk=taskDate.pk)
@@ -597,6 +678,7 @@ class TaskManager(models.Manager):
 
                             # On fait les modifications concernant la périodicité
                             TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                            taskDate.daysOfWeek.set(values.get('daysOfWeek'))
                             exception_pk = taskDate.pk
                             taskDate = TaskDate.objects.get(pk=taskDate.pk)
 
@@ -626,6 +708,7 @@ class TaskManager(models.Manager):
 
                             # On applique les modifications pour la TaskDate et les informations basiques de la tâche
                             TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                            taskDate.daysOfWeek.set(values.get('daysOfWeek'))
                             Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
 
                             # On met à jour les champs relationnels de la tâche
@@ -645,6 +728,7 @@ class TaskManager(models.Manager):
 
                         # On va faire les modifications voulues
                         TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                        taskDate.daysOfWeek.set(values.get('daysOfWeek'))
                         Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
 
                         # On met à jour les champs relationnels de la tâche
@@ -690,6 +774,7 @@ class TaskManager(models.Manager):
                             # Modifier la tâche exception et transformer la tâche copiée en tâche périodique.
                             TaskDate.objects.filter(pk=saved_pk).update(**dict_values_taskDate_exception)
                             TaskDate.objects.filter(pk=copiedTaskDate.pk).update(**dict_values_taskDate)
+                            copiedTaskDate.daysOfWeek.set(values.get('daysOfWeek'))
 
                             taskDate = TaskDate.objects.get(pk=saved_pk)
                             copiedTaskDate = TaskDate.objects.get(pk=copiedTaskDate.pk)
@@ -703,6 +788,7 @@ class TaskManager(models.Manager):
                         else:
                             # On va la modifier directement et la passer en tant que tâche principale.
                             TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
+                            taskDate.daysOfWeek.set(values.get('daysOfWeek'))
                             taskDate = TaskDate.objects.get(pk=taskDate.pk)
                             taskDate.parent = None
                             taskDate.save()
@@ -763,6 +849,7 @@ class TaskManager(models.Manager):
 
                         # On modifie la taskdate
                         TaskDate.objects.filter(pk=copiedTaskDate.pk).update(**dict_values_taskDate)
+                        copiedTaskDate.daysOfWeek.set(values.get('daysOfWeek'))
                         return TaskDate.objects.get(pk=copiedTaskDate.pk)
 
 
@@ -870,6 +957,9 @@ class TaskManager(models.Manager):
             return False
 
     def activate_taskdate(user, taskDate_pk, date):
+        '''
+        Méthode permettant de réactiver une exception qui a été désactivé (arrêter)
+        '''
         try:
             # On récupère la bonne apparition selon la date et l'ID.
             taskDate = TaskManager().get_taskDate_date(taskDate_pk, date)
@@ -890,6 +980,10 @@ class TaskManager(models.Manager):
 
 
     def add_taker(post, user):
+        '''
+        Méthode permettant d'ajouter une personne comme "taker" d'une apparition
+        si la tâche le demande et si l'utilisateur a le droit.
+        '''
         # On va d'abord voir s'il y a besoin d'un taker ou s'il en existe un.
         taskDate = TaskDate.objects.get(pk=post["taskdate"])
         sector = Group.objects.get(pk=post["sector"])
@@ -909,6 +1003,9 @@ class TaskManager(models.Manager):
 
 
     def add_comment(post, user):
+        '''
+        Méthode permettant d'ajouter un commentaire sur une apparition
+        '''
         taskDate = TaskDate.objects.get(pk=post['taskdate'])
         if not taskDate.is_an_exception_or_nonperiodic():
             # Il faut encore faire le test s'il y a une exception qui existe déjà.
@@ -926,8 +1023,13 @@ class TaskManager(models.Manager):
 
 
     def create_task(post, user):
+        '''
+        Méthode permettant de créer une tâche ainsi que son apparition directement.
+
+        Ses champs concernant la périodicité seront testées et si une erreur apparaît
+        a un endroit, on annule toutes les modifications.
+        '''
         result = None
-        print("nodwa")
         # La première étape va être de créer la Task
         try :
             with transaction.atomic():
@@ -951,16 +1053,16 @@ class TaskManager(models.Manager):
                 if post.get('copyreceiver_group') is not None:
                     task.copyreceiver_group.add(*post.get('copyreceiver_group'))
 
+
+                # On va regarder si les valeurs de périodicité sont bien fournies
+                if not TaskManager().check_periodicity_values(post):
+                    raise
+
                 start_date = post.get('start_date')
                 end_date = post.get('end_date')
                 eventType = post.get('eventType')
-                # Si la date de fin est plus petite que la date de début, cela ne joue pas !
-                if start_date is None:
-                    raise
-                if end_date is not None:
-                    if end_date < start_date :
-                        raise
-
+                periodicType = post.get('periodicType')
+                monthlyType = post.get('monthlyType')
 
                 # Les valeurs de base pour chaque cas
                 data_dict = {}
@@ -984,54 +1086,29 @@ class TaskManager(models.Manager):
                         pass
                     # Dans le cas : Hebdomadaire
                     elif periodicType == 1:
-                        if post.get('daysOfWeek') is None or post.get('intervalWeek') is None:
-                            raise
-                        #data_dict['daysOfWeek'] = post.get('daysOfWeek')
                         data_dict['intervalWeek'] = post.get('intervalWeek')
                     # Dans le cas : Mensuel
                     elif periodicType == 2:
                         monthlyType = post.get('monthlyType')
                         data_dict['monthlyType'] = monthlyType
                         # Répétition selon un jour
-                        print("mois")
-                        print(data_dict['monthlyType'])
                         if monthlyType == 0:
-                            print("yes")
-                            if post.get('dayNumber') is None or post.get('intervalMonth') is None:
-                                print("prout")
-                                raise
                             data_dict['dayNumber'] = post.get('dayNumber')
                             data_dict['intervalMonth'] = post.get('intervalMonth')
-                            print("mdr")
                         # Répépition selon le combien-t-ième jour
                         elif monthlyType == 1:
-                            if post.get('weekNumber') is None or post.get('daysOfWeek') is None or post.get('intervalMonth') is None:
-                                raise
                             data_dict['weekNumber'] = post.get('weekNumber')
-                            #data_dict['daysOfWeek'] = post.get('daysOfWeek')
                             data_dict['intervalMonth'] = post.get('intervalMonth')
-                        else:
-                            raise
 
                     # Dans le cas : Annuel
                     elif periodicType == 3:
                         # Rien de spécifique
                         pass
-                    # Pour une mauvaise valeur pour le type de périodicité (periodicType)
-                    else:
-                        raise
-
-                # Pour une mauvaise valeur dans eventType
-                else :
-                    raise
 
                 # On fait l'ajout selon les valeurs gardées
-                print("Oh !")
                 result = TaskDate.objects.create(**data_dict)
-                print("Ah !")
 
                 # On doit encore ajouter les dépendances avec weeksOfDay si c'est nécessaire
-
                 if eventType == 1:
                     if periodicType == 1 or (periodicType == 2 and monthlyType == 1):
                         result.daysOfWeek.add(*post.get('daysOfWeek'))
@@ -1043,61 +1120,63 @@ class TaskManager(models.Manager):
 
         return result
 
+    def get_tasks_for_a_day(user, date, group, resident):
+        '''
+        Méthode permettant de récupérer la bonne liste d'apparitions de tâche
+        en fonction de l'utilisateur, du secteur de travail et de la date.
+        Ou en fonction du résident et de la date.
+        '''
+        # Récupérer toutes les TaskDate où la date se situe après le début et avant la fin
+        taskDates = TaskDate.objects.filter(
+                (
+                (Q(start_date = date) & Q(eventType = 0))
+                |
+                (Q(start_date__lte = date) & Q(eventType = 1) & (Q(end_date__gte = date) | Q(end_date__isnull = True)))
+                )
+            )
+
+        if resident is None:
+            if group is not None :
+                taskDates = taskDates.filter(
+                    Q(task__receiver_user = user.id) | Q(task__copyreceiver_user = user.id) |
+                    Q(task__receiver_group = group.id) | Q(task__copyreceiver_group = group.id)
+                )
+            else:
+                taskDates = taskDates.filter(
+                    Q(task__receiver_user = user.id) | Q(task__copyreceiver_user = user.id)
+                )
+        else:
+            taskDates = taskDates.filter(Q(task__resident = resident))
+
+        taskDates = taskDates.distinct()
+
+        # On va calculer pour ne garder que celle qui tombent le jour J
+        accurateTaskDates = []
+        for taskdate in taskDates:
+            if TaskManager().is_taskDate_at_date(taskdate, date) :
+                accurateTaskDates.append(taskdate)
+
+        # La dernière étape va être de ne pas garder les exceptions et leur parent.
+        # Exemple : On a une tâche qui est faite tous les lundis, mais un lundi spécifique, on a modifié cette tâche
+        # Il faut donc ne garder que l'exception
+
+
+        # On va récupérer les ID à enlever de la liste
+        ids_to_remove = []
+        for taskdate in accurateTaskDates :
+            if taskdate.parent is not None :
+                ids_to_remove.append(taskdate.parent)
+
+        # On va les enlever de la liste
+        for index in ids_to_remove:
+            if(index in accurateTaskDates):
+                accurateTaskDates.remove(index)
+
+        return accurateTaskDates
+
 
 
 def get_groups(self):
     return self.sectors.all()
 
 User.add_to_class('get_groups', get_groups)
-
-def get_tasks_for_a_day(self, date, group, resident):
-    # Récupérer toutes les TaskDate où la date se situe après le début et avant la fin
-
-    taskDates = TaskDate.objects.filter(
-            (
-            (Q(start_date = date) & Q(eventType = 0))
-            |
-            (Q(start_date__lte = date) & Q(eventType = 1) & (Q(end_date__gte = date) | Q(end_date__isnull = True)))
-            )
-        )
-
-    if resident is None:
-        if group is not None :
-            taskDates = taskDates.filter(
-                Q(task__receiver_user = self.id) | Q(task__copyreceiver_user = self.id) |
-                Q(task__receiver_group = group.id) | Q(task__copyreceiver_group = group.id)
-            )
-        else:
-            taskDates = taskDates.filter(
-                Q(task__receiver_user = self.id) | Q(task__copyreceiver_user = self.id)
-            )
-    else:
-        taskDates = taskDates.filter(Q(task__resident = resident))
-
-    taskDates = taskDates.distinct()
-
-    # On va calculer pour ne garder que celle qui tombent le jour J
-    accurateTaskDates = []
-    for taskdate in taskDates:
-        if TaskManager().is_taskDate_at_date(taskdate, date) :
-            accurateTaskDates.append(taskdate)
-
-    # La dernière étape va être de ne pas garder les exceptions et leur parent.
-    # Exemple : On a une tâche qui est faite tous les lundis, mais un lundi spécifique, on a modifié cette tâche
-    # Il faut donc ne garder que l'exception
-    # TODO : A optimiser !
-
-    # On va récupérer les ID à enlever de la liste
-    ids_to_remove = []
-    for taskdate in accurateTaskDates :
-        if taskdate.parent is not None :
-            ids_to_remove.append(taskdate.parent)
-
-    # On va les enlever de la liste
-    for index in ids_to_remove:
-        if(index in accurateTaskDates):
-            accurateTaskDates.remove(index)
-
-    return accurateTaskDates
-
-User.add_to_class('get_tasks_for_a_day', get_tasks_for_a_day)
