@@ -16,10 +16,15 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework_jwt.views import obtain_jwt_token, refresh_jwt_token, verify_jwt_token
+from django.http import HttpResponse
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('app.urls')),
+]
+
+urlpatterns += [
+    url(r'^$', lambda req:HttpResponse("Veuillez aller sur une bonne url (/admin ou /api)")),
 ]
 
 urlpatterns += [

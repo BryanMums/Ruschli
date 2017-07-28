@@ -74,7 +74,7 @@ class TaskTypeAdmin(admin.ModelAdmin):
 
 admin.site.register(TaskType, TaskTypeAdmin)
 
-
+'''
 class TaskAdminForm(forms.ModelForm):
 
     class Meta:
@@ -117,3 +117,4 @@ class CommentAdmin(admin.ModelAdmin):
     readonly_fields = ['created_at', 'updated_at']
 
 admin.site.register(Comment, CommentAdmin)
+'''

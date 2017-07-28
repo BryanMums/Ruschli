@@ -655,7 +655,7 @@ class TaskManager(models.Manager):
 
                         # On modifie la taskDate
                         TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
-                        taskDate.daysOfWeek.set(values.get('daysOfWeek'))
+                        taskDate.daysOfWeek.set(values.get('daysOfWeek', []))
 
                         # On récupère la taskDate qu'on a modifié pour la retourner
                         return TaskDate.objects.get(pk=taskDate.pk)
@@ -678,7 +678,7 @@ class TaskManager(models.Manager):
 
                             # On fait les modifications concernant la périodicité
                             TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
-                            taskDate.daysOfWeek.set(values.get('daysOfWeek'))
+                            taskDate.daysOfWeek.set(values.get('daysOfWeek', []))
                             exception_pk = taskDate.pk
                             taskDate = TaskDate.objects.get(pk=taskDate.pk)
 
@@ -708,7 +708,7 @@ class TaskManager(models.Manager):
 
                             # On applique les modifications pour la TaskDate et les informations basiques de la tâche
                             TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
-                            taskDate.daysOfWeek.set(values.get('daysOfWeek'))
+                            taskDate.daysOfWeek.set(values.get('daysOfWeek', []))
                             Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
 
                             # On met à jour les champs relationnels de la tâche
@@ -728,7 +728,7 @@ class TaskManager(models.Manager):
 
                         # On va faire les modifications voulues
                         TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
-                        taskDate.daysOfWeek.set(values.get('daysOfWeek'))
+                        taskDate.daysOfWeek.set(values.get('daysOfWeek', []))
                         Task.objects.filter(pk=taskDate.task.pk).update(**dict_values_task)
 
                         # On met à jour les champs relationnels de la tâche
@@ -774,7 +774,7 @@ class TaskManager(models.Manager):
                             # Modifier la tâche exception et transformer la tâche copiée en tâche périodique.
                             TaskDate.objects.filter(pk=saved_pk).update(**dict_values_taskDate_exception)
                             TaskDate.objects.filter(pk=copiedTaskDate.pk).update(**dict_values_taskDate)
-                            copiedTaskDate.daysOfWeek.set(values.get('daysOfWeek'))
+                            copiedTaskDate.daysOfWeek.set(values.get('daysOfWeek', []))
 
                             taskDate = TaskDate.objects.get(pk=saved_pk)
                             copiedTaskDate = TaskDate.objects.get(pk=copiedTaskDate.pk)
@@ -788,7 +788,7 @@ class TaskManager(models.Manager):
                         else:
                             # On va la modifier directement et la passer en tant que tâche principale.
                             TaskDate.objects.filter(pk=taskDate.pk).update(**dict_values_taskDate)
-                            taskDate.daysOfWeek.set(values.get('daysOfWeek'))
+                            taskDate.daysOfWeek.set(values.get('daysOfWeek', []))
                             taskDate = TaskDate.objects.get(pk=taskDate.pk)
                             taskDate.parent = None
                             taskDate.save()
@@ -849,7 +849,7 @@ class TaskManager(models.Manager):
 
                         # On modifie la taskdate
                         TaskDate.objects.filter(pk=copiedTaskDate.pk).update(**dict_values_taskDate)
-                        copiedTaskDate.daysOfWeek.set(values.get('daysOfWeek'))
+                        copiedTaskDate.daysOfWeek.set(values.get('daysOfWeek', []))
                         return TaskDate.objects.get(pk=copiedTaskDate.pk)
 
 
